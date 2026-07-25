@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: #e8e8e8;
+  color: #111;
+}
+
+@keyframes homeRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes homeFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html.intro-js:not(.intro-go) .home-rise {
+  opacity: 0;
+}
+
+html.intro-go .home-rise {
+  animation: homeRise 0.5s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+  animation-delay: calc(0.06s + var(--i, 0) * 0.08s);
+  will-change: transform, opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.intro-go .home-rise {
+    animation-name: homeFade;
+    will-change: opacity;
+  }
+
+  .bio-link {
+    transition: none;
+  }
+}
+
+.bio-link {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(0, 0, 0, 0.28);
+  transition:
+    color 0.18s ease,
+    text-decoration-color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bio-link:hover {
+    color: #000;
+    text-decoration-color: rgba(0, 0, 0, 0.55);
+  }
+}
+
+.ipa {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.42);
+}
+
+.social-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: #8c8c8c;
+  text-decoration: none;
+  transition: color 300ms;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .social-link:hover {
+    text-decoration: underline;
+    color: #8c8c8c;
+  }
+}
+
+.social-link:active {
+  transform: scale(0.96);
+}
+
+:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.55);
+  outline-offset: 3px;
+}
