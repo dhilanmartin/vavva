@@ -280,5 +280,5 @@ void main(){
   vec2 e = min(vUv, 1.0 - vUv);
   alpha *= smoothstep(0.0, 0.07, min(e.x, e.y));
 
-  gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0) * alpha, alpha);
 }`;

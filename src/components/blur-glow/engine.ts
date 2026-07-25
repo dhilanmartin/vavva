@@ -98,10 +98,12 @@ export class BlurGlow {
     });
     host.appendChild(this.canvas);
 
+    // Premultiplied output: Safari composites non-premultiplied WebGL canvases
+    // as opaque, which paints a white block behind the mark.
     const gl = this.canvas.getContext("webgl", {
       alpha: true,
       antialias: false,
-      premultipliedAlpha: false,
+      premultipliedAlpha: true,
       powerPreference: "low-power",
     }) as WebGLRenderingContext | null;
     if (!gl) return;
@@ -415,6 +417,8 @@ export class BlurGlow {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(this.compProg);
     this.bindQuad(this.compProg);
 

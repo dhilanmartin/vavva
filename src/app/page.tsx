@@ -63,7 +63,7 @@ export default function HomePage() {
       </div>
 
       <div
-        className="dia-stage pointer-events-none fixed inset-x-0 bottom-0 z-0"
+        className="dia-stage pointer-events-none fixed inset-x-0 z-0"
         aria-hidden
       >
         <DiaGradient reveal="mount" />

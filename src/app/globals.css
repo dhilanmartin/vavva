@@ -102,9 +102,12 @@ html.intro-go .home-rise {
   }
 }
 
+/* Sits below the fold so a collapsing mobile toolbar can't reveal a seam. */
 .dia-stage {
-  height: 48vh;
-  height: 48dvh;
+  bottom: -5vh;
+  bottom: -5dvh;
+  height: 53vh;
+  height: 53dvh;
 }
 
 .dia-wrap {
@@ -127,7 +130,7 @@ html.intro-go .home-rise {
   top: 0;
   left: calc(-1 * var(--dia-blur));
   right: calc(-1 * var(--dia-blur));
-  bottom: calc(-2.4 * var(--dia-blur));
+  bottom: calc(-3.6 * var(--dia-blur));
   filter: blur(var(--dia-blur));
 }
 
