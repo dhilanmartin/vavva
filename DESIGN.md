@@ -4,7 +4,7 @@ Updated 2026-07-25.
 
 ## Direction
 
-Minimal bakai craft. No sky stage, no glass card. Light canvas, narrow prose column, Instagram only.
+Minimal bakai craft on `#E8E8E8`. Ambient WebGL “VAVVA” wordmark (paper-matched, no card). Dia aurora rises from the floor **on scroll**. Age rule in caution red. `insta` is the only CTA button.
 
 ## Layout
 
