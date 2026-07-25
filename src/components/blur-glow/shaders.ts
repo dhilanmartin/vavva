@@ -275,5 +275,10 @@ void main(){
   vec3 grained = softLight(col, g);
   col = mix(col, grained, uGrain * (0.5 + 0.7 * field));
 
-  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+  float alpha = clamp(max(field * 1.35, cover(uv)), 0.0, 1.0);
+
+  vec2 e = min(vUv, 1.0 - vUv);
+  alpha *= smoothstep(0.0, 0.07, min(e.x, e.y));
+
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), alpha);
 }`;

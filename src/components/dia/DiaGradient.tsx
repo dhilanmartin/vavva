@@ -1,8 +1,12 @@
 "use client";
 
 // Dia Browser's signature gradient.
-// reveal: "mount" rises once; "scroll" ties scaleY to scroll progress so the
-// aurora only blooms as you move down the page.
+// The bar field bleeds below its own frame so the saturated base runs off the
+// bottom of the screen instead of fading to a visible edge. Blur is applied in
+// CSS (isotropic, GPU-composited) rather than SVG — mobile browsers routinely
+// drop or stall a large stretched feGaussianBlur.
+// reveal: "mount" rises via CSS keyframes (renders even before hydration);
+// "scroll" ties scaleY to scroll progress.
 
 import { useEffect, useState } from "react";
 
@@ -35,52 +39,30 @@ function bellHeights(n: number, peak: number, valley: number): number[] {
 
 export function DiaGradient({
   bars = 9,
-  blur = 15,
   peak = 0.98,
   valley = 0.55,
   stops = DIA_STOPS,
-  riseMs = 1100,
   reveal = "mount",
   /** Scroll distance (px) to reach full height when reveal="scroll". */
   scrollRange = 420,
 }: {
   bars?: number;
-  blur?: number;
   peak?: number;
   valley?: number;
   stops?: Stop[];
-  riseMs?: number;
   reveal?: "mount" | "scroll" | "none";
   scrollRange?: number;
 }) {
-  const [scaleY, setScaleY] = useState(reveal === "none" ? 1 : 0);
+  const [scrollScale, setScrollScale] = useState(0);
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reveal === "none" || reduced) {
-      const id = requestAnimationFrame(() => setScaleY(1));
-      return () => cancelAnimationFrame(id);
-    }
+    if (reveal !== "scroll") return;
 
-    if (reveal === "mount") {
-      let outer = 0;
-      let inner = 0;
-      outer = requestAnimationFrame(() => {
-        inner = requestAnimationFrame(() => setScaleY(1));
-      });
-      return () => {
-        cancelAnimationFrame(outer);
-        cancelAnimationFrame(inner);
-      };
-    }
-
-    // scroll reveal — bloom with page scroll
     let ticking = false;
     const measure = () => {
       ticking = false;
       const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const next = Math.max(0, Math.min(1, y / Math.max(1, scrollRange)));
-      setScaleY(next);
+      setScrollScale(Math.max(0, Math.min(1, y / Math.max(1, scrollRange))));
     };
     const onScroll = () => {
       if (!ticking) {
@@ -99,51 +81,42 @@ export function DiaGradient({
 
   const heights = bellHeights(bars, peak, valley);
   const colW = VBW / bars;
-  const animated = reveal === "mount";
 
   return (
     <div
       aria-hidden
+      className={`dia-wrap${reveal === "mount" ? " dia-rise" : ""}`}
       style={{
-        height: "100%",
-        width: "100%",
-        transformOrigin: "bottom",
-        transform: `scaleY(${scaleY})`,
-        transition: animated
-          ? `transform ${riseMs}ms cubic-bezier(0.16, 1, 0.3, 1)`
-          : undefined,
-        willChange: "transform",
+        transform: reveal === "scroll" ? `scaleY(${scrollScale})` : undefined,
       }}
     >
-      <svg
-        style={{ height: "100%", width: "100%" }}
-        viewBox={`0 0 ${VBW} ${VBH}`}
-        preserveAspectRatio="none"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="dia-grad" x1="0" y1="1" x2="0" y2="0">
-            {stops.map((s, i) => (
-              <stop key={i} offset={s.offset} stopColor={s.color} />
-            ))}
-          </linearGradient>
-          <filter id="dia-blur" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation={blur} />
-          </filter>
-        </defs>
-        {heights.map((h, i) => (
-          <g key={i} filter="url(#dia-blur)">
+      <div className="dia-field">
+        <svg
+          style={{ height: "100%", width: "100%", display: "block" }}
+          viewBox={`0 0 ${VBW} ${VBH}`}
+          preserveAspectRatio="none"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="dia-grad" x1="0" y1="1" x2="0" y2="0">
+              {stops.map((s, i) => (
+                <stop key={i} offset={s.offset} stopColor={s.color} />
+              ))}
+            </linearGradient>
+          </defs>
+          {heights.map((h, i) => (
             <rect
+              key={i}
               x={i * colW}
               y={VBH - h}
               width={colW * 1.23}
               height={h}
               fill="url(#dia-grad)"
             />
-          </g>
-        ))}
-      </svg>
+          ))}
+        </svg>
+      </div>
     </div>
   );
 }

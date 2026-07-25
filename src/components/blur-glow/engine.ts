@@ -99,7 +99,7 @@ export class BlurGlow {
     host.appendChild(this.canvas);
 
     const gl = this.canvas.getContext("webgl", {
-      alpha: false,
+      alpha: true,
       antialias: false,
       premultipliedAlpha: false,
       powerPreference: "low-power",
@@ -218,7 +218,6 @@ export class BlurGlow {
     gl.uniform3fv(this.compU.uCol!, new Float32Array(u.colors));
     gl.uniform3fv(this.compU.uInk!, new Float32Array(u.ink));
     gl.uniform3fv(this.compU.uPaper!, new Float32Array(u.paper));
-    this.canvas.style.background = `rgb(${u.paper.map((c) => Math.round(c * 255)).join(",")})`;
   }
 
   private applyPalette(i: number) {

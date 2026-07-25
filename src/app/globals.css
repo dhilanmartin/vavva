@@ -58,6 +58,10 @@ html.intro-go .home-rise {
   .social-link {
     transition: none;
   }
+
+  .dia-rise {
+    animation: none;
+  }
 }
 
 .bio-link {
@@ -89,8 +93,42 @@ html.intro-go .home-rise {
   font-weight: 600;
 }
 
+@keyframes diaRise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
 .dia-stage {
   height: 48vh;
+  height: 48dvh;
+}
+
+.dia-wrap {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  transform-origin: bottom;
+}
+
+.dia-rise {
+  animation: diaRise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  will-change: transform;
+}
+
+/* Bleeds past every edge so the saturated base runs off-screen instead of
+   fading to a visible seam once blurred. */
+.dia-field {
+  --dia-blur: clamp(18px, 6vw, 46px);
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--dia-blur));
+  right: calc(-1 * var(--dia-blur));
+  bottom: calc(-2.4 * var(--dia-blur));
+  filter: blur(var(--dia-blur));
 }
 
 .social-link {

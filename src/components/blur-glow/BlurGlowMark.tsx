@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { BlurGlow } from "./engine";
 
-/** Ambient wordmark — paper matches page canvas, no card chrome. */
+/** Ambient wordmark — transparent canvas, so it sits straight on the page. */
 export function BlurGlowMark({ className }: { className?: string }) {
   const hostRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +63,7 @@ export function BlurGlowMark({ className }: { className?: string }) {
         width: "100%",
         height: "100%",
         overflow: "hidden",
-        background: "#e8e8e8",
+        background: "transparent",
       }}
     />
   );
