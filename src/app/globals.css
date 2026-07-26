@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --paper: #e8e8e8;
+  --ink: rgba(0, 0, 0, 0.9);
+  --mute: rgba(0, 0, 0, 0.45);
+  /* Sampled from the brush wordmark — the one accent the house prints in. */
+  --red: #b32622;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -12,7 +20,7 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
-  background: #e8e8e8;
+  background: var(--paper);
   color: #111;
 }
 
@@ -83,13 +91,19 @@ html.intro-go .home-rise {
   }
 }
 
+/* No orphan words at the end of a paragraph — the copy is three lines long, so
+   a single trailing "enter." reads as a mistake. */
+p {
+  text-wrap: pretty;
+}
+
 .ipa {
   font-weight: 500;
   color: rgba(0, 0, 0, 0.42);
 }
 
 .caution {
-  color: #b42318;
+  color: var(--red);
   font-weight: 600;
 }
 
@@ -104,10 +118,45 @@ html.intro-go .home-rise {
 
 /* Sits below the fold so a collapsing mobile toolbar can't reveal a seam. */
 .dia-stage {
-  bottom: -5vh;
-  bottom: -5dvh;
-  height: 53vh;
-  height: 53dvh;
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+  bottom: -3vh;
+  bottom: -3dvh;
+  height: 44vh;
+  height: 44dvh;
+}
+
+/* The ambient wordmark rides just above the aurora crest. Bottom-anchored so a
+   collapsing mobile toolbar moves it with the light, not against it. */
+.glow-stage {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  bottom: 4vh;
+  bottom: 4dvh;
+  margin-inline: auto;
+  width: min(100%, 280px);
+  height: clamp(62px, 8dvh, 76px);
+}
+
+/* Short/landscape viewports have no room for a signature under the copy — the
+   ambient mark would print straight through the paragraph. Drop it and pull the
+   light down with it. */
+@media (max-height: 620px) {
+  .glow-stage {
+    display: none;
+  }
+
+  /* The page scrolls at this height, so copy passes over the fixed light —
+     keep it low enough that it never sits behind a line of text. */
+  .dia-stage {
+    height: 26vh;
+    height: 26dvh;
+  }
 }
 
 .dia-wrap {
@@ -122,42 +171,117 @@ html.intro-go .home-rise {
   will-change: transform;
 }
 
-/* Bleeds past every edge so the saturated base runs off-screen instead of
-   fading to a visible seam once blurred. */
+/* Bleeds past the side and bottom edges by roughly one blur radius: enough that
+   the blur never fades to a visible seam, little enough that the whole colour
+   column — dark base through the pink fade — stays on screen. */
 .dia-field {
   --dia-blur: clamp(18px, 6vw, 46px);
   position: absolute;
   top: 0;
   left: calc(-1 * var(--dia-blur));
   right: calc(-1 * var(--dia-blur));
-  bottom: calc(-3.6 * var(--dia-blur));
+  bottom: calc(-1.15 * var(--dia-blur));
   filter: blur(var(--dia-blur));
 }
 
+/* One accent in the house. Instagram purple was a second brand talking over
+   the first — the link rests quiet and answers in the brush red. */
 .social-link {
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
   white-space: nowrap;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: -0.04em;
-  color: #833ab4;
+  letter-spacing: -0.015em;
+  color: var(--mute);
   text-decoration: none;
-  transition: color 300ms;
+  transition: color 180ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .social-link:hover {
-    color: #c13584;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    color: var(--red);
   }
 }
 
 .social-link:active {
   transform: scale(0.96);
+}
+
+/* The door. Rule-underlined field, no box, no button chrome — it should read as
+   a line you write on, not a form you fill out. */
+.gate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 15rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  transition: border-color 180ms ease;
+}
+
+.gate:focus-within {
+  border-bottom-color: var(--red);
+}
+
+.gate-field {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9375rem;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gate-field::placeholder {
+  color: var(--mute);
+}
+
+.gate-field:focus {
+  outline: none;
+}
+
+.gate-submit {
+  border: 0;
+  background: transparent;
+  padding: 0 0.25rem;
+  min-height: 2.75rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--mute);
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    opacity 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gate-submit:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gate-submit:not(:disabled):hover {
+    color: var(--red);
+  }
+}
+
+.gate-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.9375rem;
+  letter-spacing: -0.015em;
+  color: var(--mute);
+}
+
+.gate-note a {
+  color: inherit;
+  text-underline-offset: 3px;
 }
 
 :focus-visible {

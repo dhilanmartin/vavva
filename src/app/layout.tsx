@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -12,19 +12,22 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://vavva.xyz"),
   title: "Casa Vavva",
   description:
-    "Casa Vavva is a private members club based in New York City. You must be 21 or under to enter.",
+    "A private house in New York City. You must be 21 or under to enter.",
   openGraph: {
     title: "Casa Vavva",
     description:
-      "A private members club based in New York City. You must be 21 or under to enter.",
+      "A private house in New York City. You must be 21 or under to enter.",
     url: "https://vavva.xyz",
     siteName: "Casa Vavva",
     type: "website",
   },
-  icons: {
-    icon: [{ url: "/brand/sphere-512.png", type: "image/png" }],
-    apple: [{ url: "/brand/sphere-512.png" }],
-  },
+  // Icons and the OG card come from src/app/{icon,apple-icon,opengraph-image}.png —
+  // the file conventions win over anything declared here.
+};
+
+export const viewport: Viewport = {
+  themeColor: "#E8E8E8",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -33,7 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    // The intro script stamps `intro-js` / `intro-go` on <html> before hydration,
+    // so the server markup can't match — that mismatch is the point, not a bug.
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

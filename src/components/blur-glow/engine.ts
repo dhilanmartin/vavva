@@ -24,8 +24,10 @@ import {
 const FONT = 'var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif';
 const FOCUS_AMT = 1.5;
 
-const MORPH_SEC = 0.8;
-const HOLD_MS = 700;
+/* One word, so the "morph" is a slow sweep from one colour world into the next.
+   Held long and crossed slowly — a room changing light, not a slideshow. */
+const MORPH_SEC = 2.2;
+const HOLD_MS = 2600;
 
 const LEVELS = [
   { scale: 0.5, radius: 2 },

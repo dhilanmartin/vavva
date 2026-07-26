@@ -275,10 +275,14 @@ void main(){
   vec3 grained = softLight(col, g);
   col = mix(col, grained, uGrain * (0.5 + 0.7 * field));
 
-  float alpha = clamp(max(field * 1.35, cover(uv)), 0.0, 1.0);
+  // The halo sits over the aurora, so let the broad low-energy field fall away
+  // fast — otherwise it reads as a pale card washing out the light behind it.
+  float alpha = clamp(max(pow(field, 1.9) * 1.30, cover(uv)), 0.0, 1.0);
 
+  // Feather generously: a tight edge fade leaves a visible rectangle seam where
+  // the canvas meets whatever it is floating over.
   vec2 e = min(vUv, 1.0 - vUv);
-  alpha *= smoothstep(0.0, 0.07, min(e.x, e.y));
+  alpha *= smoothstep(0.0, 0.20, min(e.x, e.y));
 
   gl_FragColor = vec4(clamp(col, 0.0, 1.0) * alpha, alpha);
 }`;

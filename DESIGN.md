@@ -1,39 +1,64 @@
 # DESIGN.md — Casa Vavva
 
-Updated 2026-07-25.
+Updated 2026-07-26.
 
 ## Direction
 
-Minimal bakai craft on `#E8E8E8`. Ambient WebGL “VAVVA” wordmark (paper-matched, no card). Dia aurora rises from the floor **on scroll**. Age rule in caution red. `insta` is the only CTA button.
+Minimal craft on `#E8E8E8`. The brush wordmark is the only fixed brand object; everything else is light. The Dia aurora rises from the floor on mount, and the ambient WebGL “VAVVA” sits inside that light as a signature at the bottom of the frame. Age rule in the house red. One CTA.
 
 ## Layout
 
 - Canvas: `#E8E8E8`
-- Column: `max-w-[360px]`, vertically centered
-- Type: Inter · 15px · medium · tracking `-0.015em` · line-height `1.4`
-- Motion: staggered blur-rise (`intro-js` / `intro-go`)
+- Column: `max-w-[368px]`, top-anchored (`3.25rem` mobile / `5.875rem` desktop), `px-5` mobile / `px-1` desktop
+- Mark: centred, `136px` mobile / `152px` desktop — signature scale, never banner scale
+- Copy and CTA: ragged-left on the column's left edge
+- Type: Inter · 15px · medium · tracking `-0.015em` · line-height `1.4` · `text-wrap: pretty`
+- Motion: staggered blur-rise (`intro-js` / `intro-go`), 0.5s, 0.08s stagger
 
-## Copy (locked)
+## Brand objects
+
+| Object | File | Behaviour |
+|--------|------|-----------|
+| Brush wordmark | `public/brand/vavva-mark.png` | Static. Hand-drawn, keyed to transparency, trimmed. Never animated, never recoloured. |
+| Ambient wordmark | `src/components/blur-glow/` | WebGL. Bottom-fixed and centred, inside the aurora, at trademark scale (`280 × ~70`). Cycles five colour worlds, ~4.8s per world. **Rank it below the brush mark by scaling the whole stage, never the word alone** — the bloom's energy is tied to the word/canvas ratio, so a small word in a large canvas bleeds out to an invisible ghost. |
+| Aurora | `src/components/dia/DiaGradient.tsx` | SVG bars + CSS blur, rises on mount. `44dvh`, dropping to `26dvh` under 620px tall. |
+| Access gate | `src/components/gate/AccessGate.tsx` | The door. One field, no label. Falls back to an Instagram DM link when no endpoint is configured — see README. |
+
+## Copy
 
 ```
-Casa Vavva is a private members club based in New York City. You must be 21 or under to enter.
+A private house in New York City. You must be 21 or under to enter.
 
-A Vavva [vaˈvˌvːa]; evokes a sense of beauty, peace, and abundance according to ancient Greek philosophy.
+Vavva [vaˈvˌvːa]; beauty, peace, and abundance — ancient Greek.
 
-insta
+request access
 ```
+
+Rules: never say what it is, only what it feels like to be near. No "members
+club" — it explains, and "club" is the word that invites a licensing question we
+have no reason to invite. No NYU, no term dates, no event listings. The etymology
+stays because it implies rather than answers.
 
 ## Color
 
 | Token | Value | Use |
 |-------|--------|-----|
-| Canvas | `#E8E8E8` | page |
-| Ink | `rgba(0,0,0,0.90)` | primary line |
-| Mute | `rgba(0,0,0,0.45)` | etymology line |
-| Soft | `#8c8c8c` | `insta` |
+| `--paper` | `#E8E8E8` | page |
+| `--ink` | `rgba(0,0,0,0.90)` | primary line |
+| `--mute` | `rgba(0,0,0,0.45)` | etymology line, resting CTA |
+| `--red` | `#B32622` | sampled from the brush mark — age rule, CTA hover, gate focus rule |
+
+One accent only. No second brand colour (no Instagram purple, no gradient buttons).
+
+## Colour worlds (ambient mark)
+
+House Red → Blue Hour → Candlelight → Last Hour → Graphite. Each resolves to the paper at its light end; Graphite is the grey beat that keeps the cycle from reading as a rainbow.
 
 ## Anti-patterns
 
 - Full-bleed sky / frosted overlay cards
+- Banner-scale logo
 - Dense brand essays
 - Extra chrome (nav, cards, pills)
+- A second accent colour
+- A second VAVVA at brand scale — there is one logo, and the footer stamp is an effect

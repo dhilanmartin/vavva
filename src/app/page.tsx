@@ -1,19 +1,22 @@
 import { BlurGlowMark } from "@/components/blur-glow/BlurGlowMark";
+import { VavvaMark } from "@/components/brand/VavvaMark";
 import { DiaGradient } from "@/components/dia/DiaGradient";
+import { AccessGate } from "@/components/gate/AccessGate";
 
-const INSTAGRAM = "https://www.instagram.com/casavavva/";
 const NYC = "https://en.wikipedia.org/wiki/New_York_City";
 
 export default function HomePage() {
   return (
     <main className="relative flex min-h-dvh w-full flex-col bg-[#E8E8E8] antialiased">
       {/* Top-anchored like dhilan.fyi: ~2.875rem mobile / ~5.875rem desktop */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[360px] flex-1 flex-col px-1 pb-28 pt-[2.875rem] md:pt-[5.875rem]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[368px] flex-1 flex-col px-5 pb-28 pt-[3.25rem] md:px-1 md:pt-[5.875rem]">
+        {/* The house logo: centred, and the only VAVVA on the page at brand
+            scale. Everything else that says the name is subordinate to it. */}
         <div
-          className="home-rise -mx-1 mb-6 h-[132px] w-[calc(100%+0.5rem)] md:h-[148px]"
+          className="home-rise mb-8 flex justify-center md:mb-9"
           style={{ ["--i" as string]: 0 }}
         >
-          <BlurGlowMark className="h-full w-full" />
+          <VavvaMark className="h-auto w-[136px] md:w-[152px]" />
         </div>
 
         <header className="text-[15px] font-medium leading-[1.4] tracking-[-0.015em]">
@@ -21,7 +24,7 @@ export default function HomePage() {
             className="home-rise m-0 text-black/90"
             style={{ ["--i" as string]: 1 }}
           >
-            Casa Vavva is a private members club based in{" "}
+            A private house in{" "}
             <a
               href={NYC}
               target="_blank"
@@ -42,8 +45,7 @@ export default function HomePage() {
             <span className="ipa" lang="el">
               [vaˈvˌvːa]
             </span>
-            ; evokes a sense of beauty, peace, and abundance according to
-            ancient Greek philosophy.
+            ; beauty, peace, and abundance — ancient Greek.
           </p>
         </header>
 
@@ -51,21 +53,19 @@ export default function HomePage() {
           className="home-rise mt-9"
           style={{ ["--i" as string]: 3 }}
         >
-          <a
-            href={INSTAGRAM}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-link"
-          >
-            follow us
-          </a>
+          <AccessGate />
         </footer>
       </div>
 
-      <div
-        className="dia-stage pointer-events-none fixed inset-x-0 z-0"
-        aria-hidden
-      >
+      {/* Not a logo — a trademark stamp in the light. Kept subordinate to the
+          brush mark by scaling the whole stage down: the bloom's energy budget
+          is tied to the word/canvas ratio, so shrinking the word alone bleeds
+          it out to a ghost. Miniaturise both together. */}
+      <div className="glow-stage" aria-hidden>
+        <BlurGlowMark className="h-full w-full" />
+      </div>
+
+      <div className="dia-stage" aria-hidden>
         <DiaGradient reveal="mount" />
       </div>
     </main>
