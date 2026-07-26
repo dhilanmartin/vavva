@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <main className="relative flex min-h-dvh w-full flex-col bg-[#E8E8E8] antialiased">
       {/* Top-anchored like dhilan.fyi: ~2.875rem mobile / ~5.875rem desktop */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[368px] flex-1 flex-col px-5 pb-28 pt-[3.25rem] md:px-1 md:pt-[5.875rem]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[368px] flex-1 flex-col px-5 pb-28 pt-13 md:px-1 md:pt-24">
         {/* The house logo: centred, and the only VAVVA on the page at brand
             scale. Everything else that says the name is subordinate to it.
             It is an h1 because it is the page's title — the mark carries the
