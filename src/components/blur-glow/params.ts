@@ -14,8 +14,11 @@ const rgb = (hex: string): [number, number, number] => [
 ];
 
 /* Colour worlds, not a rainbow. Each one is a room in the house: the brush red
-   we print with, the hour before the door opens, candlelight, the last hour,
-   and a grey beat so the cycle breathes. All resolve to the paper. */
+   we print with, the hour before the door opens, a grey beat so the cycle
+   breathes, candlelight, the last hour. All resolve to the paper.
+   Order matters. Graphite sits third, not last — parked at the end it made the
+   loop-around a grey-to-red jump, the harshest cut in the cycle. From Last Hour
+   the wrap into House Red stays inside the red family. */
 export const PALETTES: Palette[] = [
   {
     name: "House Red",
@@ -42,6 +45,18 @@ export const PALETTES: Palette[] = [
     paper: rgb("#e8e8e8"),
   },
   {
+    name: "Graphite",
+    stops: [
+      { pos: 0.0, color: rgb("#0a0a0b") },
+      { pos: 0.22, color: rgb("#37373a") },
+      { pos: 0.46, color: rgb("#7d7d82") },
+      { pos: 0.72, color: rgb("#c4c4c7") },
+      { pos: 1.0, color: rgb("#e8e8e8") },
+    ],
+    ink: rgb("#17171a"),
+    paper: rgb("#e8e8e8"),
+  },
+  {
     name: "Candlelight",
     stops: [
       { pos: 0.0, color: rgb("#190c02") },
@@ -63,18 +78,6 @@ export const PALETTES: Palette[] = [
       { pos: 1.0, color: rgb("#e8e8e8") },
     ],
     ink: rgb("#570a2b"),
-    paper: rgb("#e8e8e8"),
-  },
-  {
-    name: "Graphite",
-    stops: [
-      { pos: 0.0, color: rgb("#0a0a0b") },
-      { pos: 0.22, color: rgb("#37373a") },
-      { pos: 0.46, color: rgb("#7d7d82") },
-      { pos: 0.72, color: rgb("#c4c4c7") },
-      { pos: 1.0, color: rgb("#e8e8e8") },
-    ],
-    ink: rgb("#17171a"),
     paper: rgb("#e8e8e8"),
   },
 ];
