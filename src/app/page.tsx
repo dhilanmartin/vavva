@@ -11,13 +11,15 @@ export default function HomePage() {
       {/* Top-anchored like dhilan.fyi: ~2.875rem mobile / ~5.875rem desktop */}
       <div className="relative z-10 mx-auto flex w-full max-w-[368px] flex-1 flex-col px-5 pb-28 pt-[3.25rem] md:px-1 md:pt-[5.875rem]">
         {/* The house logo: centred, and the only VAVVA on the page at brand
-            scale. Everything else that says the name is subordinate to it. */}
-        <div
-          className="home-rise mb-8 flex justify-center md:mb-9"
+            scale. Everything else that says the name is subordinate to it.
+            It is an h1 because it is the page's title — the mark carries the
+            name, so without this the document has no heading at all. */}
+        <h1
+          className="home-rise m-0 mb-8 flex justify-center md:mb-9"
           style={{ ["--i" as string]: 0 }}
         >
           <VavvaMark className="h-auto w-[136px] md:w-[152px]" />
-        </div>
+        </h1>
 
         <header className="text-[15px] font-medium leading-[1.4] tracking-[-0.015em]">
           <p
