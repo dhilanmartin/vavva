@@ -20,7 +20,7 @@ Minimal craft on `#E8E8E8`. The brush wordmark is the only fixed brand object; e
 | Object | File | Behaviour |
 |--------|------|-----------|
 | Brush wordmark | `public/brand/vavva-mark.png` | Static. Hand-drawn, keyed to transparency, trimmed. Never animated, never recoloured. |
-| Ambient wordmark | `src/components/blur-glow/` | WebGL. Bottom-fixed and centred, inside the aurora, at trademark scale (`280 × ~70`). Cycles five colour worlds, ~4.8s per world. **Rank it below the brush mark by scaling the whole stage, never the word alone** — the bloom's energy is tied to the word/canvas ratio, so a small word in a large canvas bleeds out to an invisible ghost. |
+| Ambient wordmark | `src/components/blur-glow/` | WebGL. Bottom-fixed and centred, inside the aurora, at trademark scale (`280 × ~70`). Cycles five colour worlds: 3.77s held + 1.3s crossfade = **5.07s per world, 25.4s per loop**. **Rank it below the brush mark by scaling the whole stage, never the word alone** — the bloom's energy is tied to the word/canvas ratio, so a small word in a large canvas bleeds out to an invisible ghost. |
 | Aurora | `src/components/dia/DiaGradient.tsx` | SVG bars + CSS blur, rises on mount. `44dvh`, dropping to `26dvh` under 620px tall. |
 | Access gate | `src/components/gate/AccessGate.tsx` | The door. One field, no label. Falls back to an Instagram DM link when no endpoint is configured — see README. |
 
@@ -52,7 +52,9 @@ One accent only. No second brand colour (no Instagram purple, no gradient button
 
 ## Colour worlds (ambient mark)
 
-House Red → Blue Hour → Candlelight → Last Hour → Graphite. Each resolves to the paper at its light end; Graphite is the grey beat that keeps the cycle from reading as a rainbow.
+House Red → Blue Hour → Graphite → Candlelight → Last Hour. Each resolves to the paper at its light end; Graphite is the grey beat that keeps the cycle from reading as a rainbow.
+
+Two rules on the order. House Red is index 0, so the brand colour is always the first frame drawn — and it is also the single still frame served under `prefers-reduced-motion`. Graphite is never last: parked at the end it made the loop-around a grey-to-red jump, the one hard cut in an otherwise continuous drift.
 
 ## Anti-patterns
 
