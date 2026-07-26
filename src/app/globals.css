@@ -3,7 +3,9 @@
 :root {
   --paper: #e8e8e8;
   --ink: rgba(0, 0, 0, 0.9);
-  --mute: rgba(0, 0, 0, 0.45);
+  /* 0.55 is the floor: at 0.45 this rendered 3.24:1 on the paper, under the
+     4.5:1 AA minimum for 15px body — and the resting CTA uses this token. */
+  --mute: rgba(0, 0, 0, 0.55);
   /* Sampled from the brush wordmark — the one accent the house prints in. */
   --red: #b32622;
 }
@@ -99,7 +101,7 @@ p {
 
 .ipa {
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.42);
+  color: var(--mute);
 }
 
 .caution {

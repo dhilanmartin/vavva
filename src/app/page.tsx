@@ -38,7 +38,7 @@ export default function HomePage() {
           </p>
 
           <p
-            className="home-rise mt-6 mb-0 text-black/45"
+            className="home-rise mt-6 mb-0 text-[color:var(--mute)]"
             style={{ ["--i" as string]: 2 }}
           >
             Vavva{" "}
