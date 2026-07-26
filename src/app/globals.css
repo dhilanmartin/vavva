@@ -79,7 +79,7 @@ html.intro-go .home-rise {
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-  text-decoration-color: rgba(0, 0, 0, 0.28);
+  text-decoration-color: rgba(0, 0, 0, 0.45);
   transition:
     color 0.18s ease,
     text-decoration-color 0.18s ease;
@@ -219,7 +219,9 @@ p {
   align-items: center;
   gap: 0.5rem;
   max-width: 15rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  /* The rule is the field's only affordance, so it is a UI component boundary:
+     WCAG 1.4.11 wants 3:1. At 0.18 it was 1.51:1 — invisible as a target. */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.45);
   transition: border-color 180ms ease;
 }
 
