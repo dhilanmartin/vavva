@@ -52,7 +52,13 @@ export function AccessGate() {
 
   if (state === "done") {
     // Says nothing about whether it worked out. That is the point.
-    return <p className="gate-note">noted.</p>;
+    // role="status" because this replaces the form rather than adding to it —
+    // without it a screen reader user gets silence where the door used to be.
+    return (
+      <p className="gate-note" role="status">
+        noted.
+      </p>
+    );
   }
 
   return (
@@ -80,7 +86,7 @@ export function AccessGate() {
         {state === "sending" ? "…" : "→"}
       </button>
       {state === "error" && (
-        <p className="gate-note">
+        <p className="gate-note" role="status">
           {"didn't send — "}
           <a href={DM} target="_blank" rel="noopener noreferrer">
             try the DMs
