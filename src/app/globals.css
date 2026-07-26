@@ -55,18 +55,27 @@ html.intro-js:not(.intro-go) .home-rise {
 html.intro-go .home-rise {
   animation: homeRise 0.5s cubic-bezier(0.19, 1, 0.22, 1) backwards;
   animation-delay: calc(0.06s + var(--i, 0) * 0.08s);
-  will-change: transform, opacity, filter;
+  /* No will-change here on purpose. CSS has no way to release it when an
+     animation ends, so it pinned four elements — each carrying a blur filter —
+     to their own compositing layer for the life of the page, to buy one frame
+     of an 0.8s intro. The page loads in 85ms with no observed stutter. */
 }
 
 @media (prefers-reduced-motion: reduce) {
   html.intro-go .home-rise {
     animation-name: homeFade;
-    will-change: opacity;
   }
 
   .bio-link,
   .social-link {
     transition: none;
+  }
+
+  /* Kill the press-scale too, not just its transition — otherwise reduced-motion
+     users get the same jump, just instantly. */
+  .social-link:active,
+  .gate-submit:active {
+    transform: none;
   }
 
   .dia-rise {
@@ -198,7 +207,11 @@ p {
   letter-spacing: -0.015em;
   color: var(--mute);
   text-decoration: none;
-  transition: color 180ms ease;
+  /* transform is listed so the press-scale is interruptible — releasing
+     mid-press eases back instead of snapping. */
+  transition:
+    color 180ms ease,
+    transform 120ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -254,6 +267,9 @@ p {
   border: 0;
   background: transparent;
   padding: 0 0.25rem;
+  /* The arrow glyph is ~12px wide; without a floor the hit area was ~20px
+     across against a 40px minimum. Height was already fine, width was not. */
+  min-width: 2.75rem;
   min-height: 2.75rem;
   font: inherit;
   font-size: 0.9375rem;
@@ -261,8 +277,14 @@ p {
   cursor: pointer;
   transition:
     color 180ms ease,
-    opacity 180ms ease;
+    opacity 180ms ease,
+    transform 120ms ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Same tactile feedback as the link CTA — the two were inconsistent. */
+.gate-submit:not(:disabled):active {
+  transform: scale(0.96);
 }
 
 .gate-submit:disabled {
