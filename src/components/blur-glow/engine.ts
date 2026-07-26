@@ -24,9 +24,11 @@ import {
 const FONT = 'var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif';
 const FOCUS_AMT = 1.5;
 
-/* One word, so the "morph" is a slow sweep from one colour world into the next.
-   Held long and crossed slowly — a room changing light, not a slideshow. */
-const MORPH_SEC = 2.2;
+/* One word, so the "morph" is a sweep from one colour world into the next.
+   Hold long, cross briskly: at 2.2s the mark spent 37% of every cycle mid-
+   dissolve and a 15-second visit only ever saw two worlds. 1.3s puts that at
+   26% and brings the full five-world loop under 26s. */
+const MORPH_SEC = 1.3;
 const HOLD_MS = 2600;
 
 const LEVELS = [
