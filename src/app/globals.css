@@ -102,10 +102,18 @@ html.intro-go .home-rise {
   }
 }
 
-/* No orphan words at the end of a paragraph — the copy is three lines long, so
-   a single trailing "enter." reads as a mistake. */
+/* Even line lengths, decided by the browser rather than by hand-tuning the
+   measure every time the copy changes. `pretty` only protects the last line
+   from becoming an orphan; `balance` equalises the whole set, which is what
+   kills the ragged notch — the etymology line goes from 297/305/126 (a 179px
+   spread ending in a stub) to 223/233/272 (48px).
+
+   Declared twice on purpose. A browser with `pretty` but no `balance` drops the
+   second declaration and keeps the orphan protection; one with neither falls
+   all the way back to normal wrapping. */
 p {
   text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .ipa {
@@ -113,9 +121,12 @@ p {
   color: var(--mute);
 }
 
+/* The house's only accent phrase, kept whole. Left to wrap it broke as
+   "21 or / under" — half the phrase, and the half that carries the rule. */
 .caution {
   color: var(--red);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 @keyframes diaRise {
@@ -127,7 +138,10 @@ p {
   }
 }
 
-/* Sits below the fold so a collapsing mobile toolbar can't reveal a seam. */
+/* Sits below the fold so a collapsing mobile toolbar can't reveal a seam.
+   Back to its full 44dvh: it was cut to 30 only to clear bare paper for the
+   ambient WebGL wordmark to stand on, and that mark is gone. Nothing else on
+   the page competes with the light for the bottom of the frame. */
 .dia-stage {
   position: fixed;
   left: 0;
@@ -140,30 +154,9 @@ p {
   height: 44dvh;
 }
 
-/* The ambient wordmark rides just above the aurora crest. Bottom-anchored so a
-   collapsing mobile toolbar moves it with the light, not against it. */
-.glow-stage {
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  bottom: 4vh;
-  bottom: 4dvh;
-  margin-inline: auto;
-  width: min(100%, 280px);
-  height: clamp(62px, 8dvh, 76px);
-}
-
-/* Short/landscape viewports have no room for a signature under the copy — the
-   ambient mark would print straight through the paragraph. Drop it and pull the
-   light down with it. */
+/* The page scrolls at this height, so copy passes over the fixed light —
+   keep it low enough that it never sits behind a line of text. */
 @media (max-height: 620px) {
-  .glow-stage {
-    display: none;
-  }
-
-  /* The page scrolls at this height, so copy passes over the fixed light —
-     keep it low enough that it never sits behind a line of text. */
   .dia-stage {
     height: 26vh;
     height: 26dvh;

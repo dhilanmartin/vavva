@@ -12,7 +12,7 @@ export function VavvaMark({ className }: { className?: string }) {
       src={mark}
       alt="Vavva"
       priority
-      sizes="(max-width: 768px) 132px, 148px"
+      sizes="(max-width: 768px) 136px, 152px"
       className={className}
     />
   );
