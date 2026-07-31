@@ -7,41 +7,42 @@ export default function HomePage() {
     <main className="relative flex min-h-dvh w-full flex-col bg-[#E8E8E8] antialiased">
       {/* Top-anchored: 3.25rem mobile / 6rem desktop / 9rem on a tall frame.
 
-          The measure is 308px, and that number is measured, not chosen. It is
-          fitted to the sentence rather than the other way round: this copy sets
-          two lines at 308 (260px and 306px — 92% of the column inked) and the
-          etymology sets three (223 / 233 / 272). Widening to the old 336 does
-          not change a single break, it only adds 28px of bare paper to the
-          right of every line and drops the fill to 84%. That gap is what made
-          the block read as shoved left under a centred mark.
+          The measure is 216px, and that number is measured, not chosen. It is
+          fitted to the sentence rather than the other way round: the copy sets
+          two lines at 216 (169px and 214px — 89% of the column inked) and the
+          etymology sets four (178 / 196 / 169 / 181, 85%).
 
-          The word "based" is absent on purpose — "a creative studio based in
-          Los Angeles" ran three lines at 215 / 233 / 199 (64% inked, and "New
-          York / City" split across the break). Deleting one word bought both
-          the second line and the intact city name, so do not put it back
-          without re-measuring.
+          216 looks aggressively narrow written down, and it is not. The whole
+          sentence is 386px set on one line, and `text-wrap: balance` in
+          globals.css splits it into the same two lines — 169 and 214 — at every
+          width from 240 all the way to 360. So the column was not choosing
+          between two-lines-narrow and one-line-wide; above 240 it was choosing
+          between those same two lines and an ever-growing strip of bare paper
+          to their right. At the previous 308 that strip put the fill at 62%.
+          Half the measure was doing nothing but pushing the block off centre.
 
-          No white-space:nowrap on the city names. At this measure the break
-          falls after "&", so "New York City" survives on its own; pinning it
-          rags harder for the same fill.
+          The alternative worth knowing about: a measure of 390+ sets the copy
+          on one line (386px, 97%) and the etymology on two (378 / 353, 96%),
+          which is the best composition this sentence can make — but a 375px
+          phone only clears 343, so mobile would fall back to the 169/214 pair
+          inside a column half again too wide for it. The narrow measure is the
+          one that holds at both ends.
 
           max-w is the measure plus the padding, so both breakpoints land on
-          308: 340 − 32 below md, 348 − 40 above. Under ~340px of viewport the
-          column goes fluid and the copy re-wraps to three lines — checked, and
-          it still balances, because `text-wrap: balance` in globals.css is
-          doing the equalising rather than this number.
+          216: 248 − 32 below md, 256 − 40 above. The column is wider than the
+          mark it sits under (136/152), which is the proportion that matters.
 
           The third padding step is keyed to viewport *height*, not width. The
           aurora is 44dvh, so the paper the column actually sits on is the top
-          56% of the frame, and the block is ~311px tall on desktop. Optical
-          centring in that band wants (0.56H − 311) / 2 of top padding: 96px at
-          900 tall, which is what md:pt-24 already is and presumably what it was
-          tuned against, but 147px at 1080, where the block was riding high over
-          a dead stripe of paper. 9rem covers the tall case without touching any
-          other viewport. Deliberately a static breakpoint rather than a dvh
-          calc — dvh arithmetic here is what produced the iOS seam this page has
-          already been through once. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[340px] flex-1 flex-col px-4 pb-28 pt-13 md:max-w-[348px] md:px-5 md:pt-24 [@media(min-height:1000px)]:md:pt-36">
+          56% of the frame, and the block is ~332px tall on desktop. Optical
+          centring in that band wants (0.56H − 332) / 2 of top padding: 86px at
+          900 tall, near enough to the 96 that md:pt-24 already gives, and 136px
+          at 1080, where the block was riding high over a dead stripe of paper.
+          9rem covers the tall case without touching any other viewport.
+          Deliberately a static breakpoint rather than a dvh calc — dvh
+          arithmetic here is what produced the iOS seam this page has already
+          been through once. */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[248px] flex-1 flex-col px-4 pb-28 pt-13 md:max-w-[256px] md:px-5 md:pt-24 [@media(min-height:1000px)]:md:pt-36">
         {/* The house logo, and now the only VAVVA on the page at all.
             It is an h1 because it is the page's title — the mark carries the
             name, so without this the document has no heading at all.
@@ -69,14 +70,13 @@ export default function HomePage() {
             className="home-rise m-0 text-black/90"
             style={{ ["--i" as string]: 1 }}
           >
-            {/* The cities carry the accent, and they are not links. Sending a
-                visitor to a Wikipedia article about Los Angeles is a leak off a
+            {/* The city carries the accent, and it is not a link. Sending a
+                visitor to a Wikipedia article about New York is a leak off a
                 one-page site, and a red link would have collided twice over:
-                .bio-link resolves its hover to #000, so a red link would have
+                .bio-link resolved its hover to #000, so a red link would have
                 *darkened* on hover, and .social-link already answers in red. */}
-            Casa Vavva is a creative studio in{" "}
-            <span className="place">Los Angeles</span> &amp;{" "}
-            <span className="place">New York City</span>. Work in progress.
+            Casa Vavva is a creative studio based in{" "}
+            <span className="place">New York City</span>.
           </p>
 
           <p

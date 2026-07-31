@@ -15,8 +15,8 @@ const INSTAGRAM = "https://instagram.com/casavavva";
    purpose, because the page was a private house; that is no longer what this
    is, and the reticence was costing reach for nothing. */
 const SEARCH_DESCRIPTION =
-  "Casa Vavva is a creative studio in Los Angeles & New York City.";
-const SOCIAL_DESCRIPTION = "A creative studio in Los Angeles & New York City.";
+  "Casa Vavva is a creative studio based in New York City.";
+const SOCIAL_DESCRIPTION = "A creative studio based in New York City.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -73,11 +73,7 @@ const ORGANIZATION_JSONLD = {
   url: SITE,
   logo: `${SITE}/icon.png`,
   image: `${SITE}/opengraph-image.png`,
-  // Both cities, in the order the page prints them.
-  areaServed: [
-    { "@type": "City", name: "Los Angeles" },
-    { "@type": "City", name: "New York City" },
-  ],
+  areaServed: { "@type": "City", name: "New York City" },
   sameAs: [INSTAGRAM],
 };
 

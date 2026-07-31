@@ -102,11 +102,10 @@ p {
   color: var(--mute);
 }
 
-/* The two cities — the house's only accent, and the only red on the page that
-   is not the mark itself. Deliberately not a link and deliberately not pinned
-   with white-space:nowrap: at the 308px measure the line breaks after the "&",
-   so each name already survives intact, and pinning them only rags the block
-   harder for the same fill. */
+/* The city — the house's only accent, and the only red on the page that is not
+   the mark itself. Deliberately not a link. Not pinned with white-space:nowrap
+   either: at the 216px measure "New York City" already lands whole on line two
+   with 2px to spare, and pinning it would only make the break brittle. */
 .place {
   color: var(--red);
   font-weight: 600;

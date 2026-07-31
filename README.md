@@ -1,6 +1,6 @@
 # Casa Vavva
 
-A creative studio — Los Angeles & New York City.
+A creative studio — New York City.
 
 ```bash
 npm install
