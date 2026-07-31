@@ -4,14 +4,19 @@
 //
 // Two modes, chosen at build time:
 //   NEXT_PUBLIC_ACCESS_ENDPOINT set → the field posts there and settles on "noted."
-//   unset                          → a plain link to the house DMs, so a request
-//                                    is never silently swallowed by a form with
-//                                    nowhere to send it.
+//   unset                          → a plain link to the Instagram profile, so a
+//                                    request is never silently swallowed by a
+//                                    form with nowhere to send it.
 
 import { useState } from "react";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_ACCESS_ENDPOINT;
-const DM = "https://ig.me/m/casavavva";
+
+// The profile, and the only outbound URL in this file. Not ig.me/m: that deep
+// link opens a compose view against whatever account the visitor happens to be
+// signed into, which is a demand rather than a door. The profile opens the page
+// and lets them decide.
+const PROFILE = "https://instagram.com/casavavva";
 
 type State = "idle" | "sending" | "done" | "error";
 
@@ -22,7 +27,7 @@ export function AccessGate() {
   if (!ENDPOINT) {
     return (
       <a
-        href={DM}
+        href={PROFILE}
         target="_blank"
         rel="noopener noreferrer"
         className="social-link"
@@ -88,8 +93,8 @@ export function AccessGate() {
       {state === "error" && (
         <p className="gate-note" role="status">
           {"didn't send — "}
-          <a href={DM} target="_blank" rel="noopener noreferrer">
-            try the DMs
+          <a href={PROFILE} target="_blank" rel="noopener noreferrer">
+            try Instagram
           </a>
         </p>
       )}

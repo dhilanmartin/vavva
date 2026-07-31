@@ -1,17 +1,18 @@
 # DESIGN.md — Casa Vavva
 
-Updated 2026-07-26.
+Updated 2026-07-31.
 
 ## Direction
 
-Minimal craft on `#E8E8E8`. The brush wordmark is the only brand object; everything else is light. The Dia aurora rises from the floor on mount and holds the bottom of the frame alone. Age rule in the house red. One CTA.
+Minimal craft on `#E8E8E8`. The brush wordmark is the only brand object; everything else is light. The Dia aurora rises from the floor on mount and holds the bottom of the frame alone. The two cities in the house red. One CTA.
 
 **A menu, not a landing page.** The mark is centred; the copy and CTA are ragged-left beneath it. That mismatch is the design, not an oversight — a centred head over a left-set block is how a menu, a title page, or a bill of fare is set, and it is the whole reason the page reads as a house rather than a product. The mark is the only centred object on the page; nothing else may be centred, or the head stops reading as a head.
 
 ## Layout
 
 - Canvas: `#E8E8E8`
-- Column: `max-w-[368px]`, top-anchored (`3.25rem` mobile / `6rem` desktop), `px-5` at **every** width — 328px of measure everywhere
+- Column: `max-w-[340px]` / `md:max-w-[348px]`, `px-4` / `md:px-5` — **308px of measure at both breakpoints**, fitted to the sentence rather than the other way round
+- Top-anchored: `3.25rem` mobile / `6rem` desktop, stepping to `9rem` above 1000px of viewport *height* — the aurora owns the bottom 44dvh, so on a tall frame the block was riding high over a dead stripe of paper
 - Mark: centred in the column, `136px` mobile / `152px` desktop — signature scale, never banner scale
 - Copy and CTA: ragged-left on the column's left edge
 
@@ -41,13 +42,13 @@ One measure at every width is load-bearing, not tidiness: `md:px-1` used to wide
 |--------|------|-----------|
 | Brush wordmark | `src/assets/vavva-mark.png` | Static. Hand-drawn, keyed to transparency, trimmed. Never animated, never recoloured. Lives in `src/`, not `public/` — a statically imported asset is already emitted to `_next/static` with a content hash, so a copy in `public/` ships the same 42KB again at an uncacheable URL. |
 | Aurora | `src/components/dia/DiaGradient.tsx` | SVG bars + CSS blur, rises on mount. `44dvh`, dropping to `26dvh` under 620px tall. Static — it does not cycle, and it is the only object in the bottom zone. |
-| Access gate | `src/components/gate/AccessGate.tsx` | The door. One field, no label. Falls back to an Instagram DM link when no endpoint is configured — see README. |
+| Access gate | `src/components/gate/AccessGate.tsx` | The door. One field, no label. Falls back to a plain Instagram profile link when no endpoint is configured — see README. One outbound URL only: no `ig.me/m` deep link, on either the resting or the send-failure path. |
 
 ## Copy
 
 ```
-Casa Vavva is a private members club based in New York City. You must be 21 or
-under to enter.
+Casa Vavva is a creative studio in Los Angeles & New York City. Work in
+progress.
 
 Vavva [vaˈvˌvːa]; evokes a sense of beauty, peace, and abundance according to
 ancient Greek philosophy.
@@ -58,12 +59,32 @@ request access
 Rules: no NYU, no term dates, no event listings. The etymology stays because it
 implies rather than answers.
 
-**Overridden 2026-07-26, by the owner, deliberately.** This file used to say
-"never say what it is, only what it feels like to be near," and specifically
-banned "members club" on the grounds that *club* invites a licensing question.
-The current copy names the thing outright. The old reasoning is recorded here
-rather than deleted so the trade-off stays visible: the page is now explicit
-about what the house is, and that is a decision, not a drift.
+**The two city names are the only red in the copy** (`.place`), and they are
+deliberately *not* links. Three reasons, in order of weight: a Wikipedia article
+about Los Angeles is a leak off a one-page site; `.bio-link` resolved its hover
+to `#000`, so a red link would have *darkened* on hover; and `.social-link`
+already answers in red, so red would have meant "link" and "hover" at once.
+`.bio-link` had no remaining users after this and was deleted.
+
+**Revised 2026-07-31, by the owner.** The page is a studio in two cities, not a
+club in one. The club line claimed members and a New York address that did not
+exist yet; a studio is true the moment it makes something. Two consequences that
+are easy to miss:
+
+- **"You must be 21 or under to enter" is gone.** It was the door rule of a club
+  without a door. Nothing inherited its meaning — only its colour.
+- **The word "based" is gone, and the measure moved to meet the sentence.** See
+  the comment in `src/app/page.tsx`. With "based" the copy ran three lines at
+  64% fill and split "New York / City"; without it, two lines at 92%. The 336px
+  measure went to 308 for the same reason — at 336 not one break changed, the
+  column just held 28px of bare paper to the right of every line. Re-measure
+  before editing this copy.
+
+**Superseded 2026-07-26 note, kept for the trade-off.** This file once said
+"never say what it is, only what it feels like to be near," and banned "members
+club" on the grounds that *club* invites a licensing question. That ban was
+overridden, and the licensing question has now gone away on its own — a studio
+raises none. The history stays so the reasoning is visible rather than lost.
 
 ## Color
 
@@ -72,7 +93,7 @@ about what the house is, and that is a decision, not a drift.
 | `--paper` | `#E8E8E8` | page |
 | `--ink` | `rgba(0,0,0,0.90)` | primary line |
 | `--mute` | `rgba(0,0,0,0.45)` | etymology line, resting CTA |
-| `--red` | `#B32622` | sampled from the brush mark — age rule, CTA hover, gate focus rule |
+| `--red` | `#B32622` | sampled from the brush mark — the two cities, CTA hover, gate focus rule |
 
 One accent only. No second brand colour (no Instagram purple, no gradient buttons).
 

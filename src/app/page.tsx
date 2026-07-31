@@ -2,23 +2,46 @@ import { VavvaMark } from "@/components/brand/VavvaMark";
 import { DiaGradient } from "@/components/dia/DiaGradient";
 import { AccessGate } from "@/components/gate/AccessGate";
 
-const NYC = "https://en.wikipedia.org/wiki/New_York_City";
-
 export default function HomePage() {
   return (
     <main className="relative flex min-h-dvh w-full flex-col bg-[#E8E8E8] antialiased">
-      {/* Top-anchored: 3.25rem mobile / 6rem desktop.
+      {/* Top-anchored: 3.25rem mobile / 6rem desktop / 9rem on a tall frame.
 
-          The measure is 336px, and that number is measured, not chosen. The
-          first paragraph sets two full lines at 336 (327px and 336px — an 8.6px
-          spread, so it reads as a solid block) and three ragged ones at 335
-          (264 / 255 / 139, a 73px notch where "based" fell to line two). The
-          threshold is that sharp. Anything in 336–360 holds the two-line set;
-          past ~364 it re-breaks to a long line over a stub.
+          The measure is 308px, and that number is measured, not chosen. It is
+          fitted to the sentence rather than the other way round: this copy sets
+          two lines at 308 (260px and 306px — 92% of the column inked) and the
+          etymology sets three (223 / 233 / 272). Widening to the old 336 does
+          not change a single break, it only adds 28px of bare paper to the
+          right of every line and drops the fill to 84%. That gap is what made
+          the block read as shoved left under a centred mark.
 
-          px-4 below md so a 375px phone still clears 336 (375 − 32 = 343);
-          px-5 above, where max-w caps the column and 376 − 40 lands on 336. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[376px] flex-1 flex-col px-4 pb-28 pt-13 md:px-5 md:pt-24">
+          The word "based" is absent on purpose — "a creative studio based in
+          Los Angeles" ran three lines at 215 / 233 / 199 (64% inked, and "New
+          York / City" split across the break). Deleting one word bought both
+          the second line and the intact city name, so do not put it back
+          without re-measuring.
+
+          No white-space:nowrap on the city names. At this measure the break
+          falls after "&", so "New York City" survives on its own; pinning it
+          rags harder for the same fill.
+
+          max-w is the measure plus the padding, so both breakpoints land on
+          308: 340 − 32 below md, 348 − 40 above. Under ~340px of viewport the
+          column goes fluid and the copy re-wraps to three lines — checked, and
+          it still balances, because `text-wrap: balance` in globals.css is
+          doing the equalising rather than this number.
+
+          The third padding step is keyed to viewport *height*, not width. The
+          aurora is 44dvh, so the paper the column actually sits on is the top
+          56% of the frame, and the block is ~311px tall on desktop. Optical
+          centring in that band wants (0.56H − 311) / 2 of top padding: 96px at
+          900 tall, which is what md:pt-24 already is and presumably what it was
+          tuned against, but 147px at 1080, where the block was riding high over
+          a dead stripe of paper. 9rem covers the tall case without touching any
+          other viewport. Deliberately a static breakpoint rather than a dvh
+          calc — dvh arithmetic here is what produced the iOS seam this page has
+          already been through once. */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[340px] flex-1 flex-col px-4 pb-28 pt-13 md:max-w-[348px] md:px-5 md:pt-24 [@media(min-height:1000px)]:md:pt-36">
         {/* The house logo, and now the only VAVVA on the page at all.
             It is an h1 because it is the page's title — the mark carries the
             name, so without this the document has no heading at all.
@@ -46,17 +69,14 @@ export default function HomePage() {
             className="home-rise m-0 text-black/90"
             style={{ ["--i" as string]: 1 }}
           >
-            Casa Vavva is a private members club based in{" "}
-            <a
-              href={NYC}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bio-link"
-            >
-              New York City
-            </a>
-            . You must be{" "}
-            <span className="caution">21 or under</span> to enter.
+            {/* The cities carry the accent, and they are not links. Sending a
+                visitor to a Wikipedia article about Los Angeles is a leak off a
+                one-page site, and a red link would have collided twice over:
+                .bio-link resolves its hover to #000, so a red link would have
+                *darkened* on hover, and .social-link already answers in red. */}
+            Casa Vavva is a creative studio in{" "}
+            <span className="place">Los Angeles</span> &amp;{" "}
+            <span className="place">New York City</span>. Work in progress.
           </p>
 
           <p

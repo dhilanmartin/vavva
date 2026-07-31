@@ -83,25 +83,6 @@ html.intro-go .home-rise {
   }
 }
 
-.bio-link {
-  color: inherit;
-  text-decoration-line: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  text-decoration-color: rgba(0, 0, 0, 0.45);
-  transition:
-    color 0.18s ease,
-    text-decoration-color 0.18s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .bio-link:hover {
-    color: #000;
-    text-decoration-color: rgba(0, 0, 0, 0.55);
-  }
-}
-
 /* Even line lengths, decided by the browser rather than by hand-tuning the
    measure every time the copy changes. `pretty` only protects the last line
    from becoming an orphan; `balance` equalises the whole set, which is what
@@ -121,12 +102,14 @@ p {
   color: var(--mute);
 }
 
-/* The house's only accent phrase, kept whole. Left to wrap it broke as
-   "21 or / under" — half the phrase, and the half that carries the rule. */
-.caution {
+/* The two cities — the house's only accent, and the only red on the page that
+   is not the mark itself. Deliberately not a link and deliberately not pinned
+   with white-space:nowrap: at the 308px measure the line breaks after the "&",
+   so each name already survives intact, and pinning them only rags the block
+   harder for the same fill. */
+.place {
   color: var(--red);
   font-weight: 600;
-  white-space: nowrap;
 }
 
 @keyframes diaRise {

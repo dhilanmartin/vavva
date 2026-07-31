@@ -1,6 +1,6 @@
 # Casa Vavva
 
-A private house — New York City.
+A creative studio — Los Angeles & New York City.
 
 ```bash
 npm install
@@ -14,7 +14,7 @@ The CTA has two modes, picked at build time from `NEXT_PUBLIC_ACCESS_ENDPOINT`
 
 | Endpoint | CTA |
 |----------|-----|
-| unset (default) | `request access` links to the house Instagram DMs |
+| unset (default) | `request access` links to the Instagram profile |
 | set | inline field; posts `{ "handle": "…" }` and settles on `noted.` |
 
 The fallback is deliberate: a form with nowhere to send its requests silently

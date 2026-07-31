@@ -11,11 +11,12 @@ const inter = Inter({
 const SITE = "https://vavva.xyz";
 const INSTAGRAM = "https://instagram.com/casavavva";
 
-/* The name and the city, nothing else. What the house is stays on the page, for
-   people who arrive at it — it is not advertised to search. See the robots block
-   below, which is the half that actually enforces this. */
-const SEARCH_DESCRIPTION = "Casa Vavva. New York City.";
-const SOCIAL_DESCRIPTION = "New York City.";
+/* A studio says what it is and where it is. The previous pair withheld both on
+   purpose, because the page was a private house; that is no longer what this
+   is, and the reticence was costing reach for nothing. */
+const SEARCH_DESCRIPTION =
+  "Casa Vavva is a creative studio in Los Angeles & New York City.";
+const SOCIAL_DESCRIPTION = "A creative studio in Los Angeles & New York City.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -25,19 +26,20 @@ export const metadata: Metadata = {
   description: SEARCH_DESCRIPTION,
   applicationName: "VAVVA",
   alternates: { canonical: "/" },
-  /* Indexed and crawlable, but no snippet.
-     `nosnippet` is doing the real work here, not the description above. Google
-     writes snippets from visible page copy, and the first paragraph says what
-     the house is in plain words — so rewriting the meta tag alone would have
-     changed nothing about what shows up in search.
-     This is deliberately NOT a robots.txt disallow, which is what produces the
-     "No information is available for this page" line on sites that hide this
-     way. facebookexternalhit and Twitterbot both honour robots.txt, so blocking
-     there would take the link previews down with it. */
+  /* Indexed, crawlable, and snippeted.
+     `nosnippet: true` used to sit here. Its only job was to keep the words
+     "private members club" out of Google, because Google writes snippets from
+     visible page copy and the first paragraph said exactly that. The page no
+     longer makes that claim, so the flag was suppressing the studio's own
+     description for nothing. Removing it is the point of this line, not an
+     oversight — put it back only if the copy goes private again.
+     Still deliberately NOT a robots.txt disallow: that is what produces the
+     "No information is available for this page" result, and it would take the
+     social link previews down with it, since facebookexternalhit and Twitterbot
+     both honour robots.txt. */
   robots: {
     index: true,
     follow: true,
-    nosnippet: true,
   },
   openGraph: {
     title: "VAVVA",
@@ -60,19 +62,22 @@ export const metadata: Metadata = {
 
 /* Tells Google this is one named entity rather than a page about a topic. It is
    deliberately an Organization and not a LocalBusiness: LocalBusiness expects a
-   street address and opening hours, and the house publishes neither. */
+   street address and opening hours, and the studio publishes neither. */
 const ORGANIZATION_JSONLD = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Casa Vavva",
-  // Both strings, so "vavva" and "casa vavva" resolve to the same entity. No
-  // description field — the snippet is suppressed anyway, and this is the one
-  // place left that would still hand search engines a sentence about the house.
+  // Both strings, so "vavva" and "casa vavva" resolve to the same entity.
   alternateName: ["VAVVA", "Vavva"],
+  description: SEARCH_DESCRIPTION,
   url: SITE,
   logo: `${SITE}/icon.png`,
   image: `${SITE}/opengraph-image.png`,
-  areaServed: { "@type": "City", name: "New York City" },
+  // Both cities, in the order the page prints them.
+  areaServed: [
+    { "@type": "City", name: "Los Angeles" },
+    { "@type": "City", name: "New York City" },
+  ],
   sameAs: [INSTAGRAM],
 };
 
