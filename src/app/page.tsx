@@ -83,31 +83,39 @@ export default function HomePage() {
             <span className="place">New York City</span>.
           </p>
 
-          {/* The gloss, and it is set as one: 13px against the statement's 15,
-              with the leading opened to 1.5 because small type needs more air
-              between lines, not less.
+          {/* The gloss stays at the statement's 15px/1.4, and that is a
+              measured decision rather than inertia — it was briefly set to 13
+              and put back.
 
-              Fill drops when you do this — four lines is the floor at the phone
-              measure no matter the size (greedy wrapping gives 209/186/163/70,
-              so three lines is not reachable), which means shrinking the type
-              only narrows each of the same four lines: 84% at 15px, 73% at 13.
-              That is the right trade here and not the same defect as a short
-              headline. A gloss that sits visibly narrower than the statement
-              above it reads as subordinate, which is the entire point.
+              Size here is a fill control, not a hierarchy control, because the
+              line count is pinned by word boundaries: four lines at the phone
+              measure for anything from 12 to 16px, two lines on desktop from 12
+              to 15. Inside a fixed line count, smaller type does not fit more
+              words, it just draws the same words narrower — so shrinking the
+              gloss strands it in the middle of the column and pulls the whole
+              block off centre. Fill by size, phone / desktop: 13px 73/81,
+              14px 78/87, 15px 84/93.
 
-              Colour is untouched at --mute. It contrasts 4.55:1 on the paper,
-              and WCAG asks the same 4.5:1 of 13px as of 15px, so the size drop
-              costs nothing in contrast. Do not darken it to compensate for the
-              apparent lightness of smaller type; that would flatten the tier
-              back into the statement. */}
+              16px fills the phone better still (89%), and is rejected: it
+              overflows desktop to three lines at 66%, and it would set the
+              gloss larger than the statement it glosses. 15 is the largest size
+              that is neither.
+
+              Hierarchy is carried by colour instead — --mute against the
+              statement's black/90 — and by .ipa's weight inside this line.
+              Colour is the cheaper lever here because it costs no fill at all. */}
           <p
-            className="home-rise mt-6 mb-0 text-[13px] leading-[1.5] text-[color:var(--mute)]"
+            className="home-rise mt-6 mb-0 text-[color:var(--mute)]"
             style={{ ["--i" as string]: 2 }}
           >
             Vavva{" "}
-            <span className="ipa" lang="el">
-              [vaˈvˌvːa]
-            </span>
+            {/* No lang="el" here. It used to claim this was Greek, and it is
+                not: the brackets hold IPA — Latin letters plus the IPA
+                modifiers ˈ ˌ ː — not Greek script. The attribute told a screen
+                reader to switch to a Greek voice and apply Greek pronunciation
+                rules to characters Greek does not have. The etymology this
+                glosses is Greek; the notation is not. */}
+            <span className="ipa">[vaˈvˌvːa]</span>
             ; evokes a sense of beauty, peace, and abundance according to ancient
             Greek philosophy.
           </p>

@@ -97,9 +97,15 @@ p {
   text-wrap: balance;
 }
 
+/* The pronunciation, a parenthetical inside an already-parenthetical gloss.
+   This rule used to set font-weight:500 and --mute, which is precisely what the
+   gloss paragraph already inherits — it styled nothing at all. 400 is the one
+   step that makes it recede without touching size or colour, so the bracket
+   reads as an aside rather than as part of the sentence. Contrast is unchanged;
+   weight does not enter the ratio, and --mute is 4.55:1 on the paper either
+   way. */
 .ipa {
-  font-weight: 500;
-  color: var(--mute);
+  font-weight: 400;
 }
 
 /* The city — the house's only accent, and the only red on the page that is not

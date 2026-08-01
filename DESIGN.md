@@ -17,7 +17,7 @@ Minimal craft on `#E8E8E8`. The brush wordmark is the only brand object; everyth
 - Copy and CTA: ragged-left on the column's left edge
 
 Centring the mark is done geometrically, and that is correct here rather than lazy: the asset is alpha-trimmed and its glyph extents are symmetric — ink spans x=2..1023 of 1026, midpoint 512.5 against a frame centre of 513.0. The ink *mass* is left-heavy (59.9/40.1, centroid 6.68% left of centre) because the V is the tallest and heaviest stroke, but for a word the eye tracks extents, not density; correcting to the centroid would visibly shove the mark right. If the asset is ever re-cut, re-check the extents before trusting `justify-center`.
-- Type: Inter · medium · tracking `-0.015em` · `text-wrap: pretty` — statement `15px / 1.4`, gloss `13px / 1.5`
+- Type: Inter · 15px · medium · tracking `-0.015em` · line-height `1.4` · `text-wrap: pretty` — one size for statement and gloss alike; the gloss separates on colour, not scale
 - Motion: staggered blur-rise (`intro-js` / `intro-go`), 0.5s, 0.08s stagger
 
 ### Vertical scale
@@ -49,11 +49,31 @@ What the old rule protected against was real and has happened here: a widening c
 
 ### The gloss
 
-The etymology is `13px / 1.5` against the statement's `15px / 1.4`, in `--mute`.
+The etymology is `15px / 1.4` — the same as the statement — in `--mute`.
 
-Shrinking it costs fill and that is the correct trade. Four lines is the floor at the phone measure regardless of size — greedy wrapping gives 209 / 186 / 163 / 70, so three lines is not reachable — which means smaller type only narrows the same four lines: 84% at 15px, 72% at 13. A gloss sitting visibly narrower than the statement reads as subordinate, which is the whole point; it is not the same defect as a short headline stranded in a wide column.
+**Size is a fill control here, not a hierarchy control.** The line count is pinned by word boundaries: four lines at the phone measure for anything from 12px to 16px, two lines on desktop from 12px to 15px. Inside a fixed line count, smaller type does not fit more words per line, it draws the same words narrower — so it strands the gloss in the middle of the column and pulls the whole block visibly off centre.
 
-Colour is unchanged. `--mute` contrasts 4.55:1 on the paper, and WCAG asks the same 4.5:1 of 13px as of 15px, so the size drop costs nothing. Do not darken it to compensate for how much lighter small type looks — that flattens the tier back into the statement.
+| Size | Phone (216) | Desktop (392) |
+|---|---|---|
+| 13px | 4 lines — 73% | 2 lines — 81% |
+| 14px | 4 lines — 78% | 2 lines — 87% |
+| **15px** | 4 lines — **84%** | 2 lines — **93%** |
+| 16px | 4 lines — 89% | 3 lines — 66% |
+| 17px | 5 lines — 76% | 3 lines — 70% |
+
+16px fills the phone best and is still rejected on two counts: it overflows desktop to three lines at 66%, and it would set the gloss *larger* than the statement it glosses. 15px is the largest size that is neither. At 392 it is also near-perfectly matched to the statement — the gloss's long line measures 378 against the statement's 386.
+
+This was set to 13px on 2026-07-31 and reverted the same day. The 13px version bought real hierarchy and paid for it in fill, and the fill was the thing that showed.
+
+Hierarchy is carried by **colour** instead: `--mute` against the statement's `black/90`, which costs no fill at all. `--mute` contrasts 4.55:1 on the paper, comfortably over the 4.5:1 WCAG asks of text this size.
+
+`.ipa` is the third tier: `font-weight: 400` against the gloss's 500, same size and colour. It previously set `font-weight: 500` and `--mute`, which is exactly what the gloss already inherits — the rule styled nothing. Weight is the only lever left that separates a parenthetical from its sentence without a fourth size or a second grey.
+
+The span carries **no `lang` attribute**, and should not get one back. It used to say `lang="el"`, which was wrong: the brackets hold IPA — Latin letters plus the modifiers `ˈ ˌ ː` — not Greek script. That attribute asked assistive tech to switch to a Greek voice and apply Greek pronunciation to characters Greek does not have. The etymology being glossed is Greek; the notation is not.
+
+`.ipa` is the third and last tier: `font-weight: 400` against the gloss's 500, same size and colour. It previously set `font-weight: 500` and `--mute`, which is exactly what the gloss already inherits — the rule styled nothing. Weight is the only lever left that separates a parenthetical from its sentence without introducing a fourth size or a second grey.
+
+The span carries **no `lang` attribute**, and should not get one back. It used to say `lang="el"`, which was wrong: the brackets hold IPA — Latin letters plus the modifiers `ˈ ˌ ː` — not Greek script. That attribute asked assistive tech to switch to a Greek voice and apply Greek pronunciation to characters Greek does not have. The etymology being glossed is Greek; the notation is not.
 
 ## Brand objects
 
