@@ -7,42 +7,46 @@ export default function HomePage() {
     <main className="relative flex min-h-dvh w-full flex-col bg-[#E8E8E8] antialiased">
       {/* Top-anchored: 3.25rem mobile / 6rem desktop / 9rem on a tall frame.
 
-          The measure is 216px, and that number is measured, not chosen. It is
-          fitted to the sentence rather than the other way round: the copy sets
-          two lines at 216 (169px and 214px — 89% of the column inked) and the
-          etymology sets four (178 / 196 / 169 / 181, 85%).
+          Two measures, and this is the one place the page deliberately sets a
+          different one per breakpoint.
 
-          216 looks aggressively narrow written down, and it is not. The whole
-          sentence is 386px set on one line, and `text-wrap: balance` in
-          globals.css splits it into the same two lines — 169 and 214 — at every
-          width from 240 all the way to 360. So the column was not choosing
-          between two-lines-narrow and one-line-wide; above 240 it was choosing
-          between those same two lines and an ever-growing strip of bare paper
-          to their right. At the previous 308 that strip put the fill at 62%.
-          Half the measure was doing nothing but pushing the block off centre.
+          216 on a phone. The statement is 386px set on one line, and it splits
+          into the same two lines — 169 and 214 — at every width from 240 to
+          360, so above 240 the column was not buying a different break, only an
+          ever-growing strip of bare paper to the right of those two lines. At
+          308 that strip put the fill at 62%; at 216 it is 89%.
 
-          The alternative worth knowing about: a measure of 390+ sets the copy
-          on one line (386px, 97%) and the etymology on two (378 / 353, 96%),
-          which is the best composition this sentence can make — but a 375px
-          phone only clears 343, so mobile would fall back to the 169/214 pair
-          inside a column half again too wide for it. The narrow measure is the
-          one that holds at both ends.
+          392 on desktop, where the whole statement lands on ONE line at 386px
+          (98%) and the gloss settles from four lines to two (327 / 306). That
+          is the strongest setting this copy can make, and it is unreachable on
+          a phone: 375px of viewport clears 343, so mobile would fall back to
+          the 169/214 pair inside a column half again too wide for it. Hence
+          both, rather than a compromise that is second-best twice.
 
-          max-w is the measure plus the padding, so both breakpoints land on
-          216: 248 − 32 below md, 256 − 40 above. The column is wider than the
-          mark it sits under (136/152), which is the proportion that matters.
+          This overrides the old "one measure at every width" rule, knowingly.
+          That rule existed to stop a widening column pulling an accent phrase
+          up onto the previous line and splitting it in half — which is why the
+          phrase it protected used to be white-space:nowrap. `.place` sits at
+          the end of the sentence now: at 216 it lands whole on line two, at 392
+          it lands whole on the single line. Checked at both. Nothing else in
+          the copy can straddle the break.
+
+          max-w is the measure plus the padding: 248 − 32 below md, 432 − 40
+          above. At 216 the column is still wider than the mark it sits under
+          (136), which is the proportion that matters.
 
           The third padding step is keyed to viewport *height*, not width. The
           aurora is 44dvh, so the paper the column actually sits on is the top
-          56% of the frame, and the block is ~332px tall on desktop. Optical
-          centring in that band wants (0.56H − 332) / 2 of top padding: 86px at
-          900 tall, near enough to the 96 that md:pt-24 already gives, and 136px
-          at 1080, where the block was riding high over a dead stripe of paper.
-          9rem covers the tall case without touching any other viewport.
-          Deliberately a static breakpoint rather than a dvh calc — dvh
-          arithmetic here is what produced the iOS seam this page has already
-          been through once. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[248px] flex-1 flex-col px-4 pb-28 pt-13 md:max-w-[256px] md:px-5 md:pt-24 [@media(min-height:1000px)]:md:pt-36">
+          56% of the frame, and the block is now ~266px tall on desktop — the
+          one-line statement and two-line gloss took 66px out of it. True
+          optical centring in that band, (0.56H − 266) / 2, would want 119px at
+          900 and 169px at 1080, and both steps here sit about 24px above that
+          on purpose: the page is top-anchored, not centred, and the aim of the
+          tall-frame step was only to stop the block stranding over a dead
+          stripe of paper, not to pull it to the middle. Deliberately a static
+          breakpoint rather than a dvh calc — dvh arithmetic here is what
+          produced the iOS seam this page has already been through once. */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[248px] flex-1 flex-col px-4 pb-28 pt-13 md:max-w-[432px] md:px-5 md:pt-24 [@media(min-height:1000px)]:md:pt-36">
         {/* The house logo, and now the only VAVVA on the page at all.
             It is an h1 because it is the page's title — the mark carries the
             name, so without this the document has no heading at all.
@@ -79,8 +83,25 @@ export default function HomePage() {
             <span className="place">New York City</span>.
           </p>
 
+          {/* The gloss, and it is set as one: 13px against the statement's 15,
+              with the leading opened to 1.5 because small type needs more air
+              between lines, not less.
+
+              Fill drops when you do this — four lines is the floor at the phone
+              measure no matter the size (greedy wrapping gives 209/186/163/70,
+              so three lines is not reachable), which means shrinking the type
+              only narrows each of the same four lines: 84% at 15px, 73% at 13.
+              That is the right trade here and not the same defect as a short
+              headline. A gloss that sits visibly narrower than the statement
+              above it reads as subordinate, which is the entire point.
+
+              Colour is untouched at --mute. It contrasts 4.55:1 on the paper,
+              and WCAG asks the same 4.5:1 of 13px as of 15px, so the size drop
+              costs nothing in contrast. Do not darken it to compensate for the
+              apparent lightness of smaller type; that would flatten the tier
+              back into the statement. */}
           <p
-            className="home-rise mt-6 mb-0 text-[color:var(--mute)]"
+            className="home-rise mt-6 mb-0 text-[13px] leading-[1.5] text-[color:var(--mute)]"
             style={{ ["--i" as string]: 2 }}
           >
             Vavva{" "}

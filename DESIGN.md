@@ -11,13 +11,13 @@ Minimal craft on `#E8E8E8`. The brush wordmark is the only brand object; everyth
 ## Layout
 
 - Canvas: `#E8E8E8`
-- Column: `max-w-[248px]` / `md:max-w-[256px]`, `px-4` / `md:px-5` — **216px of measure at both breakpoints**, fitted to the sentence rather than the other way round. Narrower than it sounds: `text-wrap: balance` sets this copy as the same two lines (169 / 214) anywhere from 240 to 360, so every pixel of measure past ~216 was bare paper to their right, not a different break. It is still wider than the mark above it (136 / 152), which is the proportion that matters. One consequence worth having: the column no longer goes fluid on a 320px phone, so every viewport renders the identical block
+- Column: `max-w-[248px]` / `md:max-w-[432px]`, `px-4` / `md:px-5` — **216px of measure on a phone, 392px on desktop**. Two measures, on purpose (see below). The phone column never goes fluid, so everything from 320px up renders the identical block
 - Top-anchored: `3.25rem` mobile / `6rem` desktop, stepping to `9rem` above 1000px of viewport *height* — the aurora owns the bottom 44dvh, so on a tall frame the block was riding high over a dead stripe of paper
 - Mark: centred in the column, `136px` mobile / `152px` desktop — signature scale, never banner scale
 - Copy and CTA: ragged-left on the column's left edge
 
 Centring the mark is done geometrically, and that is correct here rather than lazy: the asset is alpha-trimmed and its glyph extents are symmetric — ink spans x=2..1023 of 1026, midpoint 512.5 against a frame centre of 513.0. The ink *mass* is left-heavy (59.9/40.1, centroid 6.68% left of centre) because the V is the tallest and heaviest stroke, but for a word the eye tracks extents, not density; correcting to the centroid would visibly shove the mark right. If the asset is ever re-cut, re-check the extents before trusting `justify-center`.
-- Type: Inter · 15px · medium · tracking `-0.015em` · line-height `1.4` · `text-wrap: pretty`
+- Type: Inter · medium · tracking `-0.015em` · `text-wrap: pretty` — statement `15px / 1.4`, gloss `13px / 1.5`
 - Motion: staggered blur-rise (`intro-js` / `intro-go`), 0.5s, 0.08s stagger
 
 ### Vertical scale
@@ -34,7 +34,26 @@ Mark → copy is ~0.65× the mark's own height (63px / 70.5px). A masthead needs
 
 Copy → CTA is `24px` metric but ~`36px` optical. The CTA is an `inline-flex` with a `2.75rem` tap-target floor, so its 21px line box centres inside a 44px box and donates ~11.5px of invisible padding above the glyphs. Anything set here must be read net of that. At `36px` it measured 47px optical and the CTA had visibly drifted off the copy.
 
-One measure at every width is load-bearing, not tidiness. It used to be enforced by holding `px-5` everywhere; it is now enforced by `max-w` and padding that differ across the breakpoint *by exactly the padding difference*, so both sides land on 216. The failure it guards against is real and has happened here: a widening column pulled the accent phrase up onto line one and split it in half. The old `.caution` bought insurance against that with `white-space: nowrap`; `.place` deliberately does not, because at 216 the break lands before "New York City" rather than inside it, and pinning it would make that break brittle instead of safe.
+### Two measures, and why the old rule went
+
+This file used to require one measure at every width. That rule is gone, knowingly, and it is the only place the page sets a different measure per breakpoint.
+
+| | Measure | Statement | Gloss |
+|---|---|---|---|
+| Phone | `216px` | 2 lines, 169 / 214 — **89%** inked | 4 lines — 72% |
+| Desktop (`md`) | `392px` | **1 line**, 386 — **98%** | 2 lines, 326 / 305 — 80% |
+
+The statement is 386px set on a single line, so 392 is the width at which the whole sentence resolves at once — the strongest setting this copy can make. It is unreachable on a phone: 375px of viewport clears 343, so mobile would fall back to the same 169 / 214 pair inside a column half again too wide for it. Two measures beats one compromise that is second-best at both ends.
+
+What the old rule protected against was real and has happened here: a widening column pulls an accent phrase up onto the previous line and splits it in half. That is why the phrase it guarded was `white-space: nowrap`. `.place` deliberately is not, because it now sits at the **end** of the sentence — at 216 it lands whole on line two, at 392 whole on the single line, verified at both. Nothing else in the copy can straddle a break. Re-check this if the copy ever puts words after the city.
+
+### The gloss
+
+The etymology is `13px / 1.5` against the statement's `15px / 1.4`, in `--mute`.
+
+Shrinking it costs fill and that is the correct trade. Four lines is the floor at the phone measure regardless of size — greedy wrapping gives 209 / 186 / 163 / 70, so three lines is not reachable — which means smaller type only narrows the same four lines: 84% at 15px, 72% at 13. A gloss sitting visibly narrower than the statement reads as subordinate, which is the whole point; it is not the same defect as a short headline stranded in a wide column.
+
+Colour is unchanged. `--mute` contrasts 4.55:1 on the paper, and WCAG asks the same 4.5:1 of 13px as of 15px, so the size drop costs nothing. Do not darken it to compensate for how much lighter small type looks — that flattens the tier back into the statement.
 
 ## Brand objects
 
