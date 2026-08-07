@@ -1,29 +1,30 @@
 import { DiaGradient } from "@/components/dia/DiaGradient";
 import { Hero } from "@/components/home/Hero";
 
-/* clone-structure rebuild (test/mimi-structure-clone), simplified 2026-08-06
-   by the owner to an "in between" of the original one-pager and the fuller
-   mimi-structured exploration: Nav -> Hero (real copy + real AccessGate) ->
-   straight to Footer, aurora intact. The mid-page sections built for the
-   mimi-structural pass (SectionLabel, FeatureBlock, CtaTileRow, Newsletter)
-   depended entirely on placeholder imagery/copy that doesn't exist yet —
-   rather than ship placeholders on the actual landing page, they're cut from
-   this route until there's real content for them. The components themselves
+/* Landing page, 2026-08-06: matches live vavva.xyz 1:1 (Hero.tsx is a
+   direct port of main's original page.tsx) — the only differences are the
+   Nav above and Footer below, both now living in the root layout instead of
+   this page owning the whole viewport. min-h-dvh is preserved unchanged
+   from the original so the top-anchored spacing math in Hero/DESIGN.md
+   (viewport-height-relative) still holds; Nav/Footer simply add extra
+   scroll length beyond that one viewport, which is the expected cost of
+   adding chrome that didn't exist before.
+
+   The mid-page sections built for the mimi-structural pass (SectionLabel,
+   FeatureBlock, CtaTileRow, Newsletter) depended entirely on placeholder
+   imagery/copy that doesn't exist yet — cut from this route rather than
+   shipping placeholders on the actual landing page. Components themselves
    aren't deleted (still under src/components/home/), and Locations/Shop/
    Story/Gift Cards remain reachable via Nav as the live structural
-   exploration — this route alone is the one meant to be push-ready.
+   exploration.
 
-   DiaGradient is kept, not retired (DESIGN.md asks that decision be
-   deliberate either way) — unchanged from the previous build: fixed to the
-   viewport bottom, z-index 0, so it sits behind whatever section currently
-   occupies the bottom of the frame. It reads through on paper-colored
-   sections and is simply covered by opaque dark sections, same as always. */
+   DiaGradient unchanged: fixed to the viewport bottom, z-index 0. Footer
+   now carries an explicit --paper background (see Footer.tsx) so it
+   occludes the aurora instead of letting it bleed through underneath. */
 export default function HomePage() {
   return (
-    <main className="relative w-full bg-[var(--paper)]">
-      <div className="relative z-10">
-        <Hero />
-      </div>
+    <main className="relative flex min-h-dvh w-full flex-col bg-[var(--paper)]">
+      <Hero />
 
       <div className="dia-stage" aria-hidden>
         <DiaGradient reveal="mount" />

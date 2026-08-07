@@ -2,6 +2,14 @@
 // wordmark text + legal), same 4 links on every page, link row absent on
 // mobile.
 //
+// bg-[var(--paper)] added 2026-08-06: DiaGradient (dia-stage) is pinned to
+// the viewport bottom at z-index 0, and this footer previously had no
+// background of its own — so on any page tall enough for the footer to
+// land where the aurora renders, the gradient showed through behind the
+// footer's text instead of being occluded by it. DESIGN.md's own model is
+// "opaque sections cover the aurora, paper-colored ones read through it";
+// this footer just wasn't opaque before.
+//
 // Two deliberate departures from the spec's literal content fields:
 // - No image logo here. DESIGN.md's Anti-patterns bans "a second VAVVA
 //   anywhere, at any scale... including a footer stamp," and says that
@@ -27,7 +35,7 @@ const LINKS = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-black/10 px-4 py-8 md:px-5 tablet:px-6">
+    <footer className="relative z-10 border-t border-black/10 bg-[var(--paper)] px-4 py-8 md:px-5 tablet:px-6">
       <div className="mx-auto flex max-w-[1710px] flex-col items-center gap-6 tablet:flex-row tablet:justify-between">
         <div aria-hidden className="hidden tablet:block tablet:flex-1" />
 

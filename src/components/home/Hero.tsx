@@ -1,31 +1,56 @@
-// Simplified 2026-08-06, by the owner: an "in between" of the original
-// one-pager and this structural rebuild, specifically for the home hero.
-// The two-video-block pattern (see git history on this branch for that
-// version) is retired for now — there's no real photography/video yet, and
-// a gray placeholder standing in for it read as unfinished rather than
-// intentional. This reuses Vavva's own pre-existing copy (the original
-// one-pager's statement + etymology gloss) and the real AccessGate
-// mechanism — not a placeholder CTA — so the page stays honest about being
-// early while remaining genuinely functional and pushable.
+// Ported 1:1 from the live vavva.xyz landing (git history: main's
+// src/app/page.tsx, pre-clone-structure) per D's 2026-08-06 instruction —
+// "the only difference being the header and footer." Every measurement,
+// class, and comment below is preserved from that original; only the
+// wrapper changed, since Nav/Footer now live in the root layout instead of
+// this page owning the whole viewport itself.
+//
+// Two logos now render on this route (Nav's 88px mark + this h1's 136/152px
+// mark) — DESIGN.md's Anti-patterns section calls a second VAVVA "at any
+// scale" out by name. Shipped as instructed rather than silently resolved;
+// flag this at sign-off if the header mark should suppress on "/" instead.
 
+import { VavvaMark } from "@/components/brand/VavvaMark";
 import { AccessGate } from "@/components/gate/AccessGate";
 
 export function Hero() {
   return (
-    <section className="px-4 py-20 md:px-5 tablet:px-6 tablet:py-28 desktop:py-32">
-      <div className="mx-auto flex max-w-[432px] flex-col gap-6">
-        <p className="font-serif text-[22px] font-normal leading-[1.4] tracking-[-0.01em] text-[var(--ink)] desktop:text-[26px]">
-          Casa Vavva is a creative studio based in New York City.
+    <div className="relative z-10 mx-auto flex w-full max-w-[248px] flex-1 flex-col px-4 pb-28 pt-13 md:max-w-[432px] md:px-5 md:pt-24 [@media(min-height:1000px)]:md:pt-36">
+      {/* The house logo. Centred over ragged-left copy: a menu masthead. The
+          mark is the only centred object on the page, which is what makes it
+          read as a head rather than as the first line of the block. */}
+      <h1
+        className="home-rise m-0 mb-10 flex justify-center md:mb-11"
+        style={{ ["--i" as string]: 0 }}
+      >
+        <VavvaMark className="h-auto w-[136px] md:w-[152px]" />
+      </h1>
+
+      <header className="text-[15px] font-medium leading-[1.4] tracking-[-0.015em]">
+        <p
+          className="home-rise m-0 text-black/90"
+          style={{ ["--i" as string]: 1 }}
+        >
+          {/* The city carries the accent and is not a link — see DESIGN.md's
+              Copy section for why. */}
+          Casa Vavva is a creative studio based in{" "}
+          <span className="place">New York City</span>.
         </p>
-        <p className="text-[15px] font-medium leading-[1.4] tracking-[-0.015em] text-[var(--mute)]">
-          Vavva [vaˈvˌvːa]; evokes a sense of beauty, peace, and abundance
-          according to ancient Greek philosophy.
+
+        <p
+          className="home-rise mt-6 mb-0 text-[color:var(--mute)]"
+          style={{ ["--i" as string]: 2 }}
+        >
+          Vavva{" "}
+          <span className="ipa">[vaˈvˌvːa]</span>
+          ; evokes a sense of beauty, peace, and abundance according to ancient
+          Greek philosophy.
         </p>
-        <p className="text-[15px] font-medium leading-[1.4] tracking-[-0.015em] text-[var(--mute)]">
-          The full site is on its way.
-        </p>
+      </header>
+
+      <footer className="home-rise mt-6" style={{ ["--i" as string]: 3 }}>
         <AccessGate />
-      </div>
-    </section>
+      </footer>
+    </div>
   );
 }
