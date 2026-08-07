@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
 import { Triptych } from "@/components/story/Triptych";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
+import { GATED_ROUTES_LIVE } from "@/lib/site";
 import skyline from "../../assets/nyc-skyline.png";
 
 export const metadata: Metadata = { title: "Story — VAVVA" };
@@ -24,6 +26,8 @@ export const metadata: Metadata = { title: "Story — VAVVA" };
    blocks mix-blend-mode from reading the real background behind it —
    same fix as LocationCard's image. */
 export default function StoryPage() {
+  if (!GATED_ROUTES_LIVE) notFound();
+
   return (
     <main className="w-full bg-[var(--paper)] pb-24 pt-10 tablet:pt-14">
       <div className="flex flex-col gap-16 tablet:gap-20">

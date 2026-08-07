@@ -26,14 +26,14 @@
 // here (it's already prominent in the primary nav) — Story, Gift Cards,
 // Shop, Contact is the same 4-link count the reference site carries.
 
-import { CONTACT_HREF } from "@/lib/site";
+import { CONTACT_HREF, GATED_ROUTES_LIVE } from "@/lib/site";
 
 const LINKS = [
-  { href: "/story", label: "Story" },
-  { href: "/gift-card", label: "Gift Cards" },
-  { href: "/shop", label: "Shop" },
+  { href: "/story", label: "Story", gated: true },
+  { href: "/gift-card", label: "Gift Cards", gated: true },
+  { href: "/shop", label: "Shop", gated: true },
   { href: CONTACT_HREF, label: "Contact" },
-];
+].filter((link) => GATED_ROUTES_LIVE || !link.gated);
 
 export function Footer() {
   return (

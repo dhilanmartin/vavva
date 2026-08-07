@@ -28,13 +28,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
-import { CONTACT_HREF } from "@/lib/site";
+import { CONTACT_HREF, GATED_ROUTES_LIVE } from "@/lib/site";
 
 const PRIMARY_LINKS = [
   { href: "/locations", label: "Locations" },
-  { href: "/shop", label: "Shop" },
-  { href: "/story", label: "Story" },
-];
+  { href: "/shop", label: "Shop", gated: true },
+  { href: "/story", label: "Story", gated: true },
+].filter((link) => GATED_ROUTES_LIVE || !link.gated);
 
 const navLinkClass = (active: boolean) =>
   `nav-link text-[16px] font-semibold uppercase tracking-[0.01em] text-[var(--ink)] underline-offset-[6px] transition-colors ${

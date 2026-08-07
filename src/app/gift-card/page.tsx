@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { CardArtPreview } from "@/components/gift-card/CardArtPreview";
 import { SegmentedTabs } from "@/components/gift-card/SegmentedTabs";
 import { AmountPillSelector } from "@/components/gift-card/AmountPillSelector";
 import { GiftCardForm } from "@/components/gift-card/GiftCardForm";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
+import { GATED_ROUTES_LIVE } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Gift Cards — VAVVA" };
 
@@ -14,6 +16,8 @@ export const metadata: Metadata = { title: "Gift Cards — VAVVA" };
    matching the reference site. No reCAPTCHA badge — third-party, not a
    structural element to replicate. */
 export default function GiftCardPage() {
+  if (!GATED_ROUTES_LIVE) notFound();
+
   return (
     <main className="w-full bg-[var(--paper)] px-4 pb-24 pt-10 md:px-5 tablet:px-6 tablet:pt-14">
       <div className="mx-auto flex max-w-[640px] flex-col items-center gap-10">
