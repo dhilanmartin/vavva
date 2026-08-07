@@ -8,6 +8,30 @@
   --mute: rgba(0, 0, 0, 0.55);
   /* Sampled from the brush wordmark — the one accent the house prints in. */
   --red: #b32622;
+  --red-rgb: 179 38 34;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Apple HIG systemGray4/systemGray — flat AssetPlaceholder fills, not a
+     brand color choice. Kept as tokens alongside the rest so a palette
+     edit can't miss them. */
+  --placeholder-light: #d1d1d6;
+  --placeholder-dark: #8e8e93;
+}
+
+/* mimis.nyc structural-reference breakpoints (docs/research/mimis-nyc/PAGE_TOPOLOGY.md):
+   mobile <810px, tablet 810–1199.98px, desktop ≥1200px. Added alongside
+   Tailwind's defaults (sm/md/lg/xl/2xl stay available) rather than replacing
+   them, so existing `md:` usage on the home column keeps working unchanged.
+
+   --font-serif wires the clone-structure build's heading/body serif (see
+   layout.tsx's `fraunces` font) to a `font-serif` Tailwind utility. mimi's
+   spec files never named their actual face — Framer sites typically license
+   one — so this is a deliberate open-source substitution, not a match; see
+   the build report for the reasoning. */
+@theme {
+  --breakpoint-tablet: 810px;
+  --breakpoint-desktop: 1200px;
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
 }
 
 * {
@@ -294,4 +318,77 @@ p {
 :focus-visible {
   outline: 2px solid rgba(0, 0, 0, 0.55);
   outline-offset: 3px;
+}
+
+/* Touch devices fire hover on tap, which left footer/nav links stuck in
+   their hovered state after a mobile tap. Gated per improve-animations
+   audit finding #1 — plans/001-motion-polish-tokens.md. */
+@media (hover: hover) and (pointer: fine) {
+  .footer-link:hover {
+    color: var(--ink);
+  }
+
+  .nav-link:hover {
+    text-decoration-line: underline;
+  }
+}
+
+/* ---- clone-structure additions (mimis.nyc structural reference) ---- */
+
+/* Scroll-triggered reveal (feature-image-cta.spec.md): the home page's
+   feature block fades/rises into place as it enters the viewport. Reuses the
+   home page's blur-rise motion values (0.5s, cubic-bezier(0.19,1,0.22,1),
+   14px rise, 6px blur) rather than inventing new timing, per that spec's own
+   note — but as a transition toggled by IntersectionObserver
+   (ScrollReveal.tsx), since `.home-rise` is wired to a one-shot
+   page-mount class on <html> and this needs to re-arm per section, below the
+   fold, on routes that never touch that mount sequence. */
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  filter: blur(6px);
+  transition:
+    opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+    transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+    filter 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    transition: opacity 0.3s ease;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Nav mobile panel (nav.spec.md): "an in-flow panel pushes page content
+   down" on hamburger open — not an overlay/drawer. The grid-rows technique
+   animates from an unknown content height without JS measuring it, and
+   collapses to a true 0 (unlike max-height tricks, which either clip early
+   or leave a guessed ceiling). */
+.nav-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.nav-panel.is-open {
+  grid-template-rows: 1fr;
+}
+
+.nav-panel > div {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-panel {
+    transition: none;
+  }
 }
