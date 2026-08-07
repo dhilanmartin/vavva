@@ -25,7 +25,7 @@ export function CtaTileRow() {
           <li key={tile.href}>
             <Link
               href={tile.href}
-              className="flex h-full items-center justify-between gap-4 rounded-[24px] bg-[var(--ink)] px-6 py-6 transition-transform active:scale-[0.98]"
+              className="flex h-full items-center justify-between gap-4 rounded-[24px] bg-[var(--ink)] px-6 py-6 transition-transform ease-[var(--ease-out)] active:scale-[0.98]"
             >
               <span className="flex flex-col gap-1">
                 <span className="text-[16px] font-semibold text-[var(--paper)]">

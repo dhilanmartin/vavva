@@ -23,7 +23,7 @@ export function SegmentedTabs({
           type="button"
           onClick={() => setActive(i)}
           aria-pressed={active === i}
-          className={`min-h-11 rounded-full px-5 text-[12px] font-semibold uppercase tracking-[0.06em] transition-[transform,background-color,color] active:scale-[0.96] ${
+          className={`min-h-11 rounded-full px-5 text-[12px] font-semibold uppercase tracking-[0.06em] transition-[transform,background-color,color] ease-[var(--ease-out)] active:scale-[0.96] ${
             active === i
               ? "bg-[var(--ink)] text-[var(--paper)]"
               : "text-[var(--ink)]"

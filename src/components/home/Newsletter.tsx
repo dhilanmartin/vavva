@@ -40,7 +40,7 @@ export function Newsletter() {
           />
           <button
             type="submit"
-            className="min-h-11 shrink-0 rounded-full bg-[var(--ink)] px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform active:scale-[0.96]"
+            className="min-h-11 shrink-0 rounded-full bg-[var(--ink)] px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform ease-[var(--ease-out)] active:scale-[0.96]"
           >
             Join the list
           </button>

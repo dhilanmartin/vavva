@@ -46,7 +46,7 @@ export function Footer() {
             <li key={link.label}>
               <a
                 href={link.href}
-                className="text-[13px] font-medium uppercase tracking-[0.04em] text-[var(--mute)] transition-colors hover:text-[var(--ink)]"
+                className="footer-link text-[13px] font-medium uppercase tracking-[0.04em] text-[var(--mute)] transition-colors"
               >
                 {link.label}
               </a>

@@ -68,7 +68,7 @@ export function GiftCardForm() {
 
       <button
         type="submit"
-        className="mt-2 inline-flex min-h-11 items-center justify-center self-center rounded-full bg-[var(--ink)] px-8 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform active:scale-[0.96]"
+        className="mt-2 inline-flex min-h-11 items-center justify-center self-center rounded-full bg-[var(--ink)] px-8 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform ease-[var(--ease-out)] active:scale-[0.96]"
       >
         Send gift card
       </button>

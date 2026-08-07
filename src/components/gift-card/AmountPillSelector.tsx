@@ -19,7 +19,7 @@ export function AmountPillSelector() {
           type="button"
           onClick={() => setActive(i)}
           aria-pressed={active === i}
-          className={`min-h-11 rounded-full border px-5 text-[13px] font-semibold transition-[transform,background-color,border-color] active:scale-[0.96] ${
+          className={`min-h-11 rounded-full border px-5 text-[13px] font-semibold transition-[transform,background-color,border-color] ease-[var(--ease-out)] active:scale-[0.96] ${
             active === i
               ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
               : "border-black/15 text-[var(--ink)]"

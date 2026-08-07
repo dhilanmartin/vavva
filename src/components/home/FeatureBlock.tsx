@@ -33,7 +33,7 @@ export function FeatureBlock() {
 
         <Link
           href="/shop"
-          className="mt-1 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--paper)] px-6 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)] transition-transform active:scale-[0.96]"
+          className="mt-1 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--paper)] px-6 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)] transition-transform ease-[var(--ease-out)] active:scale-[0.96]"
         >
           See the shop
         </Link>

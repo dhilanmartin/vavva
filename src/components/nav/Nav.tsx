@@ -28,8 +28,8 @@ const PRIMARY_LINKS = [
 ];
 
 const navLinkClass = (active: boolean) =>
-  `text-[16px] font-semibold uppercase tracking-[0.01em] text-[var(--ink)] underline-offset-[6px] transition-colors ${
-    active ? "underline" : "no-underline hover:underline"
+  `nav-link text-[16px] font-semibold uppercase tracking-[0.01em] text-[var(--ink)] underline-offset-[6px] transition-colors ${
+    active ? "underline" : "no-underline"
   }`;
 
 export function Nav() {
@@ -50,12 +50,12 @@ export function Nav() {
           >
             <span aria-hidden className="relative block h-3.5 w-5">
               <span
-                className={`absolute left-0 top-0 h-[1.5px] w-full bg-[var(--ink)] transition-transform duration-300 ease-out ${
+                className={`absolute left-0 top-0 h-[1.5px] w-full bg-[var(--ink)] transition-transform duration-300 ease-[var(--ease-out)] ${
                   open ? "translate-y-[6.5px] rotate-45" : ""
                 }`}
               />
               <span
-                className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-[var(--ink)] transition-transform duration-300 ease-out ${
+                className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-[var(--ink)] transition-transform duration-300 ease-[var(--ease-out)] ${
                   open ? "-translate-y-[6.5px] -rotate-45" : ""
                 }`}
               />

@@ -9,6 +9,7 @@
   /* Sampled from the brush wordmark — the one accent the house prints in. */
   --red: #b32622;
   --red-rgb: 179 38 34;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* mimis.nyc structural-reference breakpoints (docs/research/mimis-nyc/PAGE_TOPOLOGY.md):
@@ -311,6 +312,19 @@ p {
 :focus-visible {
   outline: 2px solid rgba(0, 0, 0, 0.55);
   outline-offset: 3px;
+}
+
+/* Touch devices fire hover on tap, which left footer/nav links stuck in
+   their hovered state after a mobile tap. Gated per improve-animations
+   audit finding #1 — plans/001-motion-polish-tokens.md. */
+@media (hover: hover) and (pointer: fine) {
+  .footer-link:hover {
+    color: var(--ink);
+  }
+
+  .nav-link:hover {
+    text-decoration-line: underline;
+  }
 }
 
 /* ---- clone-structure additions (mimis.nyc structural reference) ---- */
