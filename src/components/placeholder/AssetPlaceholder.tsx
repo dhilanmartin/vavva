@@ -7,8 +7,11 @@
 // here, so one component can serve the hero, the product grid, the location
 // illustrations, and the story triptychs without a prop per shape.
 //
-// Colors are alpha ramps of the two neutrals already in the palette (black
-// for `dark`, black-on-paper for `light`) — no new brand hues, per DESIGN.md.
+// Flat Apple system-gray fills (HIG systemGray palette) — plain layout
+// blocking, not a design decision, so D can read section rhythm/copy gaps
+// without a gradient reading as "finished." No new brand hues, per DESIGN.md.
+
+const SYSTEM_GRAY = { light: "#D1D1D6", dark: "#8E8E93" };
 
 export function AssetPlaceholder({
   tone = "light",
@@ -26,12 +29,7 @@ export function AssetPlaceholder({
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{
-          background:
-            tone === "dark"
-              ? "linear-gradient(155deg, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.68) 100%)"
-              : "linear-gradient(155deg, rgba(0,0,0,0.09) 0%, rgba(0,0,0,0.03) 100%)",
-        }}
+        style={{ background: SYSTEM_GRAY[tone] }}
       />
       {label ? (
         <span
