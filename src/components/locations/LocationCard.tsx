@@ -2,27 +2,29 @@
 // text block (right) — name, 2-line address, hours — same side every entry,
 // not alternating. Stacks to image-above-text on mobile.
 
-import { AssetPlaceholder } from "@/components/placeholder/AssetPlaceholder";
+import { SkylineSketch } from "./SkylineSketch";
 
-export function LocationCard() {
+// Redesigned 2026-08-06 per D's reference mockup: one location, sketch
+// illustration left / text right, no card chrome, generous whitespace —
+// replaces the earlier stacked image-over-text card pattern.
+export function LocationCard({
+  name,
+  location,
+  status,
+}: {
+  name: string;
+  location: string;
+  status: string;
+}) {
   return (
-    <div className="flex flex-col gap-6 tablet:flex-row tablet:items-start tablet:gap-10">
-      <AssetPlaceholder
-        tone="light"
-        className="aspect-[176/246] w-full max-w-[220px] shrink-0 rounded-[24px] tablet:w-[176px]"
-      />
-      <div className="flex flex-col gap-2">
-        <h3 className="font-serif text-[22px] font-normal tracking-[-0.01em] text-[var(--ink)]">
-          [VAVVA COPY TBD]
+    <div className="flex flex-col items-center gap-10 tablet:flex-row tablet:items-center tablet:gap-20">
+      <SkylineSketch className="w-full max-w-[560px] tablet:w-[46%] tablet:max-w-none" />
+      <div className="flex flex-col gap-5 text-center tablet:text-left">
+        <h3 className="font-serif text-[32px] font-normal tracking-[-0.01em] text-[var(--ink)] desktop:text-[36px]">
+          {name}
         </h3>
-        <p className="text-[15px] leading-[1.5] text-[var(--mute)]">
-          [VAVVA COPY TBD]
-          <br />
-          [VAVVA COPY TBD]
-        </p>
-        <p className="text-[15px] leading-[1.5] text-[var(--mute)]">
-          [VAVVA COPY TBD]
-        </p>
+        <p className="text-[18px] leading-[1.6] text-[var(--ink)]">{location}</p>
+        <p className="text-[18px] leading-[1.6] text-[var(--ink)]">{status}</p>
       </div>
     </div>
   );
