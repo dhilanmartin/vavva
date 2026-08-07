@@ -1,10 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
+import { Nav } from "@/components/nav/Nav";
+import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+/* clone-structure addition. mimis.nyc's spec files documented a serif used
+   for both display headings AND body copy (COMPONENT_INVENTORY.md's type
+   scale), with sans reserved for nav/buttons/labels/prices — a role, not a
+   named face; recon never identified mimi's actual font (likely a licensed
+   Framer font), so this is a deliberate open substitution rather than a
+   match. Fraunces was picked for the same reason a body-capable display
+   serif was needed structurally: it holds up at both 48px headline sizes and
+   ~18–20px paragraph sizes without a second face. */
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -90,7 +106,11 @@ export default function RootLayout({
   return (
     // The intro script stamps `intro-js` / `intro-go` on <html> before hydration,
     // so the server markup can't match — that mismatch is the point, not a bug.
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${fraunces.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -104,7 +124,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${inter.className} antialiased`}>
+        {/* Nav + Footer are persistent, route-agnostic chrome — every mimi
+            page type carries both (PAGE_TOPOLOGY.md), so they live in the
+            root layout rather than being repeated per page. */}
+        <Nav />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }
