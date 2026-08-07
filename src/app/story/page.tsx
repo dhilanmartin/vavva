@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
 import { Triptych } from "@/components/story/Triptych";
-import { IconTextBlock } from "@/components/story/IconTextBlock";
-import { Timeline } from "@/components/story/Timeline";
-import { AssetPlaceholder } from "@/components/placeholder/AssetPlaceholder";
+import skyline from "../../assets/nyc-skyline.png";
 
 export const metadata: Metadata = { title: "Story — VAVVA" };
 
-/* story-page.spec.md order: Lead block -> triptych -> section heading ->
-   icon+text x3 -> triptych -> curved timeline (deferred, see Timeline.tsx)
-   -> closing illustration. */
+/* Trimmed 2026-08-07 per the owner: the "why we believe" icon+text section
+   and the Timeline are cut from this route for now (not deleted —
+   IconTextBlock.tsx and Timeline.tsx stay in src/components/story/,
+   same "paused, not gone" treatment as the home page's FeatureBlock/
+   CtaTileRow/Newsletter). The two triptych instances collapse to one —
+   with the "why" section and timeline gone, a second identical 3-image
+   grid right after the first read as duplicate content, not a deliberate
+   beat.
+
+   Closing visual is now the real skyline artwork (src/assets/nyc-skyline.png)
+   instead of a placeholder — same flush mix-blend-multiply treatment as
+   the Locations page, full-bleed rather than the earlier boxed/rounded
+   placeholder. */
 export default function StoryPage() {
   return (
     <main className="w-full bg-[var(--paper)] pb-24 pt-10 tablet:pt-14">
@@ -20,41 +29,12 @@ export default function StoryPage() {
           <Triptych />
         </div>
 
-        <h2 className="px-4 text-center font-serif text-[30px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] md:px-5 desktop:text-[36px]">
-          What we believe
-        </h2>
-
-        <div className="flex flex-col gap-16 tablet:gap-20">
-          <IconTextBlock
-            icon="circle"
-            title="Considered craft"
-            body="Everything we make starts with a question worth answering slowly, not a trend worth chasing quickly."
-          />
-          <IconTextBlock
-            icon="plus"
-            title="Quiet patience"
-            body="Good work takes the time it takes. We'd rather finish something right than finish it first."
-          />
-          <IconTextBlock
-            icon="triangle"
-            title="Shared abundance"
-            body="A studio is nothing without the people who show up for it. Vavva is built to be shared."
-          />
-        </div>
-
-        <div className="px-4 md:px-5 tablet:px-6">
-          <Triptych />
-        </div>
-
-        <Timeline />
-
-        <div className="px-4 md:px-5 tablet:px-6">
-          <AssetPlaceholder
-            tone="light"
-            label="VAVVA ASSET TBD — illustration"
-            className="mx-auto aspect-[16/7] w-full max-w-[900px] rounded-[24px]"
-          />
-        </div>
+        <Image
+          src={skyline}
+          alt="New York City skyline"
+          sizes="100vw"
+          className="mix-blend-multiply mx-auto w-full max-w-[1200px]"
+        />
       </div>
     </main>
   );
