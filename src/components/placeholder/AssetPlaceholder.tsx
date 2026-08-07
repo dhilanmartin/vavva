@@ -19,8 +19,10 @@ export function AssetPlaceholder({
   label?: string;
   className?: string;
 }) {
+  const position = className.includes("absolute") ? "" : "relative";
+
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`${position} overflow-hidden ${className}`}>
       <div
         aria-hidden
         className="absolute inset-0"
