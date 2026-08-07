@@ -59,7 +59,7 @@ export function Timeline() {
               {milestone.label}
             </span>
             <p
-              className={`mt-1 text-[15px] leading-[1.5] ${
+              className={`mt-1 font-serif text-[15px] leading-[1.5] ${
                 i === 0 ? "font-semibold text-[var(--ink)]" : "text-[var(--mute)]"
               }`}
             >

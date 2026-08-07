@@ -33,6 +33,7 @@ export function AssetPlaceholder({
       />
       {label ? (
         <span
+          aria-hidden
           className="absolute bottom-2 right-2.5 select-none text-[9px] font-semibold uppercase leading-none tracking-[0.08em]"
           style={{
             color:

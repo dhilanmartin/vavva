@@ -26,11 +26,13 @@
 // here (it's already prominent in the primary nav) — Story, Gift Cards,
 // Shop, Contact is the same 4-link count the reference site carries.
 
+import { CONTACT_HREF } from "@/lib/site";
+
 const LINKS = [
   { href: "/story", label: "Story" },
   { href: "/gift-card", label: "Gift Cards" },
   { href: "/shop", label: "Shop" },
-  { href: "mailto:hello@vavva.xyz", label: "Contact" },
+  { href: CONTACT_HREF, label: "Contact" },
 ];
 
 export function Footer() {

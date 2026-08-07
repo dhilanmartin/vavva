@@ -19,16 +19,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
+import { CONTACT_HREF } from "@/lib/site";
 
 const PRIMARY_LINKS = [
   { href: "/locations", label: "Locations" },
   { href: "/shop", label: "Shop" },
   { href: "/story", label: "Story" },
 ];
-
-// Placeholder inbox — no real address has been confirmed yet; swap before
-// this branch ships past a test build.
-const CONTACT_HREF = "mailto:hello@vavva.xyz";
 
 const navLinkClass = (active: boolean) =>
   `text-[16px] font-semibold uppercase tracking-[0.01em] text-[var(--ink)] underline-offset-[6px] transition-colors ${
@@ -100,7 +97,11 @@ export function Nav() {
 
       {/* In-flow panel: grid-rows technique in globals.css animates from an
           unmeasured content height to 0 and back — not an overlay/drawer. */}
-      <div id="nav-panel" className={`nav-panel tablet:hidden ${open ? "is-open" : ""}`}>
+      <div
+        id="nav-panel"
+        inert={!open}
+        className={`nav-panel tablet:hidden ${open ? "is-open" : ""}`}
+      >
         <div>
           <ul className="flex flex-col gap-1 px-4 pb-6 pt-2 md:px-5">
             {PRIMARY_LINKS.map((link) => {

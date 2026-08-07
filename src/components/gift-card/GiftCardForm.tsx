@@ -13,7 +13,7 @@
 import { useState } from "react";
 
 const inputClass =
-  "min-h-11 w-full rounded-md border border-black/20 bg-transparent px-3 text-[14px] text-[var(--ink)] outline-none placeholder:text-[var(--mute)] transition-colors focus:border-[var(--red)]";
+  "min-h-11 w-full rounded-md border border-black/20 bg-transparent px-3 text-[14px] text-[var(--ink)] placeholder:text-[var(--mute)] transition-colors focus:border-[var(--red)]";
 
 export function GiftCardForm() {
   const [sendToSelf, setSendToSelf] = useState(false);
@@ -24,8 +24,13 @@ export function GiftCardForm() {
       className="mx-auto flex w-full max-w-[520px] flex-col gap-5"
     >
       <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2">
-        <input className={inputClass} placeholder="Your name" />
-        <input className={inputClass} type="email" placeholder="Your email" />
+        <input className={inputClass} aria-label="Your name" placeholder="Your name" />
+        <input
+          className={inputClass}
+          type="email"
+          aria-label="Your email"
+          placeholder="Your email"
+        />
       </div>
 
       <label className="flex items-center gap-2 text-[14px] text-[var(--ink)]">
@@ -40,10 +45,15 @@ export function GiftCardForm() {
 
       {!sendToSelf ? (
         <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2">
-          <input className={inputClass} placeholder="Recipient's name" />
+          <input
+            className={inputClass}
+            aria-label="Recipient's name"
+            placeholder="Recipient's name"
+          />
           <input
             className={inputClass}
             type="email"
+            aria-label="Recipient's email"
             placeholder="Recipient's email"
           />
         </div>
@@ -51,6 +61,7 @@ export function GiftCardForm() {
 
       <textarea
         rows={4}
+        aria-label="Message"
         placeholder="Add a message (optional)"
         className={`${inputClass} min-h-28 resize-none py-3`}
       />

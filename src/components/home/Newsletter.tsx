@@ -32,14 +32,15 @@ export function Newsletter() {
           <input
             type="email"
             inputMode="email"
+            aria-label="Email address"
             placeholder="Email address"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="min-h-9 flex-1 min-w-0 bg-transparent px-3 text-[14px] text-[var(--ink)] outline-none placeholder:text-[var(--mute)]"
+            className="min-h-11 flex-1 min-w-0 rounded-full bg-transparent px-3 text-[14px] text-[var(--ink)] placeholder:text-[var(--mute)]"
           />
           <button
             type="submit"
-            className="min-h-9 shrink-0 rounded-full bg-[var(--ink)] px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform active:scale-[0.96]"
+            className="min-h-11 shrink-0 rounded-full bg-[var(--ink)] px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform active:scale-[0.96]"
           >
             Join the list
           </button>

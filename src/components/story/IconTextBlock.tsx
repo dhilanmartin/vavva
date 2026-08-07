@@ -41,7 +41,7 @@ export function IconTextBlock({
           {ICONS[icon]}
         </svg>
       </span>
-      <p className="text-[15px] leading-[1.6] text-[var(--mute)]">{body}</p>
+      <p className="font-serif text-[15px] leading-[1.6] text-[var(--mute)]">{body}</p>
     </div>
   );
 }

@@ -24,14 +24,16 @@ export function LocationCard({
       <Image
         src={skyline}
         alt="New York City skyline"
+        priority
+        sizes="(min-width: 810px) 46vw, 560px"
         className="w-full max-w-[560px] tablet:w-[46%] tablet:max-w-none"
       />
       <div className="flex flex-col gap-5 text-center tablet:text-left">
         <h3 className="font-serif text-[32px] font-normal tracking-[-0.01em] text-[var(--ink)] desktop:text-[36px]">
           {name}
         </h3>
-        <p className="text-[18px] leading-[1.6] text-[var(--ink)]">{location}</p>
-        <p className="text-[18px] leading-[1.6] text-[var(--ink)]">{status}</p>
+        <p className="font-serif text-[18px] leading-[1.6] text-[var(--ink)]">{location}</p>
+        <p className="font-serif text-[18px] leading-[1.6] text-[var(--ink)]">{status}</p>
       </div>
     </div>
   );

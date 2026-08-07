@@ -8,6 +8,7 @@
   --mute: rgba(0, 0, 0, 0.55);
   /* Sampled from the brush wordmark — the one accent the house prints in. */
   --red: #b32622;
+  --red-rgb: 179 38 34;
 }
 
 /* mimis.nyc structural-reference breakpoints (docs/research/mimis-nyc/PAGE_TOPOLOGY.md):
