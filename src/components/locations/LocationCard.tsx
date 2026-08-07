@@ -26,7 +26,7 @@ export function LocationCard({
         alt="New York City skyline"
         priority
         sizes="(min-width: 810px) 46vw, 560px"
-        className="w-full max-w-[560px] tablet:w-[46%] tablet:max-w-none"
+        className="w-full max-w-[560px] mix-blend-multiply tablet:w-[46%] tablet:max-w-none"
       />
       <div className="flex flex-col gap-5 text-center tablet:text-left">
         <h3 className="font-serif text-[32px] font-normal tracking-[-0.01em] text-[var(--ink)] desktop:text-[36px]">
