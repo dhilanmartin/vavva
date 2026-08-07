@@ -20,7 +20,7 @@ export default function StoryPage() {
           <Triptych />
         </div>
 
-        <h2 className="px-4 text-center font-serif text-[30px] font-normal tracking-[-0.02em] text-[var(--ink)] md:px-5 desktop:text-[36px]">
+        <h2 className="px-4 text-center font-serif text-[30px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] md:px-5 desktop:text-[36px]">
           What we believe
         </h2>
 

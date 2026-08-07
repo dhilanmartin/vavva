@@ -16,7 +16,7 @@ export default function GiftCardPage() {
   return (
     <main className="w-full bg-[var(--paper)] px-4 pb-24 pt-10 md:px-5 tablet:px-6 tablet:pt-14">
       <div className="mx-auto flex max-w-[640px] flex-col items-center gap-10">
-        <h1 className="text-center font-serif text-[36px] font-normal tracking-[-0.02em] text-[var(--ink)] desktop:text-[48px]">
+        <h1 className="text-center font-serif text-[36px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] desktop:text-[48px]">
           Gift Cards
         </h1>
 
