@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
 import { Triptych } from "@/components/story/Triptych";
+import { ScrollReveal } from "@/components/reveal/ScrollReveal";
 import skyline from "../../assets/nyc-skyline.png";
 
 export const metadata: Metadata = { title: "Story — VAVVA" };
@@ -25,16 +26,18 @@ export default function StoryPage() {
       <div className="flex flex-col gap-16 tablet:gap-20">
         <LeadBlock />
 
-        <div className="px-4 md:px-5 tablet:px-6">
+        <ScrollReveal className="px-4 md:px-5 tablet:px-6">
           <Triptych />
-        </div>
+        </ScrollReveal>
 
-        <Image
-          src={skyline}
-          alt="New York City skyline"
-          sizes="100vw"
-          className="mix-blend-multiply mx-auto w-full max-w-[1200px]"
-        />
+        <ScrollReveal>
+          <Image
+            src={skyline}
+            alt="New York City skyline"
+            sizes="100vw"
+            className="mix-blend-multiply mx-auto w-full max-w-[1200px]"
+          />
+        </ScrollReveal>
       </div>
     </main>
   );

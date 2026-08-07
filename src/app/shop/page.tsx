@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/shop/ProductGrid";
+import { ScrollReveal } from "@/components/reveal/ScrollReveal";
 
 export const metadata: Metadata = { title: "Shop — VAVVA" };
 
@@ -10,7 +11,9 @@ export default function ShopPage() {
         <h1 className="mb-12 text-center font-serif text-[36px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] tablet:mb-16 desktop:text-[48px]">
           Shop
         </h1>
-        <ProductGrid />
+        <ScrollReveal>
+          <ProductGrid />
+        </ScrollReveal>
       </div>
     </main>
   );

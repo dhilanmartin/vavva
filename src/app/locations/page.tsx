@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LocationCard } from "@/components/locations/LocationCard";
+import { ScrollReveal } from "@/components/reveal/ScrollReveal";
 
 export const metadata: Metadata = { title: "Locations — VAVVA" };
 
@@ -32,7 +33,9 @@ export default function LocationsPage() {
         </h1>
         <div className="flex flex-col gap-14 tablet:gap-16">
           {LOCATIONS.map((location) => (
-            <LocationCard key={location.name} {...location} />
+            <ScrollReveal key={location.name}>
+              <LocationCard {...location} />
+            </ScrollReveal>
           ))}
         </div>
       </div>

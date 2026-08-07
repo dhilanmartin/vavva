@@ -3,6 +3,7 @@ import { CardArtPreview } from "@/components/gift-card/CardArtPreview";
 import { SegmentedTabs } from "@/components/gift-card/SegmentedTabs";
 import { AmountPillSelector } from "@/components/gift-card/AmountPillSelector";
 import { GiftCardForm } from "@/components/gift-card/GiftCardForm";
+import { ScrollReveal } from "@/components/reveal/ScrollReveal";
 
 export const metadata: Metadata = { title: "Gift Cards — VAVVA" };
 
@@ -26,7 +27,9 @@ export default function GiftCardPage() {
 
         <AmountPillSelector />
 
-        <GiftCardForm />
+        <ScrollReveal className="w-full">
+          <GiftCardForm />
+        </ScrollReveal>
 
         <SegmentedTabs options={["Send now", "Schedule"]} />
       </div>
