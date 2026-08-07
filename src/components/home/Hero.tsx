@@ -1,13 +1,14 @@
 // Ported from the live vavva.xyz landing (git history: main's
 // src/app/page.tsx, pre-clone-structure), then revised 2026-08-06 per D:
 // the h1 mark is replaced with a text headline to resolve the two-VAVVA
-// duplication (Nav already carries the mark). Sizing matches mimi's H1/hero
-// heading type-scale fact from COMPONENT_INVENTORY.md (48px/400/1.17
-// line-height/-0.02em serif desktop, stepped down for mobile per this
-// rebuild's own convention) — but the words are Vavva's own. "Meet me at
-// Mimi's" is their tagline; swapping a couple of words for "Casa Vavva"
-// would still be their line, not a new one, so this is an original
-// invitational headline instead, calibrated to the same word count/register.
+// duplication (Nav already carries the mark). Simplified same day to just
+// "Casa Vavva" — a full sentence wrapped to two lines, and D's design
+// system (dvault/00-system/context/design-system.md) is explicit that
+// display type should be "confident and tightly controlled" and fit as a
+// single deliberate mark, not a wrapped headline. Font-size uses that same
+// file's fluid Hero scale token (clamp(2.3rem, 5vw, 4.5rem)) instead of
+// this rebuild's earlier fixed mobile/desktop breakpoint jump — the vault's
+// own rule is "never fixed px at display sizes."
 
 import { AccessGate } from "@/components/gate/AccessGate";
 
@@ -19,10 +20,10 @@ export function Hero() {
           on the page, which is what makes it read as a head rather than as
           the first line of the block. */}
       <h1
-        className="home-rise m-0 mb-10 text-center font-serif text-[36px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] md:mb-11 desktop:text-[48px]"
+        className="home-rise m-0 mb-10 text-balance text-center font-serif text-[clamp(2.3rem,5vw,4.5rem)] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] md:mb-11"
         style={{ ["--i" as string]: 0 }}
       >
-        Welcome to Casa Vavva
+        Casa Vavva
       </h1>
 
       <header className="text-[15px] font-medium leading-[1.4] tracking-[-0.015em]">
