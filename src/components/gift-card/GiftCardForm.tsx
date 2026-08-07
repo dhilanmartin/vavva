@@ -24,12 +24,8 @@ export function GiftCardForm() {
       className="mx-auto flex w-full max-w-[520px] flex-col gap-5"
     >
       <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2">
-        <input className={inputClass} placeholder="[VAVVA COPY TBD — sender name]" />
-        <input
-          className={inputClass}
-          type="email"
-          placeholder="[VAVVA COPY TBD — sender email]"
-        />
+        <input className={inputClass} placeholder="Your name" />
+        <input className={inputClass} type="email" placeholder="Your email" />
       </div>
 
       <label className="flex items-center gap-2 text-[14px] text-[var(--ink)]">
@@ -39,26 +35,23 @@ export function GiftCardForm() {
           onChange={(e) => setSendToSelf(e.target.checked)}
           className="h-4 w-4 rounded-sm border border-black/30 accent-[var(--red)]"
         />
-        [VAVVA COPY TBD — send to myself]
+        Send this to myself
       </label>
 
       {!sendToSelf ? (
         <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2">
-          <input
-            className={inputClass}
-            placeholder="[VAVVA COPY TBD — recipient name]"
-          />
+          <input className={inputClass} placeholder="Recipient's name" />
           <input
             className={inputClass}
             type="email"
-            placeholder="[VAVVA COPY TBD — recipient email]"
+            placeholder="Recipient's email"
           />
         </div>
       ) : null}
 
       <textarea
         rows={4}
-        placeholder="[VAVVA COPY TBD — message]"
+        placeholder="Add a message (optional)"
         className={`${inputClass} min-h-28 resize-none py-3`}
       />
 
@@ -66,7 +59,7 @@ export function GiftCardForm() {
         type="submit"
         className="mt-2 inline-flex min-h-11 items-center justify-center self-center rounded-full bg-[var(--ink)] px-8 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform active:scale-[0.96]"
       >
-        [VAVVA COPY TBD]
+        Send gift card
       </button>
     </form>
   );
