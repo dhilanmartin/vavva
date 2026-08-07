@@ -15,11 +15,13 @@ export function LeadBlock() {
   return (
     <div className="mx-auto max-w-[640px] px-4 text-center md:px-5">
       <h1 className="font-serif text-[36px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] desktop:text-[48px]">
-        Casa Vavva began as an idea before it was a room.
+        The Vavva Story
       </h1>
       <p className="mt-6 font-serif text-[18px] leading-[1.6] text-[var(--mute)]">
-        We build for people who want fewer, better things — spaces, objects,
-        and work that hold up under attention.
+        It started with a mark, drawn once by hand, and a question: what
+        would a studio feel like if it slowed down. Everything since has
+        been in service of that same idea — fewer things, made with more
+        care.
       </p>
     </div>
   );

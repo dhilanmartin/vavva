@@ -14,6 +14,15 @@
 // route, and sits in the secondary slot on every breakpoint since it never
 // needs to hide behind the hamburger. Gift Cards is footer-only per the
 // reference site's own IA — intentionally not in this nav.
+//
+// On-load entrance (2026-08-07): mimis.nyc's own nav fades + rises in on
+// load (measured: opacity 0->1, translateY -20px->0, easing out over
+// ~0.6-0.8s) — a structural/behavioral fact, not their content, so it's
+// fair game the same way every other measured value on this branch is.
+// Reuses Vavva's own already-established .home-rise system (site-wide via
+// the intro-js/intro-go classes stamped on <html> in layout.tsx, not a
+// home-page-only mechanism) rather than inventing separate motion tokens
+// for just the nav — same fade+rise+blur shape, same 0.5s curve.
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -43,7 +52,10 @@ export function Nav() {
   return (
     <header className="relative z-20 bg-[var(--paper)]">
       <div className="mx-auto flex h-16 max-w-[1710px] items-center px-4 md:px-5 tablet:px-6">
-        <div className="flex flex-1 items-center justify-start">
+        <div
+          className="home-rise flex flex-1 items-center justify-start"
+          style={{ ["--i" as string]: 0 }}
+        >
           <button
             type="button"
             aria-expanded={open}
@@ -84,12 +96,16 @@ export function Nav() {
         <Link
           href="/"
           aria-label="Vavva — home"
-          className="flex flex-1 items-center justify-center"
+          className="home-rise flex flex-1 items-center justify-center"
+          style={{ ["--i" as string]: 1 }}
         >
           <VavvaMark className="h-auto w-[88px]" />
         </Link>
 
-        <div className="flex flex-1 items-center justify-end">
+        <div
+          className="home-rise flex flex-1 items-center justify-end"
+          style={{ ["--i" as string]: 2 }}
+        >
           <a href={CONTACT_HREF} className={navLinkClass(false)}>
             Contact
           </a>
