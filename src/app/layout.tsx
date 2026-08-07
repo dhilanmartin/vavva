@@ -124,12 +124,20 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} flex min-h-svh flex-col antialiased`}>
         {/* Nav + Footer are persistent, route-agnostic chrome — every mimi
             page type carries both (PAGE_TOPOLOGY.md), so they live in the
-            root layout rather than being repeated per page. */}
+            root layout rather than being repeated per page.
+
+            flex-1 on the children wrapper + min-h-svh on body: "sticky
+            footer" per D's 2026-08-07 note — on a short page (Locations'
+            single entry, Gift Cards) the footer sits pinned to the actual
+            bottom of the viewport instead of floating mid-screen; on a
+            tall page it's pushed down and scrolls normally, same as
+            before. svh not dvh, matching the fix already applied to the
+            home page's own min-height (mobile-chrome scroll-jump). */}
         <Nav />
-        {children}
+        <div className="flex-1">{children}</div>
         <Footer />
       </body>
     </html>

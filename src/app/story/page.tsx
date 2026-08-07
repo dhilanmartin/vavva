@@ -19,7 +19,10 @@ export const metadata: Metadata = { title: "Story — VAVVA" };
    Closing visual is now the real skyline artwork (src/assets/nyc-skyline.png)
    instead of a placeholder — same flush mix-blend-multiply treatment as
    the Locations page, full-bleed rather than the earlier boxed/rounded
-   placeholder. */
+   placeholder. Not wrapped in ScrollReveal (2026-08-07): an ancestor's
+   opacity transition forces a stacking context for its duration, which
+   blocks mix-blend-mode from reading the real background behind it —
+   same fix as LocationCard's image. */
 export default function StoryPage() {
   return (
     <main className="w-full bg-[var(--paper)] pb-24 pt-10 tablet:pt-14">
@@ -30,14 +33,12 @@ export default function StoryPage() {
           <Triptych />
         </ScrollReveal>
 
-        <ScrollReveal>
-          <Image
-            src={skyline}
-            alt="New York City skyline"
-            sizes="100vw"
-            className="mix-blend-multiply mx-auto w-full max-w-[1200px]"
-          />
-        </ScrollReveal>
+        <Image
+          src={skyline}
+          alt="New York City skyline"
+          sizes="100vw"
+          className="mix-blend-multiply mx-auto w-full max-w-[1200px]"
+        />
       </div>
     </main>
   );
