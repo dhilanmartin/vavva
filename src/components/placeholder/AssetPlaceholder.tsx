@@ -10,8 +10,10 @@
 // Flat Apple system-gray fills (HIG systemGray palette) — plain layout
 // blocking, not a design decision, so D can read section rhythm/copy gaps
 // without a gradient reading as "finished." No new brand hues, per DESIGN.md.
+// Values live as --placeholder-light/-dark in globals.css, alongside the
+// rest of the palette tokens, not hardcoded here.
 
-const SYSTEM_GRAY = { light: "#D1D1D6", dark: "#8E8E93" };
+const SYSTEM_GRAY = { light: "var(--placeholder-light)", dark: "var(--placeholder-dark)" };
 
 export function AssetPlaceholder({
   tone = "light",

@@ -35,6 +35,10 @@ const navLinkClass = (active: boolean) =>
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const links = PRIMARY_LINKS.map((link) => ({
+    ...link,
+    active: pathname === link.href,
+  }));
 
   return (
     <header className="relative z-20 bg-[var(--paper)]">
@@ -63,20 +67,17 @@ export function Nav() {
           </button>
 
           <ul className="hidden items-center gap-8 tablet:flex">
-            {PRIMARY_LINKS.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    aria-current={active ? "page" : undefined}
-                    className={navLinkClass(active)}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  aria-current={link.active ? "page" : undefined}
+                  className={navLinkClass(link.active)}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -104,23 +105,20 @@ export function Nav() {
       >
         <div>
           <ul className="flex flex-col gap-1 px-4 pb-6 pt-2 md:px-5">
-            {PRIMARY_LINKS.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    aria-current={active ? "page" : undefined}
-                    onClick={() => setOpen(false)}
-                    className={`block py-2 text-[16px] font-bold uppercase tracking-[0.01em] text-[var(--ink)] ${
-                      active ? "underline underline-offset-[6px]" : ""
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  aria-current={link.active ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                  className={`block py-2 text-[16px] font-bold uppercase tracking-[0.01em] text-[var(--ink)] ${
+                    link.active ? "underline underline-offset-[6px]" : ""
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

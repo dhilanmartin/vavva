@@ -10,6 +10,12 @@
   --red: #b32622;
   --red-rgb: 179 38 34;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Apple HIG systemGray4/systemGray — flat AssetPlaceholder fills, not a
+     brand color choice. Kept as tokens alongside the rest so a palette
+     edit can't miss them. */
+  --placeholder-light: #d1d1d6;
+  --placeholder-dark: #8e8e93;
 }
 
 /* mimis.nyc structural-reference breakpoints (docs/research/mimis-nyc/PAGE_TOPOLOGY.md):
