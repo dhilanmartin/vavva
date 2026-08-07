@@ -13,7 +13,7 @@
 import { useState } from "react";
 
 const inputClass =
-  "min-h-11 w-full rounded-md border border-black/20 bg-transparent px-3 text-[14px] text-[var(--ink)] outline-none placeholder:text-[var(--mute)] focus:border-[var(--red)]";
+  "min-h-11 w-full rounded-md border border-black/20 bg-transparent px-3 text-[14px] text-[var(--ink)] outline-none placeholder:text-[var(--mute)] transition-colors focus:border-[var(--red)]";
 
 export function GiftCardForm() {
   const [sendToSelf, setSendToSelf] = useState(false);
