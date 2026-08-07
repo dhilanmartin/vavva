@@ -24,9 +24,9 @@ export function FeatureBlock() {
         </span>
 
         <h2 className="font-serif text-[28px] font-normal leading-[1.2] tracking-[-0.02em] text-[var(--paper)] desktop:text-[36px]">
-          [VAVVA COPY TBD]
+          Step inside
           <br />
-          [VAVVA COPY TBD]
+          the studio
         </h2>
 
         <AssetPlaceholder tone="dark" label="" className="h-14 w-14 rounded-full" />
@@ -35,7 +35,7 @@ export function FeatureBlock() {
           href="/shop"
           className="mt-1 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--paper)] px-6 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)] transition-transform active:scale-[0.96]"
         >
-          [VAVVA COPY TBD]
+          See the shop
         </Link>
       </ScrollReveal>
     </section>

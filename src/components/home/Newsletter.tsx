@@ -20,7 +20,9 @@ export function Newsletter() {
     <section className="bg-[var(--ink)] px-4 py-16 text-center md:px-5 tablet:py-20">
       <div className="mx-auto flex max-w-[420px] flex-col items-center gap-6">
         <h2 className="font-serif text-[24px] font-normal leading-[1.25] tracking-[-0.02em] text-[var(--paper)] desktop:text-[28px]">
-          [VAVVA COPY TBD]
+          Stay close
+          <br />
+          to Vavva
         </h2>
 
         <form
@@ -30,7 +32,7 @@ export function Newsletter() {
           <input
             type="email"
             inputMode="email"
-            placeholder="[VAVVA COPY TBD]"
+            placeholder="Email address"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             className="min-h-9 flex-1 min-w-0 bg-transparent px-3 text-[14px] text-[var(--ink)] outline-none placeholder:text-[var(--mute)]"
@@ -39,7 +41,7 @@ export function Newsletter() {
             type="submit"
             className="min-h-9 shrink-0 rounded-full bg-[var(--ink)] px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[var(--paper)] transition-transform active:scale-[0.96]"
           >
-            [VAVVA COPY TBD]
+            Join the list
           </button>
         </form>
       </div>

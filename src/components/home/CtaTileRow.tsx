@@ -12,9 +12,9 @@
 import Link from "next/link";
 
 const TILES = [
-  { href: "/locations" },
-  { href: "/shop" },
-  { href: "/story" },
+  { href: "/locations", label: "Locations", sub: "Find the studio" },
+  { href: "/shop", label: "Shop", sub: "Objects, considered" },
+  { href: "/story", label: "Our Story", sub: "How it began" },
 ];
 
 export function CtaTileRow() {
@@ -29,10 +29,10 @@ export function CtaTileRow() {
             >
               <span className="flex flex-col gap-1">
                 <span className="text-[16px] font-semibold text-[var(--paper)]">
-                  [VAVVA COPY TBD]
+                  {tile.label}
                 </span>
                 <span className="text-[13px] text-[var(--paper)]/60">
-                  [VAVVA COPY TBD]
+                  {tile.sub}
                 </span>
               </span>
               <span
