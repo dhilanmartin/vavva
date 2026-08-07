@@ -5,13 +5,22 @@
 
 import { ProductCard } from "./ProductCard";
 
-const PRODUCT_COUNT = 8;
+const PRODUCTS = [
+  { name: "Table Candle", price: "$38" },
+  { name: "Ceramic Vessel", price: "$64" },
+  { name: "Studio Print", price: "$48" },
+  { name: "Canvas Tote", price: "$32" },
+  { name: "Wool Scarf", price: "$86" },
+  { name: "Bound Notebook", price: "$24" },
+  { name: "Vavva Tee", price: "$42" },
+  { name: "Enamel Pin", price: "$14" },
+];
 
 export function ProductGrid() {
   return (
     <div className="grid grid-cols-1 gap-5 tablet:grid-cols-2 desktop:grid-cols-4">
-      {Array.from({ length: PRODUCT_COUNT }).map((_, i) => (
-        <ProductCard key={i} />
+      {PRODUCTS.map((product) => (
+        <ProductCard key={product.name} {...product} />
       ))}
     </div>
   );

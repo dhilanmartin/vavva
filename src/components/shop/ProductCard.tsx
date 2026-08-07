@@ -5,17 +5,21 @@
 
 import { AssetPlaceholder } from "@/components/placeholder/AssetPlaceholder";
 
-export function ProductCard() {
+export function ProductCard({
+  name,
+  price,
+}: {
+  name: string;
+  price: string;
+}) {
   return (
     <div className="flex flex-col gap-3">
       <AssetPlaceholder tone="light" className="aspect-[5/4] w-full" />
       <div className="flex flex-col items-center gap-1 text-center">
         <span className="text-[13px] font-semibold uppercase tracking-[0.04em] text-[var(--ink)]">
-          [VAVVA COPY TBD]
+          {name}
         </span>
-        <span className="text-[13px] text-[var(--mute)]">
-          [VAVVA COPY TBD]
-        </span>
+        <span className="text-[13px] text-[var(--mute)]">{price}</span>
       </div>
     </div>
   );
