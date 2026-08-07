@@ -9,10 +9,11 @@ export function LeadBlock() {
   return (
     <div className="mx-auto max-w-[640px] px-4 text-center md:px-5">
       <h1 className="font-serif text-[22px] font-semibold leading-[1.5] tracking-[-0.01em] text-[var(--ink)] desktop:text-[26px]">
-        [VAVVA COPY TBD]
+        Casa Vavva began as an idea before it was a room.
       </h1>
       <p className="font-serif text-[22px] font-normal leading-[1.5] tracking-[-0.01em] text-[var(--ink)] desktop:text-[26px]">
-        [VAVVA COPY TBD]
+        We build for people who want fewer, better things — spaces, objects,
+        and work that hold up under attention.
       </p>
     </div>
   );

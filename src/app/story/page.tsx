@@ -21,13 +21,25 @@ export default function StoryPage() {
         </div>
 
         <h2 className="px-4 text-center font-serif text-[30px] font-normal tracking-[-0.02em] text-[var(--ink)] md:px-5 desktop:text-[36px]">
-          [VAVVA COPY TBD]
+          What we believe
         </h2>
 
         <div className="flex flex-col gap-16 tablet:gap-20">
-          <IconTextBlock icon="circle" />
-          <IconTextBlock icon="plus" />
-          <IconTextBlock icon="triangle" />
+          <IconTextBlock
+            icon="circle"
+            title="Considered craft"
+            body="Everything we make starts with a question worth answering slowly, not a trend worth chasing quickly."
+          />
+          <IconTextBlock
+            icon="plus"
+            title="Quiet patience"
+            body="Good work takes the time it takes. We'd rather finish something right than finish it first."
+          />
+          <IconTextBlock
+            icon="triangle"
+            title="Shared abundance"
+            body="A studio is nothing without the people who show up for it. Vavva is built to be shared."
+          />
         </div>
 
         <div className="px-4 md:px-5 tablet:px-6">

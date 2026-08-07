@@ -12,14 +12,43 @@
 // curved/click-driven version is a deferred follow-up, not shipped here —
 // see the build report.
 
-const MILESTONES = [1, 2, 3, 4, 5, 6, 7];
+const MILESTONES = [
+  {
+    label: "Origin",
+    caption: "Vavva starts as a question: what would a studio feel like if it slowed down.",
+  },
+  {
+    label: "First room",
+    caption: "The first space is small, deliberately — enough to prove the idea, not perform it.",
+  },
+  {
+    label: "The mark",
+    caption: "The brush wordmark is drawn by hand, once, and never redrawn.",
+  },
+  {
+    label: "First work",
+    caption: "Early projects are chosen for fit, not scale — the right room over the big one.",
+  },
+  {
+    label: "The gate",
+    caption: "Access opens slowly, by invitation, before it opens to everyone.",
+  },
+  {
+    label: "Today",
+    caption: "Vavva works with a small circle of clients and collaborators in New York.",
+  },
+  {
+    label: "Next",
+    caption: "What comes after this page is still being decided — on purpose.",
+  },
+];
 
 export function Timeline() {
   return (
     <div className="mx-auto max-w-[720px] px-4 md:px-5">
       <ol className="relative flex flex-col gap-8 border-l border-black/15 pl-6 tablet:gap-10">
-        {MILESTONES.map((id, i) => (
-          <li key={id} className="relative">
+        {MILESTONES.map((milestone, i) => (
+          <li key={milestone.label} className="relative">
             <span
               aria-hidden
               className={`absolute -left-[27px] top-1 h-3 w-3 rounded-full border-2 border-[var(--paper)] ${
@@ -27,14 +56,14 @@ export function Timeline() {
               }`}
             />
             <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-[var(--mute)]">
-              [VAVVA COPY TBD]
+              {milestone.label}
             </span>
             <p
               className={`mt-1 text-[15px] leading-[1.5] ${
                 i === 0 ? "font-semibold text-[var(--ink)]" : "text-[var(--mute)]"
               }`}
             >
-              [VAVVA COPY TBD]
+              {milestone.caption}
             </p>
           </li>
         ))}

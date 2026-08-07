@@ -12,11 +12,19 @@ const ICONS: Record<IconKey, React.ReactNode> = {
   triangle: <path d="M12 3 21 20H3Z" strokeLinejoin="round" />,
 };
 
-export function IconTextBlock({ icon = "circle" }: { icon?: IconKey }) {
+export function IconTextBlock({
+  icon = "circle",
+  title,
+  body,
+}: {
+  icon?: IconKey;
+  title: string;
+  body: string;
+}) {
   return (
     <div className="mx-auto flex max-w-[480px] flex-col items-center gap-4 px-4 text-center md:px-5">
       <h3 className="font-serif text-[22px] font-normal tracking-[-0.01em] text-[var(--ink)]">
-        [VAVVA COPY TBD]
+        {title}
       </h3>
       <span
         aria-hidden
@@ -33,9 +41,7 @@ export function IconTextBlock({ icon = "circle" }: { icon?: IconKey }) {
           {ICONS[icon]}
         </svg>
       </span>
-      <p className="text-[15px] leading-[1.6] text-[var(--mute)]">
-        [VAVVA COPY TBD]
-      </p>
+      <p className="text-[15px] leading-[1.6] text-[var(--mute)]">{body}</p>
     </div>
   );
 }
