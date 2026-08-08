@@ -11,9 +11,7 @@
 //
 // Route destinations per PAGE_TOPOLOGY.md: primary nav = Locations, Shop,
 // Story (the 3 nav-reachable pages). Contact is a mailto: handoff, not a
-// route, and sits in the secondary slot on every breakpoint since it never
-// needs to hide behind the hamburger. Gift Cards is footer-only per the
-// reference site's own IA — intentionally not in this nav.
+// route, and sits in the secondary slot at tablet and up.
 //
 // On-load entrance (2026-08-07): mimis.nyc's own nav fades + rises in on
 // load (measured: opacity 0->1, translateY -20px->0, easing out over
@@ -23,19 +21,58 @@
 // the intro-js/intro-go classes stamped on <html> in layout.tsx, not a
 // home-page-only mechanism) rather than inventing separate motion tokens
 // for just the nav — same fade+rise+blur shape, same 0.5s curve.
+//
+// ---- 2026-08-07 revision, against D's own mobile-header reference ----
+//
+// Measured off mimis.nyc rather than eyeballed from the screenshot, then
+// cross-checked against it (their logo renders 60px wide, which is exactly
+// half its width in D's 2x capture — so the capture reads 1:1 in points and
+// every offset below could be verified against it):
+//
+//   header height        64px            (unchanged — this was already h-16)
+//   page gutter          24px            (was 16/20/24 stepped; now flat 24)
+//   panel link type      Inter 600 / 16px / uppercase, same as the desktop
+//                        row — the mobile links are NOT scaled up
+//   panel row pitch      32px
+//   panel top offset     ~24px below the header
+//   link states          rest #000 / none, hover accent + underline,
+//                        current #111 + underline  (see globals.css)
+//
+// Two departures, both deliberate:
+// - The accent is Vavva red, not their yellow. D's call.
+// - Contact joins the panel on mobile. Their panel lists all four
+//   destinations and the right zone holds the cart instead; Vavva has no
+//   cart, so parking Contact alone in an otherwise-empty right zone would
+//   have been the one place this nav read as emptier than the reference.
+//   It keeps its tablet+ position unchanged.
+//
+// The 32px row pitch is below this repo's usual 44px control floor but
+// clears WCAG 2.5.8 AA (24px) on both axes — each link is a full-width
+// block — so the reference value is kept rather than overridden.
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
-import { CONTACT_HREF, GATED_ROUTES_LIVE } from "@/lib/site";
+import { CONTACT_HREF } from "@/lib/site";
 
+// Labels are decoupled from routes on purpose (D, 2026-08-07: "change store
+// to merch. and change story to our story"). /shop keeps its path and reads
+// "Merch"; /story keeps its path and reads "Our Story". That split is also
+// what the reference site does — its nav says MERCH and points at ./shop —
+// so the URLs stay short and stable while the labels say what visitors
+// actually call the pages. No redirects needed; nothing links to the old
+// label.
 const PRIMARY_LINKS = [
   { href: "/locations", label: "Locations" },
-  { href: "/shop", label: "Shop", gated: true },
-  { href: "/story", label: "Story", gated: true },
-].filter((link) => GATED_ROUTES_LIVE || !link.gated);
+  { href: "/shop", label: "Merch" },
+  { href: "/story", label: "Our Story" },
+];
 
+// Leading is deliberately NOT set here: the row is 20px in the header bar and
+// 32px in the mobile panel, and two line-height utilities on one element are
+// decided by stylesheet order rather than by the order they're concatenated
+// in — so each call site sets its own.
 const navLinkClass = (active: boolean) =>
   `nav-link text-[16px] font-semibold uppercase tracking-[0.01em] text-[var(--ink)] underline-offset-[6px] transition-colors ${
     active ? "underline" : "no-underline"
@@ -51,7 +88,7 @@ export function Nav() {
 
   return (
     <header className="relative z-20 bg-[var(--paper)]">
-      <div className="mx-auto flex h-16 max-w-[1710px] items-center px-4 md:px-5 tablet:px-6">
+      <div className="mx-auto flex h-16 max-w-[1710px] items-center px-6">
         <div
           className="home-rise flex flex-1 items-center justify-start"
           style={{ ["--i" as string]: 0 }}
@@ -78,13 +115,13 @@ export function Nav() {
             </span>
           </button>
 
-          <ul className="hidden items-center gap-8 tablet:flex">
+          <ul className="hidden items-center gap-5 tablet:flex">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   aria-current={link.active ? "page" : undefined}
-                  className={navLinkClass(link.active)}
+                  className={`leading-5 ${navLinkClass(link.active)}`}
                 >
                   {link.label}
                 </Link>
@@ -106,7 +143,10 @@ export function Nav() {
           className="home-rise flex flex-1 items-center justify-end"
           style={{ ["--i" as string]: 2 }}
         >
-          <a href={CONTACT_HREF} className={navLinkClass(false)}>
+          <a
+            href={CONTACT_HREF}
+            className={`hidden leading-5 tablet:inline ${navLinkClass(false)}`}
+          >
             Contact
           </a>
         </div>
@@ -120,21 +160,28 @@ export function Nav() {
         className={`nav-panel tablet:hidden ${open ? "is-open" : ""}`}
       >
         <div>
-          <ul className="flex flex-col gap-1 px-4 pb-6 pt-2 md:px-5">
+          <ul className="flex flex-col px-6 pb-8 pt-6">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   aria-current={link.active ? "page" : undefined}
                   onClick={() => setOpen(false)}
-                  className={`block py-2 text-[16px] font-bold uppercase tracking-[0.01em] text-[var(--ink)] ${
-                    link.active ? "underline underline-offset-[6px]" : ""
-                  }`}
+                  className={`block leading-[32px] ${navLinkClass(link.active)}`}
                 >
                   {link.label}
                 </Link>
               </li>
             ))}
+            <li>
+              <a
+                href={CONTACT_HREF}
+                onClick={() => setOpen(false)}
+                className={`block leading-[32px] ${navLinkClass(false)}`}
+              >
+                Contact
+              </a>
+            </li>
           </ul>
         </div>
       </div>

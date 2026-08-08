@@ -36,12 +36,28 @@ export function LocationCard({
         sizes="(min-width: 810px) 46vw, 560px"
         className="w-full max-w-[560px] mix-blend-multiply tablet:w-[46%] tablet:max-w-none"
       />
-      <ScrollReveal className="flex flex-col gap-5 text-center tablet:text-left">
-        <h3 className="font-serif text-[32px] font-normal tracking-[-0.01em] text-[var(--ink)] desktop:text-[36px]">
-          {name}
-        </h3>
-        <p className="font-serif text-[18px] leading-[1.6] text-[var(--ink)]">{location}</p>
-        <p className="font-serif text-[18px] leading-[1.6] text-[var(--ink)]">{status}</p>
+      {/* Type is mimis.nyc/locations' own scale, measured off their live
+          computed styles on 2026-08-07 and reproduced exactly — entry name
+          at 26/36.4/-1.04px serif 400 (.mimi-lead), address and hours at
+          14/19.6/-0.14px Inter 500 (.mimi-body), with a 20px gap between
+          the two body lines, which is the margin their own stacked
+          paragraphs carry. Only the fonting was asked for and only the
+          fonting changed: this stays illustration-left / text-right per D's
+          2026-08-06 mockup, where the reference stacks its entries centred.
+
+          Text stays centred — the reference's own alignment, and it reads
+          correctly as the right half of a two-column row. A
+          `tablet:text-left` override was tried here and removed: .mimi-* is
+          authored after Tailwind's utility layer in globals.css, so at equal
+          specificity its `text-align: center` beat the utility and the
+          override was doing nothing. Better to state the alignment once than
+          to leave behind a line that only looks like it works. */}
+      <ScrollReveal className="flex flex-col gap-5">
+        <h3 className="mimi-lead">{name}</h3>
+        <div className="flex flex-col gap-5">
+          <p className="mimi-body">{location}</p>
+          <p className="mimi-body">{status}</p>
+        </div>
       </ScrollReveal>
     </div>
   );

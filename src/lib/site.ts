@@ -1,22 +1,27 @@
 // Placeholder inbox — no real address has been confirmed yet; swap before
-// this branch ships past a test build. Single source so Nav and Footer
-// can't drift from each other while it's still a placeholder.
+// this branch ships past a test build. Single source so Nav and the waitlist
+// copy can't drift from each other while it's still a placeholder.
 export const CONTACT_EMAIL = "hello@vavva.xyz";
 export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
 
-// 2026-08-07: D asked to push live "despite the placeholder[s], but limit
-// the pages available to just the ones without placeholders." Shop, Story,
-// and Gift Cards still carry gray AssetPlaceholder boxes and/or an invented
-// catalog — Home and Locations are the two pages with no placeholder
-// content left. Gated on NEXT_PUBLIC_VERCEL_ENV (the client-exposed mirror
-// Vercel auto-provides for Next.js projects — plain VERCEL_ENV is
-// server-only and would silently read as undefined in Nav.tsx, a client
-// component), so:
-//   - local dev / `npm run dev`: unset -> everything stays reachable, keep iterating
-//   - Vercel preview deploys (this PR's preview URL): "preview" -> everything reachable, keep reviewing
-//   - the actual production deploy (vavva.xyz): "production" -> gated routes 404
-// Nav/Footer filtering below is the visible layer; the notFound() calls on
-// each gated page are the actual enforcement, since a visitor could still
-// type the URL directly.
-export const GATED_ROUTES_LIVE =
-  process.env.NEXT_PUBLIC_VERCEL_ENV !== "production";
+// GATED_ROUTES_LIVE removed 2026-08-07.
+//
+// It existed for a specific situation: the landing was the finished public
+// page, and Shop/Story/Gift Cards were half-built rooms behind it, so
+// production hid them and left the front door open. D asked to reopen Story
+// ("open back up the Our Story page") and to keep Shop's placeholders
+// visible, which retires that arrangement — and the landing is now a
+// waitlist, so the whole site reads as pre-launch rather than as a live
+// storefront with three doors locked.
+//
+// A flag that no route consults is worse than no flag: it reads as
+// protection that isn't there. The notFound() calls it drove are gone from
+// /shop and /story with it.
+//
+// The one route that went the other way is /gift-card: it was reachable
+// only from the footer, the footer was removed site-wide the same day, and
+// D's call on the orphan was to delete it ("remove the gift card page for
+// now"). src/app/gift-card/ and its sitemap entry are gone. Its four
+// components stay under src/components/gift-card/ — unreferenced but
+// building, same paused-not-gone convention as the rest of this branch —
+// so restoring the page is a matter of putting the route file back.
