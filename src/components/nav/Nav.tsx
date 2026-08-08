@@ -54,18 +54,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
-import { CONTACT_HREF } from "@/lib/site";
+import { CONTACT_HREF, SECONDARY_PAGES_LIVE } from "@/lib/site";
 
-// Labels are decoupled from routes on purpose (D, 2026-08-07: "change store
-// to merch. and change story to our story"). /shop keeps its path and reads
-// "Merch"; /story keeps its path and reads "Our Story". That split is also
-// what the reference site does — its nav says MERCH and points at ./shop —
-// so the URLs stay short and stable while the labels say what visitors
-// actually call the pages. No redirects needed; nothing links to the old
-// label.
+// "Merch" reverted to "Shop" 2026-08-07 at D's instruction, matching the
+// route again. "Our Story" keeps its label/route split.
 const PRIMARY_LINKS = [
   { href: "/locations", label: "Locations" },
-  { href: "/shop", label: "Merch" },
+  { href: "/shop", label: "Shop" },
   { href: "/story", label: "Our Story" },
 ];
 
@@ -100,6 +95,57 @@ const navLinkClass = (active: boolean) =>
   `nav-link inline-block text-[16px] font-semibold uppercase ${
     active ? "text-[#111] underline" : "text-black no-underline"
   }`;
+
+/* One nav item, rendered as a real link or as an inert label.
+   D, 2026-08-07: "ensure the buttons are still visible on the header even
+   tho they are disabled. just have them click to nothing."
+
+   When SECONDARY_PAGES_LIVE is false this renders a <span>, not an <a>. It
+   is NOT an anchor with a dead href: that would still be focusable, still
+   announce as a link, still show a target in the status bar, and — with the
+   routes 404ing — would hand anyone who clicked it a Not Found page, which
+   is exactly the "click to nothing" D is ruling out.
+
+   The span is visually identical to a live link (same class, same colour,
+   same weight — it should not read as greyed out), but carries
+   aria-disabled so assistive tech announces it as unavailable rather than
+   silently offering a link that goes nowhere, and drops the press-scale,
+   since feedback on a press that does nothing is a small lie. */
+function NavItem({
+  href,
+  label,
+  active,
+  className,
+  onNavigate,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  className: string;
+  onNavigate?: () => void;
+}) {
+  if (!SECONDARY_PAGES_LIVE) {
+    return (
+      <span
+        aria-disabled="true"
+        className={`${className} ${navLinkClass(false)} nav-link-inert`}
+      >
+        {label}
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
+      className={`${className} ${navLinkClass(active)}`}
+    >
+      {label}
+    </Link>
+  );
+}
 
 export function Nav() {
   const pathname = usePathname();
@@ -141,13 +187,7 @@ export function Nav() {
           <ul className="hidden items-center gap-5 tablet:flex">
             {links.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  aria-current={link.active ? "page" : undefined}
-                  className={`leading-5 ${navLinkClass(link.active)}`}
-                >
-                  {link.label}
-                </Link>
+                <NavItem {...link} className="leading-5" />
               </li>
             ))}
           </ul>
@@ -198,14 +238,11 @@ export function Nav() {
           <ul className="flex flex-col px-6 pb-8 pt-6">
             {links.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  aria-current={link.active ? "page" : undefined}
-                  onClick={() => setOpen(false)}
-                  className={`block leading-[32px] ${navLinkClass(link.active)}`}
-                >
-                  {link.label}
-                </Link>
+                <NavItem
+                  {...link}
+                  className="block leading-[32px]"
+                  onNavigate={() => setOpen(false)}
+                />
               </li>
             ))}
             <li>

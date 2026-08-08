@@ -41,12 +41,18 @@
 // padded back up with something invented — the row is a flex-wrap list and
 // reads fine at any count.
 
-import { CONTACT_HREF } from "@/lib/site";
+import { CONTACT_HREF, SECONDARY_PAGES_LIVE } from "@/lib/site";
 
-// Labels track Nav's — see the note on PRIMARY_LINKS there. Routes unchanged.
+// Filtered by the same flag Nav uses, so remounting this can't resurrect
+// links to disabled routes. Contact is a mailto rather than a route, so it
+// always stays — which is why the list can't go empty.
 const LINKS = [
-  { href: "/story", label: "Our Story" },
-  { href: "/shop", label: "Merch" },
+  ...(SECONDARY_PAGES_LIVE
+    ? [
+        { href: "/story", label: "Our Story" },
+        { href: "/shop", label: "Shop" },
+      ]
+    : []),
   { href: CONTACT_HREF, label: "Contact" },
 ];
 

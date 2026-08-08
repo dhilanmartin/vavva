@@ -31,11 +31,10 @@
   --placeholder-light: #d1d1d6;
   --placeholder-dark: #8e8e93;
 
-  /* Waitlist-field accents only, and the one place a second hue is allowed
-     in this house — D asked for the reference's green caret/ghost by name
-     (2026-08-07). Both are that site's own literal values: #0D0 is its
-     green-base token, #979797 its gray-500, which the ghost gradient fades
-     into at 72.03%.
+  /* Waitlist field. The caret and ghost placeholder were the reference's
+     green (#0D0) flashing against grey; D asked for black instead
+     (2026-08-07), which also puts the house back to a single accent — the
+     brush red — rather than carrying a second hue for one control.
 
      --ghost-grey is deliberately NOT --mute. It resolves to 2.8:1 on white,
      under the 4.5:1 floor --mute exists to hold — acceptable here and
@@ -43,7 +42,6 @@
      carries aria-label="Email" plus a real (visually hidden) placeholder
      with the same text, and this layer clears the moment anything is typed.
      Do not reach for this token for readable copy. */
-  --green: #0d0;
   --ghost-grey: #979797;
 }
 
@@ -408,6 +406,27 @@ p {
   }
 }
 
+/* Inert nav labels — visible, same colour and weight as a live link, but
+   they navigate nowhere (D, 2026-08-07). Deliberately NOT greyed out: the
+   ask was that they stay visible, not that they read as disabled. Only the
+   affordances go — no pointer cursor, no press-scale, no text selection
+   drag, since feedback on a press that does nothing is a small lie. */
+.nav-link-inert {
+  cursor: default;
+  user-select: none;
+}
+
+.nav-link-inert:active {
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-link-inert:hover {
+    color: var(--nav-link, #000);
+    text-decoration-line: none;
+  }
+}
+
 /* Press feedback. Every other pressable thing in this house already answers
    a press (.social-link, .gate-submit, .idx-submit all scale on :active);
    the nav links and the menu button were the two that stayed dead under the
@@ -674,9 +693,11 @@ html.intro-js .scroll-reveal.is-visible {
    which is why the ramp needed no edits at all when the paper changed
    underneath it.
 
-   The accents are the reference's own literal values, at D's request: the
-   caret and ghost gradient are its green (#0d0 into #979797), not the house
-   red. The brush red keeps the nav hover and the submit button. */
+   The field's caret and ghost briefly used the reference's own green
+   (#0d0 fading into #979797). D asked for black instead on 2026-08-07, so
+   the caret is --ink and the ghost is flat --ghost-grey — no second hue and
+   no colour animation. The brush red keeps the nav hover and the submit
+   button, which leaves the house on one accent again. */
 /* The landing-only `:root:has(.idx-stage) { --paper: #fff }` override that
    used to sit here is gone — --paper is white for the whole site now, so
    the override was restating the default. Deleted rather than left in as a
@@ -859,17 +880,24 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
-/* The field's caret and ghost are GREEN, not the house red.
-   D's call, 2026-08-07: "same with the green glow in the email as
-   index.how has it." Their exact values, re-measured off the live page:
-     caret       rgb(0,221,0) = #0D0, 2×18px at x=12, vertically centred
-     ghost       linear-gradient(90deg, #0D0 0%, #979797 72.03%) clipped to
-                 text — the green bleeding into grey IS the "glow"; there is
-                 no box-shadow or filter anywhere on either element
-     blink       1.1s steps(1) infinite (not 1s — corrected on re-measure),
-                 the two in antiphase so the pair reads as a live terminal
-   The house red keeps the nav hover and the submit button; this is the one
-   place a second hue is deliberate, because D asked for it by name. */
+/* The field's caret is black; the ghost is flat grey.
+   D's call, 2026-08-07: black rather than the flashing green this briefly
+   carried. Two things went with the colour:
+
+     - the ghost's green→grey gradient (background-clip: text) is gone. It
+       was the whole "glow" — there was never a shadow or filter on either
+       element — so with the green removed there was nothing left for it to
+       do but cost a paint.
+     - the ghost's colour-flash animation is gone with it, along with its
+       keyframes and its reduced-motion override, which now had nothing to
+       disable.
+
+   The caret keeps its 1.1s blink. That is a caret behaving like a caret,
+   not the flashing D was objecting to; a static bar reads as a rendering
+   bug. Geometry is unchanged: 2×18px at x=12, vertically centred.
+
+   Removing the green also puts the house back on a single accent — the
+   brush red, on the nav hover and the submit button. */
 .idx-cursor {
   position: absolute;
   top: 50%;
@@ -877,7 +905,7 @@ html.intro-js .scroll-reveal.is-visible {
   height: 18px;
   width: 2px;
   transform: translateY(-50%);
-  background: var(--green);
+  background: var(--ink);
   animation: idxCursorBlink 1.1s steps(1, end) infinite;
 }
 
@@ -889,15 +917,7 @@ html.intro-js .scroll-reveal.is-visible {
   transform: translateY(2%);
   font-size: 15px;
   letter-spacing: 0.02em;
-  background-image: linear-gradient(
-    90deg,
-    var(--green) 0%,
-    var(--ghost-grey) 72.03%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: idxPlaceholderBlink 1.1s steps(1, end) infinite;
+  color: var(--ghost-grey);
 }
 
 @keyframes idxCursorBlink {
@@ -911,16 +931,6 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
-@keyframes idxPlaceholderBlink {
-  0%,
-  49% {
-    -webkit-text-fill-color: transparent;
-  }
-  50%,
-  100% {
-    -webkit-text-fill-color: var(--ghost-grey);
-  }
-}
 
 /* Header mark: hard-cut flicker, 0.5s after load. Not a fade — `step-end`
    is what makes it read as a filament catching rather than a transition.
@@ -960,11 +970,6 @@ html.intro-js .scroll-reveal.is-visible {
 @media (prefers-reduced-motion: reduce) {
   .idx-cursor {
     animation: none;
-  }
-
-  .idx-placeholder {
-    animation: none;
-    -webkit-text-fill-color: var(--ghost-grey);
   }
 
   .vv-power-on {

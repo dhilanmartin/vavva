@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { LocationCard } from "@/components/locations/LocationCard";
+import { SECONDARY_PAGES_LIVE } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Locations — VAVVA" };
 
@@ -30,6 +32,9 @@ const LOCATIONS = [
    site, so the `desktop:` size jump this file used to carry is gone. Page
    gutter is their 24px, and the h1 sits 40px below the 64px header. */
 export default function LocationsPage() {
+  // Disabled 2026-08-07 — see SECONDARY_PAGES_LIVE in src/lib/site.ts.
+  if (!SECONDARY_PAGES_LIVE) notFound();
+
   return (
     <main className="w-full bg-[var(--paper)] px-6 pb-24 pt-10">
       <div className="mx-auto max-w-[1400px]">

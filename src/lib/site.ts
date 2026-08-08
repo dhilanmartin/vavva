@@ -4,6 +4,20 @@
 export const CONTACT_EMAIL = "hello@vavva.xyz";
 export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
 
+// The whole site is the landing page as of 2026-08-07, at D's instruction:
+// "disable every page but the home page."
+//
+// One boolean, consulted everywhere it matters — the routes themselves
+// (notFound()), the nav, the footer and the sitemap — so there is exactly
+// one thing to flip when these come back. Deliberately NOT env-derived: an
+// env gate would 404 in production while still rendering locally, which is
+// the setup that lets a broken page sit unnoticed for a week. This behaves
+// the same everywhere.
+//
+// Flip to true and Locations / Shop / Our Story return, links and sitemap
+// entries included. Nothing else needs touching.
+export const SECONDARY_PAGES_LIVE = false;
+
 // GATED_ROUTES_LIVE removed 2026-08-07.
 //
 // It existed for a specific situation: the landing was the finished public

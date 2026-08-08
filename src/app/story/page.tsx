@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
 import { Triptych } from "@/components/story/Triptych";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
+import { SECONDARY_PAGES_LIVE } from "@/lib/site";
 import skyline from "../../assets/nyc-skyline.png";
 
 // Route stays /story, label reads "Our Story" (D, 2026-08-07) — see Nav.tsx.
@@ -35,6 +37,10 @@ export const metadata: Metadata = { title: "Our Story — VAVVA" };
    for its duration, which blocks mix-blend-mode from reading the real
    background behind it — same fix as LocationCard's image. */
 export default function StoryPage() {
+  // Disabled 2026-08-07 — see SECONDARY_PAGES_LIVE in src/lib/site.ts. The
+  // page is intact below; only the door is shut.
+  if (!SECONDARY_PAGES_LIVE) notFound();
+
   return (
     <main className="w-full bg-[var(--paper)] pb-24 pt-10">
       <div className="flex flex-col gap-20">
