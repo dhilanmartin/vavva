@@ -408,6 +408,52 @@ p {
   }
 }
 
+/* Press feedback. Every other pressable thing in this house already answers
+   a press (.social-link, .gate-submit, .idx-submit all scale on :active);
+   the nav links and the menu button were the two that stayed dead under the
+   finger, which reads as the interface not having heard you — most obvious
+   on mobile, where the panel links are the primary navigation.
+
+   inline-block is required, not decorative: `transform` has no effect on a
+   non-replaced inline box, and these are bare <a>/<Link> elements in the
+   header row. The panel copies are already `block`, which also qualifies.
+
+   120ms and 0.96 match .social-link exactly rather than inventing a second
+   press feel. transform is named in the transition so a press released
+   mid-scale eases back instead of snapping. */
+.nav-link,
+.nav-toggle {
+  transition:
+    color 180ms ease,
+    transform 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-link:active,
+.nav-toggle:active {
+  transform: scale(0.96);
+}
+
+/* Kill the scale itself, not just its transition — otherwise reduced-motion
+   users get the same jump, just instantly. Same treatment .social-link and
+   .gate-submit already carry. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .nav-toggle {
+    transition: color 180ms ease;
+  }
+
+  .nav-link:active,
+  .nav-toggle:active {
+    transform: none;
+  }
+
+  /* The hamburger→X morph is a transform too. */
+  .nav-toggle span span {
+    transition: none;
+  }
+}
+
 /* ---- clone-structure additions (mimis.nyc structural reference) ---- */
 
 /* Scroll-triggered reveal (feature-image-cta.spec.md): the home page's
@@ -418,24 +464,55 @@ p {
    (ScrollReveal.tsx), since `.home-rise` is wired to a one-shot
    page-mount class on <html> and this needs to re-arm per section, below the
    fold, on routes that never touch that mount sequence. */
-.scroll-reveal {
+/* The hidden state is gated behind `html.intro-js` — do not move it back
+   onto the bare `.scroll-reveal` class.
+
+   ScrollReveal is a client component whose `visible` state starts false, so
+   the SERVER ships `class="scroll-reveal"` with no `is-visible`. Ungated,
+   that means `opacity: 0` is in the initial paint, and if JS never runs —
+   disabled, blocked, a hydration error, an IntersectionObserver that never
+   fires — the Story triptych, the Merch grid and the Locations text block
+   stay invisible permanently. Not degraded: gone.
+
+   `intro-js` is stamped on <html> by the inline script in layout.tsx before
+   hydration, so it is present exactly when JS is available to remove it
+   again. Same mechanism the home-rise entrance already uses. Without JS the
+   content simply renders, no animation, which is the correct failure mode.
+
+   SPECIFICITY — the reason `.is-visible` below is also gated:
+   `html.intro-js .scroll-reveal` is (0,2,1) — two classes plus the `html`
+   element selector. A bare `.scroll-reveal.is-visible` is only (0,2,0), so
+   the hidden rule OUTRANKS it and the content stays invisible forever even
+   after the observer fires. That is not hypothetical: it shipped that way
+   for one build and blanked the Locations text entirely. Both rules carry
+   the same `html.intro-js` prefix so the cascade is decided by source
+   order, which is what it looks like it is. */
+html.intro-js .scroll-reveal {
   opacity: 0;
   transform: translate3d(0, 14px, 0);
   filter: blur(6px);
+}
+
+.scroll-reveal {
   transition:
     opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1),
     transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
     filter 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.scroll-reveal.is-visible {
+html.intro-js .scroll-reveal.is-visible {
   opacity: 1;
   transform: translate3d(0, 0, 0);
   filter: blur(0px);
 }
 
+/* Selector must stay at `html.intro-js .scroll-reveal`, matching the hidden
+   state above. As a bare `.scroll-reveal` (0,1,0) it lost to that rule's
+   (0,2,1) and silently handed reduced-motion users back the 14px rise and
+   the 6px blur — the exact two things this block exists to remove. Opacity
+   is kept: it aids comprehension and carries no movement. */
 @media (prefers-reduced-motion: reduce) {
-  .scroll-reveal {
+  html.intro-js .scroll-reveal {
     transition: opacity 0.3s ease;
     transform: none;
     filter: none;
@@ -497,11 +574,27 @@ p {
    site puts alongside the class. It did exactly that to the Story lead's
    68px gap and to both section headings' bottom margins before this note
    existed. */
+/* font-weight 440, not 400 — and that is a substitution correction, not a
+   drift from the measurement.
+
+   The reference sets these at weight 400 in GT Alpina. Newsreader at a
+   literal 400 renders visibly lighter: measured on the word "Story" at 48px
+   with the same -0.96px tracking, GT Alpina gives 109.49px and Newsreader
+   400 gives 107.88px, and the stems read thinner still because Newsreader
+   carries more stroke contrast at display sizes. Probing Newsreader's
+   weight axis in 20-step increments, 440 lands "Story" at 109.44px — a
+   0.05px delta, the closest instance available.
+
+   Newsreader is a variable font, so 440 is a real interpolated instance
+   rather than a browser-synthesized bold. When a licensed GT Alpina drops
+   into the @font-face slot above, this number should go back to 400 — the
+   stack prefers GT Alpina, and 440 against the real face would be too
+   heavy. That is the one line to change on the day the licence lands. */
 .mimi-display,
 .mimi-title,
 .mimi-lead {
   font-family: var(--font-serif);
-  font-weight: 400;
+  font-weight: 440;
   color: var(--ink);
   text-align: center;
 }
@@ -528,6 +621,24 @@ p {
    text inside the same block, not a separate standout paragraph. */
 .mimi-lead strong {
   font-weight: 700;
+}
+
+/* Greedy wrapping, overriding the global `p { text-wrap: balance }`.
+
+   This was the thing making the Story lead read wrong against the
+   reference. The opening bold sentence measures 682px and fits the 716px
+   measure on one line — but balance equalises every line in the block, so
+   it was being split across two, turning a clean opening statement into a
+   wrapped clump. The reference wraps greedily, its bold run-in lands on one
+   line at 636px, and the regular text starts fresh on line two.
+
+   Applies to .mimi-body for the same reason: those are <p> too, and the
+   reference's own body paragraphs fill greedily. Both are measured columns
+   matching another measured column — the house balance rule is for the
+   short ragged blocks it was written for, not for these. */
+.mimi-lead,
+.mimi-body {
+  text-wrap: wrap;
 }
 
 .mimi-body {

@@ -24,10 +24,23 @@
 // gone. The serif itself is GT Alpina where a licence is installed and
 // Newsreader otherwise — see globals.css.
 //
-// The words are Vavva's own. Their story paragraph is their copy, and the
-// one thing on this branch that is never reproduced; what is reproduced is
-// its shape — bold opening claim running straight into the regular-weight
-// account behind it, one block, one measure.
+// The words are Vavva's own. The reference's story paragraph is their copy
+// and is never reproduced; what is reproduced is its shape and its
+// measurements — bold opening claim running straight into the
+// regular-weight account behind it, one block, one measure.
+//
+// Length is deliberate, 2026-08-07. The block was running 5 lines against
+// the reference's 9, which is what made it read as a different design at
+// the same numbers: half the mass in the same column. The copy was extended
+// (Vavva's own material — the mark, New York, the studio's stated ethos)
+// and measured until the block landed at 327.6px, the reference's own
+// height to the decimal. If this copy is rewritten, keep an eye on that
+// height rather than on word count.
+//
+// The other half of that fix was a wrapping bug, not copy: the global
+// `p { text-wrap: balance }` was splitting the 682px bold sentence across
+// two lines even though it fits the 716px measure on one. .mimi-lead now
+// wraps greedily like the reference — see globals.css.
 
 // The 24px gutter sits on an outer wrapper, not on .mimi-measure itself:
 // box-sizing is border-box globally, so padding inside a max-width:716px box
@@ -50,9 +63,14 @@ export function LeadBlock() {
             Vavva was built to make fewer things, and to make them properly.
           </strong>{" "}
           It started with a mark, drawn once by hand, and a question: what
-          would a studio feel like if it slowed down. Everything since has been
-          in service of that same idea — work that holds up when you look at it
-          twice, made at the pace that takes.
+          would a studio feel like if it slowed down. New York rewards speed,
+          and most of what gets made here is made fast — briefed on Monday,
+          shipped on Friday, forgotten by the quarter. We wanted the opposite
+          of that: fewer projects than we could take, longer on each than most
+          would spend, and the second look treated as the only test that
+          matters. Everything we make from here is in service of that same
+          idea — work that holds up when you look at it twice, made at the
+          pace that takes.
         </p>
       </div>
     </div>

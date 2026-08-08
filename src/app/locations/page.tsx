@@ -3,23 +3,23 @@ import { LocationCard } from "@/components/locations/LocationCard";
 
 export const metadata: Metadata = { title: "Locations — VAVVA" };
 
-// locations-page.spec.md flags this as an open question ("does Vavva's IA
-// need this at all?"). Simplified per the owner's 2026-08-06 note and
-// reference mockup to keep thin sections minimal: one real entry (the
-// studio itself), not a multi-location retail pattern Vavva doesn't have.
+// One entry — the studio itself — not the multi-location retail pattern the
+// reference site carries, which Vavva has no equivalent of.
 //
-// Copy is the owner's own, from the 2026-08-06 mockup. Flagging rather than
-// silently resolving: "Members Only" reintroduces the members-club framing
-// DESIGN.md's Copy section records as deliberately retired on 2026-07-31
-// ("a creative studio, not a private members club"). Shipped as given —
-// this needs the owner's call, not mine, on whether that reversal is
-// intentional for this page or should read differently (e.g. "By
-// appointment").
+// Content is D's own, supplied verbatim 2026-08-07. It also resolves the
+// "Members Only" flag this file used to carry: that string reintroduced the
+// members-club framing DESIGN.md records as deliberately retired on
+// 2026-07-31, and "Open Soon" replaces it — which is both consistent with
+// the studio's stated positioning and with the landing's "arriving fall
+// 2026".
+//
+// Address shape matches the reference's: street on one line, city/state/ZIP
+// on the next, inside a single paragraph, with hours as a separate one.
 const LOCATIONS = [
   {
-    name: "Casa Vavva",
-    location: "New York City, NY",
-    status: "Members Only",
+    name: "New York City",
+    address: ["Mercer St", "New York NY 10012"],
+    status: "Open Soon",
   },
 ];
 

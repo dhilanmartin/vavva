@@ -1,63 +1,69 @@
-// locations-page.spec.md / COMPONENT_INVENTORY.md §8: illustration (left) +
-// text block (right) — name, 2-line address, hours — same side every entry,
-// not alternating. Stacks to image-above-text on mobile.
+// locations-page.spec.md / COMPONENT_INVENTORY.md §8: illustration + text
+// block — name, address, hours.
+//
+// ---- 2026-08-07: centred stack, replacing the two-column row ----
+//
+// D: "fix our locations to have the image centered."
+//
+// The reference lays each entry out as a centred ROW — 183×250 portrait
+// illustration, 48px gutter, 300px text column, the pair centred on the page
+// and vertically centred against each other. That works because their
+// artwork is a tall, narrow building sketch.
+//
+// Vavva's illustration is a wide landscape skyline, so the same row put the
+// image hard against the left of a 1400px container with the text stranded
+// far right and dead space on both sides — the lopsided result D is
+// reporting. Stacking it centred is the honest translation: it keeps the
+// reference's actual composition (a centred entry, name → address → hours,
+// everything centre-aligned) and drops only the horizontal arrangement,
+// which was a consequence of their artwork's proportions rather than a
+// design decision to copy.
+//
+// Vertical rhythm inside the text block is the reference's own, measured at
+// 1710 on 2026-08-07:
+//   name (26/36.4/-1.04)  →24px→  address (14/19.6/-0.14)  →20px→  hours
+// The 40px image→name gap has no counterpart on their side (their layout is
+// horizontal there), so it is chosen to give the illustration room without
+// detaching it from its label.
+//
+// The image stays OUTSIDE ScrollReveal, unchanged from before: any opacity
+// transition on an ancestor forces a new stacking context for its duration,
+// which blocks mix-blend-mode from reading the real page background behind
+// it and breaks the flush blend mid-reveal. Only the text half reveals.
 
 import Image from "next/image";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
 import skyline from "../../assets/nyc-skyline.png";
 
-// Redesigned 2026-08-06 per D's reference mockup: one location, skyline
-// illustration left / text right, no card chrome, generous whitespace —
-// replaces the earlier stacked image-over-text card pattern. Illustration
-// is D's own supplied asset (src/assets/nyc-skyline.png), swapped in for
-// the placeholder hand-authored sketch this slot carried until now.
-//
-// The image is deliberately outside ScrollReveal (2026-08-07): any
-// opacity transition on an ancestor forces a new stacking context for
-// its duration, which blocks mix-blend-mode from seeing the real page
-// background behind it — the flush blend broke while the reveal was
-// mid-transition. Only the text half reveals; the image is just always
-// there, which reads fine for a static illustration.
 export function LocationCard({
   name,
-  location,
+  address,
   status,
 }: {
   name: string;
-  location: string;
+  address: string[];
   status: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-10 tablet:flex-row tablet:items-center tablet:gap-20">
+    <div className="flex flex-col items-center">
       <Image
         src={skyline}
         alt="New York City skyline"
         priority
-        sizes="(min-width: 810px) 46vw, 560px"
-        className="w-full max-w-[560px] mix-blend-multiply tablet:w-[46%] tablet:max-w-none"
+        sizes="(max-width: 810px) 100vw, 560px"
+        className="w-full max-w-[560px] mix-blend-multiply"
       />
-      {/* Type is mimis.nyc/locations' own scale, measured off their live
-          computed styles on 2026-08-07 and reproduced exactly — entry name
-          at 26/36.4/-1.04px serif 400 (.mimi-lead), address and hours at
-          14/19.6/-0.14px Inter 500 (.mimi-body), with a 20px gap between
-          the two body lines, which is the margin their own stacked
-          paragraphs carry. Only the fonting was asked for and only the
-          fonting changed: this stays illustration-left / text-right per D's
-          2026-08-06 mockup, where the reference stacks its entries centred.
 
-          Text stays centred — the reference's own alignment, and it reads
-          correctly as the right half of a two-column row. A
-          `tablet:text-left` override was tried here and removed: .mimi-* is
-          authored after Tailwind's utility layer in globals.css, so at equal
-          specificity its `text-align: center` beat the utility and the
-          override was doing nothing. Better to state the alignment once than
-          to leave behind a line that only looks like it works. */}
-      <ScrollReveal className="flex flex-col gap-5">
+      <ScrollReveal className="mt-10 flex flex-col items-center">
         <h3 className="mimi-lead">{name}</h3>
-        <div className="flex flex-col gap-5">
-          <p className="mimi-body">{location}</p>
-          <p className="mimi-body">{status}</p>
-        </div>
+        <p className="mimi-body mt-6">
+          {address.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </p>
+        <p className="mimi-body mt-5">{status}</p>
       </ScrollReveal>
     </div>
   );

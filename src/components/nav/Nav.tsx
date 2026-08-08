@@ -73,9 +73,32 @@ const PRIMARY_LINKS = [
 // 32px in the mobile panel, and two line-height utilities on one element are
 // decided by stylesheet order rather than by the order they're concatenated
 // in — so each call site sets its own.
+//
+// 2026-08-07, re-measured against mimis.nyc/story at 1280 for a 1:1 match on
+// D's request. Three things were off and all three are corrected here:
+//
+//   underline offset   was 6px, reference is `auto` — the browser's own
+//                      font-derived position. 6px sat the rule visibly low
+//                      and was the single most obvious difference.
+//   letter-spacing     was 0.01em, reference is `normal` (0). Tiny, but it
+//                      widened every link and made the row read looser.
+//   colour             was --ink (#1A1A1A on white) for both states;
+//                      reference is #000 at rest and #111 for the current
+//                      page. Kept literal here rather than tokenised
+//                      because "1:1" was the ask and the two values are a
+//                      deliberate pair on that site — the current page is
+//                      very slightly LIGHTER than its siblings, not darker.
+//
+// Everything else already matched and is left alone: Inter, 16px, weight
+// 600, 20px line-height, uppercase, 20px gap, 24px gutter, 64px bar.
+// inline-block so the :active press-scale in globals.css can apply — a
+// non-replaced inline box ignores `transform` entirely. `transition-colors`
+// is gone with it: .nav-link now owns its own transition (colour + the
+// press transform together), and two transition declarations on one element
+// are resolved by stylesheet order rather than by concatenation order.
 const navLinkClass = (active: boolean) =>
-  `nav-link text-[16px] font-semibold uppercase tracking-[0.01em] text-[var(--ink)] underline-offset-[6px] transition-colors ${
-    active ? "underline" : "no-underline"
+  `nav-link inline-block text-[16px] font-semibold uppercase ${
+    active ? "text-[#111] underline" : "text-black no-underline"
   }`;
 
 export function Nav() {
@@ -99,7 +122,7 @@ export function Nav() {
             aria-controls="nav-panel"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
-            className="-ml-2 flex h-11 w-11 items-center justify-center tablet:hidden"
+            className="nav-toggle -ml-2 flex h-11 w-11 items-center justify-center tablet:hidden"
           >
             <span aria-hidden className="relative block h-3.5 w-5">
               <span
@@ -136,7 +159,19 @@ export function Nav() {
           className="home-rise flex flex-1 items-center justify-center"
           style={{ ["--i" as string]: 1 }}
         >
-          <VavvaMark className="h-auto w-[88px]" />
+          {/* Sized by HEIGHT, not width: a nav bar sizes marks by height,
+              which is what sets the row's optical rhythm, and the two
+              wordmarks have different proportions (the brush mark is
+              2.16:1 against the reference's 2.73:1) so matching width
+              would leave this one visibly taller.
+
+              31px is the midpoint D asked for, 2026-08-07. The mark was
+              40.8px tall (88px wide); matching the reference's 22px bar
+              exactly overshot — the brush script carries real ascenders
+              and descenders where "Mimi's" sits compact, so the same
+              numeric height reads much smaller on this wordmark. 31px
+              splits the difference and lands it ~67px wide. */}
+          <VavvaMark className="h-[31px] w-auto" />
         </Link>
 
         <div
