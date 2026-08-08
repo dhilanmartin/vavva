@@ -5,6 +5,9 @@
 
 import { ProductCard } from "./ProductCard";
 
+// [VAVVA COPY TBD] — invented catalog. Neither the names nor the prices are
+// real; they exist so the grid has something to lay out while every image
+// slot is still an AssetPlaceholder. Nothing here is a commitment.
 const PRODUCTS = [
   { name: "Table Candle", price: "$38" },
   { name: "Ceramic Vessel", price: "$64" },

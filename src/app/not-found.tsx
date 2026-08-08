@@ -1,8 +1,28 @@
 import Link from "next/link";
 
+/* This route matters again as of 2026-08-07: deleting /gift-card made this
+   the page that request lands on, so it was worth reading rather than
+   assuming. Two things were wrong with it, both predating the nav's
+   existence — it was written when this site was a single full-viewport page
+   with no chrome above it:
+
+   - `min-h-dvh` measured the whole viewport while sitting *below* a 64px
+     nav, so the document overflowed by exactly the nav's height and put a
+     scrollbar on a page holding two lines of text. Now `100svh - 64px`, the
+     same arithmetic the landing stage uses. svh not dvh for the reason
+     page.tsx already documents: dvh recalculates as the mobile address bar
+     collapses and shoves centred content mid-scroll.
+   - The background was a hardcoded `#E8E8E8` rather than `var(--paper)` —
+     the same colour today, but a second place to remember on a palette
+     change. There is no second place now.
+
+   px-4 / md:px-5 is left as-is. The rest of the site moved to a flat 24px
+   gutter to match the type reference, but this page's gutter comment is an
+   explicit decision to match the *home column*, and the home column is
+   still on that stepped scale. */
 export default function NotFound() {
   return (
-    <main className="flex min-h-dvh w-full flex-col bg-[#E8E8E8] antialiased">
+    <main className="flex min-h-[calc(100svh-64px)] w-full flex-col bg-[var(--paper)] antialiased">
       {/* px-4 / md:px-5 to match the home column. This was px-1, which put the
           copy 4px off the bezel on a 320px phone while the home page held 16 —
           the two pages are the same site and should not gutter differently.

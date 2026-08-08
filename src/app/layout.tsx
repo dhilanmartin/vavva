@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Newsreader, Literata } from "next/font/google";
 import { Nav } from "@/components/nav/Nav";
-import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,17 +9,44 @@ const inter = Inter({
   display: "swap",
 });
 
-/* clone-structure addition. mimis.nyc's spec files documented a serif used
-   for both display headings AND body copy (COMPONENT_INVENTORY.md's type
-   scale), with sans reserved for nav/buttons/labels/prices — a role, not a
-   named face; recon never identified mimi's actual font (likely a licensed
-   Framer font), so this is a deliberate open substitution rather than a
-   match. Fraunces was picked for the same reason a body-capable display
-   serif was needed structurally: it holds up at both 48px headline sizes and
-   ~18–20px paragraph sizes without a second face. */
-const fraunces = Fraunces({
+/* Serif role. Recon had never identified mimi's actual face and this slot
+   carried Fraunces as an admitted guess; reading their live @font-face table
+   on 2026-08-07 settled it — mimis.nyc sets **GT Alpina Regular** (Grilli
+   Type), served from framerusercontent.com, with Inter for all nav/UI.
+   Fraunces was the wrong shape for it: soft, wonky, low-contrast where GT
+   Alpina is sharp and transitional.
+
+   GT Alpina is a paid webfont and its .woff2 cannot be vendored here, so
+   this is the stand-in and globals.css names "GT Alpina" ahead of it in
+   --font-serif (with a ready @font-face slot) so a licence swaps it in
+   without touching a single component. Newsreader over the alternatives
+   because the Story lead runs a bold sentence into regular text inside one
+   block: it needs a real 700 in the same family, which rules out Instrument
+   Serif despite that face matching GT Alpina's display proportions more
+   closely. `opsz` is requested explicitly so the 48px headings and 26px lead
+   get their proper optical cuts rather than one compromise master. */
+const newsreader = Newsreader({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-newsreader",
+  axes: ["opsz"],
+  display: "swap",
+});
+
+/* Second serif, for the landing's URL list only.
+   The two reference sites do not share a serif, so matching both honestly
+   takes two faces — index.how itself ships three. Its list is set in a
+   licensed "Schoolbook" (the woff2 is literally schoolbook_book-*.woff2), a
+   Century Schoolbook-class face: very large x-height, low stroke contrast,
+   sturdy bracketed serifs, wide. Newsreader — the GT Alpina stand-in
+   carrying Story/Locations — is the opposite shape: narrower, higher
+   contrast, more transitional, and at 20px in a tight list that difference
+   was the most visible thing separating this page from the reference.
+   Literata is the closest freely-licensed face to that Schoolbook skeleton.
+   Scoped to .idx-slug in globals.css; it touches nothing else. */
+const literata = Literata({
+  subsets: ["latin"],
+  variable: "--font-literata",
+  axes: ["opsz"],
   display: "swap",
 });
 
@@ -94,7 +120,11 @@ const ORGANIZATION_JSONLD = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#E8E8E8",
+  // Tracks --paper. Must be a literal — this is a <meta> value, so it can't
+  // read a CSS custom property; it went white with the palette on
+  // 2026-08-07. Left stale it would tint mobile browser chrome grey against
+  // a white page.
+  themeColor: "#FFFFFF",
   colorScheme: "light",
 };
 
@@ -108,7 +138,7 @@ export default function RootLayout({
     // so the server markup can't match — that mismatch is the point, not a bug.
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable}`}
+      className={`${inter.variable} ${newsreader.variable} ${literata.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -125,20 +155,27 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} flex min-h-svh flex-col antialiased`}>
-        {/* Nav + Footer are persistent, route-agnostic chrome — every mimi
-            page type carries both (PAGE_TOPOLOGY.md), so they live in the
-            root layout rather than being repeated per page.
+        {/* Nav stays — persistent, route-agnostic chrome on every page.
 
-            flex-1 on the children wrapper + min-h-svh on body: "sticky
-            footer" per D's 2026-08-07 note — on a short page (Locations'
-            single entry, Gift Cards) the footer sits pinned to the actual
-            bottom of the viewport instead of floating mid-screen; on a
-            tall page it's pushed down and scrolls normally, same as
-            before. svh not dvh, matching the fix already applied to the
-            home page's own min-height (mobile-chrome scroll-jump). */}
+            Footer removed 2026-08-07 at D's instruction ("keep the vavva
+            header, and remove its footer"), site-wide rather than
+            landing-only, which is what "remove the footer" said twice.
+            The reference landing this page now follows carries no footer at
+            all; a full-height vertically-centred column and a footer below
+            it are two different pages fighting over the same viewport.
+
+            Footer.tsx is left on disk, not deleted — same "paused, not
+            gone" treatment this branch already gives FeatureBlock,
+            CtaTileRow, Newsletter, IconTextBlock and Timeline. The sticky-
+            footer flex scaffolding (min-h-svh + flex-1) is kept too: it
+            costs nothing and is what the footer needs the day it returns.
+
+            The footer's removal orphaned /gift-card, which was reachable
+            only from it. D's answer was to drop that route entirely
+            ("remove the gift card page for now"), so src/app/gift-card/ is
+            gone and every remaining route is reachable from the nav. */}
         <Nav />
         <div className="flex-1">{children}</div>
-        <Footer />
       </body>
     </html>
   );

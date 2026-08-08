@@ -3,33 +3,37 @@ import { LocationCard } from "@/components/locations/LocationCard";
 
 export const metadata: Metadata = { title: "Locations — VAVVA" };
 
-// locations-page.spec.md flags this as an open question ("does Vavva's IA
-// need this at all?"). Simplified per the owner's 2026-08-06 note and
-// reference mockup to keep thin sections minimal: one real entry (the
-// studio itself), not a multi-location retail pattern Vavva doesn't have.
+// One entry — the studio itself — not the multi-location retail pattern the
+// reference site carries, which Vavva has no equivalent of.
 //
-// Copy is the owner's own, from the 2026-08-06 mockup. Flagging rather than
-// silently resolving: "Members Only" reintroduces the members-club framing
-// DESIGN.md's Copy section records as deliberately retired on 2026-07-31
-// ("a creative studio, not a private members club"). Shipped as given —
-// this needs the owner's call, not mine, on whether that reversal is
-// intentional for this page or should read differently (e.g. "By
-// appointment").
+// Content is D's own, supplied verbatim 2026-08-07. It also resolves the
+// "Members Only" flag this file used to carry: that string reintroduced the
+// members-club framing DESIGN.md records as deliberately retired on
+// 2026-07-31, and "Open Soon" replaces it — which is both consistent with
+// the studio's stated positioning and with the landing's "arriving fall
+// 2026".
+//
+// Address shape matches the reference's: street on one line, city/state/ZIP
+// on the next, inside a single paragraph, with hours as a separate one.
 const LOCATIONS = [
   {
-    name: "Casa Vavva",
-    location: "New York City, NY",
-    status: "Members Only",
+    name: "New York City",
+    address: ["Mercer St", "New York NY 10012"],
+    status: "Open Soon",
   },
 ];
 
+/* Type matches mimis.nyc/locations exactly as of 2026-08-07 — h1 at
+   43px / 56px leading / -0.86px tracking / weight 400 (.mimi-title), which
+   is a genuinely different size from the 48px their Story h1 uses, and is
+   fixed rather than fluid: it measured 43px at both 1280 and 375 on their
+   site, so the `desktop:` size jump this file used to carry is gone. Page
+   gutter is their 24px, and the h1 sits 40px below the 64px header. */
 export default function LocationsPage() {
   return (
-    <main className="w-full bg-[var(--paper)] px-4 pb-24 pt-10 md:px-5 tablet:px-6 tablet:pt-14">
+    <main className="w-full bg-[var(--paper)] px-6 pb-24 pt-10">
       <div className="mx-auto max-w-[1400px]">
-        <h1 className="mb-16 text-center font-serif text-[36px] font-normal leading-[1.17] tracking-[-0.02em] text-[var(--ink)] tablet:mb-20 desktop:text-[48px]">
-          Locations
-        </h1>
+        <h1 className="mimi-title mb-20">Locations</h1>
         <div className="flex flex-col gap-14 tablet:gap-16">
           {LOCATIONS.map((location) => (
             <LocationCard key={location.name} {...location} />

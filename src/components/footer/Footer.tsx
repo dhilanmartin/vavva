@@ -26,14 +26,29 @@
 // here (it's already prominent in the primary nav) — Story, Gift Cards,
 // Shop, Contact is the same 4-link count the reference site carries.
 
-import { CONTACT_HREF, GATED_ROUTES_LIVE } from "@/lib/site";
+// UNMOUNTED as of 2026-08-07 — layout.tsx no longer renders this, at D's
+// instruction ("keep the vavva header, and remove its footer"). Kept on disk
+// rather than deleted, the same way Hero/AccessGate/FeatureBlock/CtaTileRow/
+// Newsletter/IconTextBlock/Timeline are kept: paused, not gone. It still
+// compiles and still type-checks, so it can be remounted in one line.
+//
+// The per-link `gated` flags went with GATED_ROUTES_LIVE (see src/lib/site.ts)
+// — every route in this list renders unconditionally now.
+//
+// Gift Cards dropped from the link set the same day: D removed that route
+// ("remove the gift card page for now") and it no longer exists, so this is
+// down to 3 links against the reference site's 4. Left as 3 rather than
+// padded back up with something invented — the row is a flex-wrap list and
+// reads fine at any count.
 
+import { CONTACT_HREF } from "@/lib/site";
+
+// Labels track Nav's — see the note on PRIMARY_LINKS there. Routes unchanged.
 const LINKS = [
-  { href: "/story", label: "Story", gated: true },
-  { href: "/gift-card", label: "Gift Cards", gated: true },
-  { href: "/shop", label: "Shop", gated: true },
+  { href: "/story", label: "Our Story" },
+  { href: "/shop", label: "Merch" },
   { href: CONTACT_HREF, label: "Contact" },
-].filter((link) => GATED_ROUTES_LIVE || !link.gated);
+];
 
 export function Footer() {
   return (

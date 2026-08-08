@@ -39,7 +39,7 @@ export function AssetPlaceholder({
           className="absolute bottom-2 right-2.5 select-none text-[9px] font-semibold uppercase leading-none tracking-[0.08em]"
           style={{
             color:
-              tone === "dark" ? "rgba(232,232,232,0.4)" : "var(--mute)",
+              tone === "dark" ? "rgba(255,255,255,0.45)" : "var(--mute)",
           }}
         >
           {label}

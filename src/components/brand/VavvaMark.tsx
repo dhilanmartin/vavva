@@ -12,7 +12,11 @@ export function VavvaMark({ className }: { className?: string }) {
       src={mark}
       alt="Vavva"
       priority
-      sizes="(max-width: 768px) 136px, 152px"
+      // Was 136/152px, sized for the old 88px-wide nav mark. The mark now
+      // renders ~47px wide (height-matched to the reference's 22px bar), so
+      // that hint was making the browser fetch a source several times wider
+      // than any slot on the site actually uses. 96px covers a 2x display.
+      sizes="96px"
       className={className}
     />
   );
