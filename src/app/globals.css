@@ -43,6 +43,22 @@
      with the same text, and this layer clears the moment anything is typed.
      Do not reach for this token for readable copy. */
   --ghost-grey: #979797;
+
+  /* The interaction colour, from system.studio, where one --color-selection
+     token paints both ::selection and every focus ring. That is the whole
+     idea and it is worth stating: the colour means "you are touching this"
+     and nothing else.
+
+     Deliberately NOT the brush red. --red means Vavva — the mark, the city in
+     the copy. If selection were also red, red would mean "Vavva" and
+     "selected" at once and stop meaning either. Amber is analogous to the
+     brush red rather than clashing with it, and black on amber is 11.6:1. */
+  --hl: #ffa600;
+}
+
+::selection {
+  background: var(--hl);
+  color: #000;
 }
 
 /* mimis.nyc structural-reference breakpoints (docs/research/mimis-nyc/PAGE_TOPOLOGY.md):
@@ -379,9 +395,25 @@ p {
   text-underline-offset: 3px;
 }
 
+/* The focus ring is amber PLUS a 1px black hairline, and the hairline is not
+   decoration.
+
+   WCAG 1.4.11 asks a focus indicator to hold 3:1 against what surrounds it.
+   Amber on white is 1.94:1 — it fails on its own, and it fails on
+   system.studio too, where this idea comes from. Stacking a dark box-shadow
+   immediately outside the amber guarantees the indicator is perceivable
+   against any background this site can put behind it, while the amber stays
+   the colour you read. Two rings, one indicator. */
 :focus-visible {
-  outline: 2px solid rgba(0, 0, 0, 0.55);
-  outline-offset: 3px;
+  outline: 2px solid var(--hl);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85);
+  border-radius: 1px;
+}
+
+/* Mouse and touch users never see the ring; keyboard users always do. */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Touch devices fire hover on tap, which left footer/nav links stuck in
@@ -406,25 +438,36 @@ p {
   }
 }
 
-/* Inert nav labels — visible, same colour and weight as a live link, but
-   they navigate nowhere (D, 2026-08-07). Deliberately NOT greyed out: the
-   ask was that they stay visible, not that they read as disabled. Only the
-   affordances go — no pointer cursor, no press-scale, no text selection
-   drag, since feedback on a press that does nothing is a small lie. */
+/* Inert nav labels — visible, styled exactly like a live link, HOVERING
+   exactly like a live link, but navigating nowhere (D, 2026-08-07; hover
+   restored 2026-08-11).
+
+   They previously had their hover explicitly cancelled, on the reasoning that
+   an affordance without an action is a lie. D's call is the other way, and it
+   holds up: with the routes coming back, these labels are a menu of what the
+   house will have, and a menu that goes dead under the cursor reads as broken
+   rather than as forthcoming. So the full hover lands — brush red plus the
+   underline — and the pointer cursor with it, since a hover state that
+   changes colour under a default arrow is a half-signal that just looks like
+   a bug.
+
+   What stays off is the PRESS. `:active` scale is feedback confirming an
+   action, and there is no action; a label that recoils under the finger and
+   then does nothing is the one moment this would actually read as broken.
+   `user-select: none` stays too, so dragging across the row does not select
+   the text of something that behaves like a control.
+
+   These render as <span aria-disabled="true">, not anchors — see NavItem in
+   Nav.tsx. So none of this reaches assistive tech as an offer: it announces
+   as unavailable, has no href to expose, and is not a tab stop. The hover is
+   a pointer-only affordance, which is exactly the surface it belongs on. */
 .nav-link-inert {
-  cursor: default;
+  cursor: pointer;
   user-select: none;
 }
 
 .nav-link-inert:active {
   transform: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .nav-link-inert:hover {
-    color: var(--nav-link, #000);
-    text-decoration-line: none;
-  }
 }
 
 /* Press feedback. Every other pressable thing in this house already answers
@@ -446,6 +489,16 @@ p {
     color 180ms ease,
     transform 120ms ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* A label is one word even when it is two words.
+   "Our Story" broke across two lines between roughly 810px and 950px, which
+   took the link row to 42px inside a 64px bar and left the header visibly
+   taller on one side. A multi-word nav label has no legitimate reason to
+   wrap: if the row does not fit, the fix is the row's layout, never a
+   fractured phrase. See the header comment in Nav.tsx for the layout half. */
+.nav-link {
+  white-space: nowrap;
 }
 
 .nav-link:active,
@@ -874,6 +927,32 @@ html.intro-js .scroll-reveal.is-visible {
   opacity: 0;
 }
 
+/* THE DOUBLE CARET (D, 2026-08-10).
+
+   Two vertical bars appeared the moment you clicked into the empty field:
+   the drawn one (.idx-cursor, absolutely positioned at x=12) and the real
+   browser caret, which sits at the start of the input's text — x=16, since
+   .idx-input carries 16px of side padding. Four pixels apart, both blinking,
+   on their own unsynchronised timers.
+
+   `:placeholder-shown` is exactly the right hook and not an approximation.
+   It matches when and only when the value is empty, which is precisely the
+   condition WaitlistForm.tsx uses to decide whether to render .idx-cursor
+   (`showGhost = value.length === 0`). So the two can never both be visible,
+   and they can never both be hidden — type one character and the drawn caret
+   unmounts in the same render that this selector stops matching, handing the
+   real caret back.
+
+   It also still matches while the placeholder is invisible: the pseudo-class
+   keys off the value being empty, not off the placeholder's opacity.
+
+   caret-color rather than hiding the drawn one, because the drawn caret is
+   what gives the resting field its terminal look — it blinks with no focus
+   at all, which a real caret cannot do. */
+.idx-input:placeholder-shown {
+  caret-color: transparent;
+}
+
 @media (min-width: 1024px) {
   .idx-input {
     font-size: 15px;
@@ -964,6 +1043,51 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
+/* The lamp strip (LoadingLamps.tsx) — lights left to right once on load, then
+   stays lit.
+
+   It is an ENTRANCE, not a loop (D, 2026-08-11). It ran as an infinite
+   fill/empty rotation for one build and that was the wrong instrument: a
+   strip cycling forever reads as a system busy with something, and nothing on
+   this page is loading. Motion that repeats indefinitely also has nowhere to
+   resolve to, so the eye keeps returning to it — costly for a strip sitting
+   directly above the one thing the page wants you to watch. Once, on arrival,
+   then still.
+
+   Each lamp reuses the single mark's own power-on flicker rather than a plain
+   fade, so the row catches like nineteen filaments rather than nineteen
+   opacity transitions. Offsetting the start by 60ms per lamp is the entire
+   mechanism — one keyframe track, nineteen phases.
+
+     lead      150ms   after paint, so the sweep is seen starting
+     step       60ms   between neighbours
+     sweep    1080ms   (19 − 1) × 60
+     flicker   600ms   each lamp's own power-on
+     settled  ~1830ms  lead + sweep + flicker
+
+   `both` is doing two separate jobs and both are load-bearing:
+
+     backwards  applies the 0% keyframe (dark) during each lamp's delay, so a
+                lamp that has not had its turn yet is OFF. Without it they all
+                sit lit and then flicker, which plays the sequence backwards.
+     forwards   holds the 100% keyframe (lit) after the flicker ends, which is
+                what "and keep them on" means. Without it every lamp snaps
+                back to its base value the instant its animation finishes.
+
+   There is deliberately NO `opacity` declaration on the rule itself. The base
+   value stays 1 so that if the animation never runs at all — reduced motion,
+   or a browser that drops the declaration — the strip is simply on, which is
+   the correct resting state. Setting `opacity: 0` here would make that
+   failure mode an invisible strip.
+
+   `step-end` rather than an ease: these are LEDs, and the lamp this strip is
+   built from switches in hard cuts. Animating `opacity` only, so it composites
+   on the GPU and touches no layout. */
+.vv-lamp {
+  animation: vvPowerOn 0.6s step-end both;
+  animation-delay: calc(150ms + var(--i, 0) * 60ms);
+}
+
 /* An infinite blink and a stuttering power-on are exactly the kind of motion
    this media query exists for — the caret settles solid, the ghost stops
    flickering, and the mark is simply on. */
@@ -975,6 +1099,18 @@ html.intro-js .scroll-reveal.is-visible {
   .vv-power-on {
     animation: none;
     opacity: 1;
+  }
+
+  /* The strip arrives lit, all nineteen, with no sweep. Nineteen staggered
+     filament flickers is exactly the motion this preference is asking us not
+     to run — and since the animation's whole purpose is to arrive at "lit",
+     removing it loses nothing but the flourish.
+
+     No `opacity` needed: the base value is already 1 (see the note on
+     `.vv-lamp` above for why it is deliberately not 0), so killing the
+     animation leaves the strip on rather than invisible. */
+  .vv-lamp {
+    animation: none;
   }
 }
 
@@ -1021,4 +1157,30 @@ html.intro-js .scroll-reveal.is-visible {
   .idx-submit:active {
     transform: none;
   }
+}
+
+/* ---- media frame ---------------------------------------------------------
+
+   The rounded video slot. 12px matches the waitlist field's radius (.idx-form)
+   rather than introducing a third corner size to the house.
+
+   `overflow: hidden` plus `isolation` is the fix for the oldest bug in
+   rounded media: a <video> is a replaced element painted by the compositor,
+   and on Safari it ignores an ancestor's border-radius clip unless that
+   ancestor forms its own stacking context. Without `isolation`, the corners
+   are round everywhere except Safari, where they are square. */
+.vv-media {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--placeholder-light);
+}
+
+.vv-media video,
+.vv-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

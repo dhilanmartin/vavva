@@ -157,9 +157,32 @@ export function Nav() {
 
   return (
     <header className="relative z-20 bg-[var(--paper)]">
-      <div className="mx-auto flex h-16 max-w-[1710px] items-center px-6">
+      {/* THE MARK IS ABSOLUTELY CENTRED, and the side zones size to their own
+          content. This replaced three `flex-1` zones, which looked like the
+          right way to centre a mark and failed at a specific band of widths.
+
+          The failure, measured at 856px: a third of the bar is 269px, and
+          "LOCATIONS SHOP OUR STORY" at 16px/600 needs 277px. Eight pixels
+          short. The zone could not grow — the other two thirds were holding
+          their width — so the only give in the system was the text, and "OUR
+          STORY" broke across two lines, taking the link row to 42px inside a
+          64px bar.
+
+          Adding `white-space: nowrap` alone would have moved the problem
+          rather than fixed it: a flex item's default `min-width: auto` stops
+          it shrinking below its content, so the left zone would then push
+          past its third and shove the mark off-centre — trading a wrapped
+          label for a mark that drifts as the labels change.
+
+          Out of flow, the mark is pinned to the true centre of the bar at
+          every width, and the side zones are free to be whatever width their
+          content needs. The centring transform lives on this wrapper rather
+          than on the <Link>, because the link carries `home-rise`, whose
+          keyframes animate `transform` — one element cannot hold both a
+          static centring translate and an animated one. */}
+      <div className="relative mx-auto flex h-16 max-w-[1710px] items-center justify-between px-6">
         <div
-          className="home-rise flex flex-1 items-center justify-start"
+          className="home-rise flex items-center justify-start"
           style={{ ["--i" as string]: 0 }}
         >
           <button
@@ -193,12 +216,13 @@ export function Nav() {
           </ul>
         </div>
 
-        <Link
-          href="/"
-          aria-label="Vavva — home"
-          className="home-rise flex flex-1 items-center justify-center"
-          style={{ ["--i" as string]: 1 }}
-        >
+        <div className="pointer-events-none absolute left-1/2 top-0 flex h-full -translate-x-1/2 items-center">
+          <Link
+            href="/"
+            aria-label="Vavva — home"
+            className="home-rise pointer-events-auto flex items-center"
+            style={{ ["--i" as string]: 1 }}
+          >
           {/* Sized by HEIGHT, not width: a nav bar sizes marks by height,
               which is what sets the row's optical rhythm, and the two
               wordmarks have different proportions (the brush mark is
@@ -211,19 +235,36 @@ export function Nav() {
               and descenders where "Mimi's" sits compact, so the same
               numeric height reads much smaller on this wordmark. 31px
               splits the difference and lands it ~67px wide. */}
-          <VavvaMark className="h-[31px] w-auto" />
-        </Link>
+            <VavvaMark className="h-[31px] w-auto" />
+          </Link>
+        </div>
 
         <div
-          className="home-rise flex flex-1 items-center justify-end"
+          className="home-rise flex items-center justify-end"
           style={{ ["--i" as string]: 2 }}
         >
-          <a
-            href={CONTACT_HREF}
-            className={`hidden leading-5 tablet:inline ${navLinkClass(false)}`}
-          >
-            Contact
-          </a>
+          {/* Visibility lives on a WRAPPER, not on the link.
+
+              `hidden tablet:inline` on the link itself did not work, and the
+              reason is not obvious from reading the markup: navLinkClass()
+              also contributes `inline-block` (which .nav-link needs, since
+              `transform` has no effect on a non-replaced inline box and the
+              press-scale would silently do nothing). Tailwind emits display
+              utilities in its own canonical order — `.hidden` before
+              `.inline-block` — and both are plain single-class selectors, so
+              source order decides and `inline-block` wins.
+
+              The result was CONTACT visible in the header bar at every width,
+              including mobile, where it ALSO appears in the open panel. Two
+              of the same link on one screen.
+
+              A wrapper separates the two concerns: it owns display, the link
+              owns inline-block, and neither can override the other. */}
+          <div className="hidden tablet:block">
+            <a href={CONTACT_HREF} className={`leading-5 ${navLinkClass(false)}`}>
+              Contact
+            </a>
+          </div>
         </div>
       </div>
 

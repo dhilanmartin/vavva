@@ -174,6 +174,20 @@ export default function RootLayout({
             only from it. D's answer was to drop that route entirely
             ("remove the gift card page for now"), so src/app/gift-card/ is
             gone and every remaining route is reachable from the nav. */}
+        {/* Nav stays — persistent, route-agnostic chrome on every page.
+
+            NO FOOTER. It was briefly remounted on 2026-08-10 and taken back
+            off the same day at D's instruction, which restores the 08-07
+            decision and its original reasoning: the landing is a full-height
+            vertically-centred column, and a footer below it is a second page
+            fighting the first over the same viewport. The reference landing
+            this page follows carries no footer either.
+
+            Footer.tsx is left on disk, not deleted — same "paused, not gone"
+            treatment as SlugList, Hero, AccessGate, FeatureBlock, CtaTileRow,
+            Newsletter, IconTextBlock and Timeline. The sticky-footer flex
+            scaffolding below (min-h-svh + flex-1) is kept too: it costs
+            nothing and is exactly what the footer needs the day it returns. */}
         <Nav />
         <div className="flex-1">{children}</div>
       </body>
