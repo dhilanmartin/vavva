@@ -50,7 +50,7 @@ const LINKS = [
   ...(SECONDARY_PAGES_LIVE
     ? [
         { href: "/story", label: "Our Story" },
-        { href: "/shop", label: "Shop" },
+        { href: "/products", label: "Products" },
       ]
     : []),
   { href: CONTACT_HREF, label: "Contact" },

@@ -1,5 +1,4 @@
 import { MediaFrame } from "@/components/media/MediaFrame";
-import { LoadingLamps } from "@/components/waitlist/LoadingLamps";
 import { WaitlistForm } from "@/components/waitlist/WaitlistForm";
 
 /* Landing, on index.how's structure. Every measurement was read off that
@@ -36,17 +35,10 @@ export default function HomePage() {
   return (
     <main className="idx-stage w-full bg-[var(--paper)]">
       <div className="idx-col">
-        {/* Inside the column, not beside it: .idx-stage is a centring grid
-            at ≥768, so a header as its own grid child would centre
-            horizontally instead of sitting at the column's left edge.
-
-            The single status lamp became a full-width strip of them on
-            2026-08-11 (D). Same lamp and same power-on flicker, staggered
-            70ms apart so the row fills left to right across the top of the
-            column and holds. PowerOnMark.tsx is untouched on disk. */}
-        <header className="mb-4">
-          <LoadingLamps />
-        </header>
+        {/* Lamp strip moved out of this column 2026-08-11(later, 08-12) —
+            see the site-wide header line in layout.tsx, which reuses this
+            same LoadingLamps component instead of a homepage-only header.
+            PowerOnMark.tsx and LoadingLamps.tsx are untouched on disk. */}
 
         {/* 16:9 — the column is 460px, so this lands at 460×259. It is the
             reference clip's own ratio, and it keeps the whole composition

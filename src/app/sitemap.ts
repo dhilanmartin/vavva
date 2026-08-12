@@ -6,9 +6,12 @@ import type { MetadataRoute } from "next";
 // the same way when that route was deleted.
 import { SECONDARY_PAGES_LIVE } from "@/lib/site";
 
-const ROUTES = SECONDARY_PAGES_LIVE
-  ? ["/", "/locations", "/shop", "/story"]
-  : ["/"];
+// /story dropped 2026-08-12 regardless of SECONDARY_PAGES_LIVE — it now
+// always redirects to "/" (see story/page.tsx), and a sitemap entry for a
+// redirecting URL is the same problem this comment already describes for a
+// 404ing one: an explicit claim to crawlers that a distinct page lives
+// there.
+const ROUTES = SECONDARY_PAGES_LIVE ? ["/", "/locations", "/products"] : ["/"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

@@ -159,3 +159,27 @@ The third option won: the page has one wordmark now. That resolves the two-VAVVA
 - A second accent colour
 - A second VAVVA anywhere, at any scale — there is one logo, and the exemption the footer stamp used to run under is withdrawn
 - A second centred object — centring is what marks the head; spend it once
+
+**Scoped exception, media embeds only (2026-08-12, widened later same day):**
+a rounded card + soft drop shadow (`.vv-embed` in globals.css) is used on
+every media embed — Home's video, the Products card, and Locations'
+skyline — deliberately breaking the chrome ban above. Started as a
+Products-only match to internetlabs.co's portfolio-card pattern (D attached
+the CHIP card as a reference), then widened to Home and Locations at D's
+request for cross-page visual cohesion ("make the home page and product
+page more visually cohesive with the image embed and locations"). See
+`ProductTile.tsx`, `MediaFrame.tsx`, `LocationCard.tsx`, and
+`plans/003-viral-direction-brief.md` for the fuller reasoning. Products'
+card background is `--red` — the site's one existing accent, not a second
+color — so this still stays inside the one-accent rule even though it
+breaks the chrome rule. Nav, footer, pill tags outside the Products tags
+row, and everything else stay exactly as restrained as the rest of this
+file describes; this is the embed treatment's exception, not a system-wide
+reversal.
+
+**Header line (2026-08-12):** the LoadingLamps strip (previously homepage-
+only, above the video) now renders site-wide directly under Nav, in
+layout.tsx — at D's request, replacing "the leds" as a page-local loading
+flourish with a persistent header line instead. Same component, same
+power-on animation, unchanged internally; only its position and scope
+changed.

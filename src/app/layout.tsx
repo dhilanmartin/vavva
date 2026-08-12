@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader, Literata } from "next/font/google";
 import { Nav } from "@/components/nav/Nav";
+import { LoadingLamps } from "@/components/waitlist/LoadingLamps";
 import "./globals.css";
 
 const inter = Inter({
@@ -189,6 +190,36 @@ export default function RootLayout({
             scaffolding below (min-h-svh + flex-1) is kept too: it costs
             nothing and is exactly what the footer needs the day it returns. */}
         <Nav />
+
+        {/* Header line, added 2026-08-12. Was a homepage-only strip above
+            the video (see the note it replaced in app/page.tsx) — moved
+            here, site-wide, at D's instruction ("remove the leds from the
+            homepage and i want to create a cool header line with them
+            rather"). Same LoadingLamps component, same 24px gutter Nav
+            uses, unchanged internally: it still only lights up once on
+            first mount per page load, so it re-plays its power-on flicker
+            on every navigation rather than staying lit across routes — a
+            real behavior change from being homepage-only, and arguably the
+            point of a "header line" (every page gets the entrance), not an
+            oversight.
+
+            Width-capped 2026-08-12 (later, same day): D noticed the lamp
+            count didn't match "the entire header." The bug: this row was
+            bare `w-full` — full raw viewport width — while Nav's own row is
+            `mx-auto max-w-[1710px]`. Below 1758px (1710 + two 24px gutters)
+            they coincide and nothing looked wrong, which is why it shipped;
+            above it, Nav sits centred with margin on both sides but the
+            lamp row kept going, so it computed a lamp count for a wider
+            strip than the header actually is. The outer div stays `w-full`
+            so the paper background still fills edge to edge; the new inner
+            div reproduces Nav's own centring so LoadingLamps' ResizeObserver
+            measures the same content width Nav uses, not the viewport. */}
+        <div aria-hidden className="w-full bg-[var(--paper)] py-3">
+          <div className="mx-auto max-w-[1710px] px-6">
+            <LoadingLamps />
+          </div>
+        </div>
+
         <div className="flex-1">{children}</div>
       </body>
     </html>

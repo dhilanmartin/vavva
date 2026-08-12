@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
 import { Triptych } from "@/components/story/Triptych";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
-import { SECONDARY_PAGES_LIVE } from "@/lib/site";
 import skyline from "../../assets/nyc-skyline.png";
 
 // Route stays /story, label reads "Our Story" (D, 2026-08-07) — see Nav.tsx.
@@ -37,9 +36,15 @@ export const metadata: Metadata = { title: "Our Story — VAVVA" };
    for its duration, which blocks mix-blend-mode from reading the real
    background behind it — same fix as LocationCard's image. */
 export default function StoryPage() {
-  // Disabled 2026-08-07 — see SECONDARY_PAGES_LIVE in src/lib/site.ts. The
-  // page is intact below; only the door is shut.
-  if (!SECONDARY_PAGES_LIVE) notFound();
+  // Disabled again 2026-08-12, independent of SECONDARY_PAGES_LIVE (which
+  // still gates Locations/Products) — D wants "Our Story" specifically off:
+  // the nav link stays visible and hoverable, but clicking it (or hitting
+  // /story directly) redirects to home instead of 404ing. A redirect, not
+  // notFound(), on purpose: a dead-looking nav link with a live hover state
+  // would read as broken; landing on the homepage reads as intentional. The
+  // page is intact below the return — only the door is shut, same
+  // paused-not-gone convention as the rest of this repo's disabled sections.
+  redirect("/");
 
   return (
     <main className="w-full bg-[var(--paper)] pb-24 pt-10">

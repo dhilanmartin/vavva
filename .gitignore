@@ -42,3 +42,7 @@ yarn-error.log*
 next-env.d.ts
 .gstack/
 .env*.local
+
+# Lyse local cache (baseline.json is tracked)
+.lyse/*
+!.lyse/baseline.json

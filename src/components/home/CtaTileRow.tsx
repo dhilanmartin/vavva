@@ -13,7 +13,7 @@ import Link from "next/link";
 
 const TILES = [
   { href: "/locations", label: "Locations", sub: "Find the studio" },
-  { href: "/shop", label: "Shop", sub: "Objects, considered" },
+  { href: "/products", label: "Products", sub: "Objects, considered" },
   { href: "/story", label: "Our Story", sub: "How it began" },
 ];
 

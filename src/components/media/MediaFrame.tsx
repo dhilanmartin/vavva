@@ -96,7 +96,7 @@ export function MediaFrame({
   return (
     <div
       aria-hidden
-      className={`vv-media ${className}`}
+      className={`vv-media vv-embed ${className}`}
       style={{ aspectRatio: aspect }}
     >
       {still ? (

@@ -56,11 +56,12 @@ import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
 import { CONTACT_HREF, SECONDARY_PAGES_LIVE } from "@/lib/site";
 
-// "Merch" reverted to "Shop" 2026-08-07 at D's instruction, matching the
-// route again. "Our Story" keeps its label/route split.
+// "Merch" reverted to "Shop" 2026-08-07, then "Shop" renamed to "Products"
+// 2026-08-12 (label and route together, same rule as the 2026-08-07 move —
+// see products/page.tsx). "Our Story" keeps its label/route split.
 const PRIMARY_LINKS = [
   { href: "/locations", label: "Locations" },
-  { href: "/shop", label: "Shop" },
+  { href: "/products", label: "Products" },
   { href: "/story", label: "Our Story" },
 ];
 
