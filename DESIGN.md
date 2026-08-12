@@ -160,26 +160,34 @@ The third option won: the page has one wordmark now. That resolves the two-VAVVA
 - A second VAVVA anywhere, at any scale — there is one logo, and the exemption the footer stamp used to run under is withdrawn
 - A second centred object — centring is what marks the head; spend it once
 
-**Scoped exception, media embeds only (2026-08-12, widened later same day):**
+**Scoped exception, media embeds only (2026-08-12, revised twice same day):**
 a rounded card + soft drop shadow (`.vv-embed` in globals.css) is used on
-every media embed — Home's video, the Products card, and Locations'
-skyline — deliberately breaking the chrome ban above. Started as a
-Products-only match to internetlabs.co's portfolio-card pattern (D attached
-the CHIP card as a reference), then widened to Home and Locations at D's
-request for cross-page visual cohesion ("make the home page and product
-page more visually cohesive with the image embed and locations"). See
-`ProductTile.tsx`, `MediaFrame.tsx`, `LocationCard.tsx`, and
-`plans/003-viral-direction-brief.md` for the fuller reasoning. Products'
-card background is `--red` — the site's one existing accent, not a second
-color — so this still stays inside the one-accent rule even though it
-breaks the chrome rule. Nav, footer, pill tags outside the Products tags
-row, and everything else stay exactly as restrained as the rest of this
-file describes; this is the embed treatment's exception, not a system-wide
-reversal.
+Home's video and the Products card, deliberately breaking the chrome ban
+above. Started as a Products-only match to internetlabs.co's portfolio-card
+pattern (D attached the CHIP card as a reference), briefly widened to
+Locations too for cross-page cohesion, then narrowed back — D: "make the
+locations back to how it was before where the image was embedded. i dont
+want it like the product page." Locations keeps its own pre-existing flush
+mix-blend-multiply treatment instead; see `LocationCard.tsx`. See
+`ProductTile.tsx`, `MediaFrame.tsx`, and `plans/003-viral-direction-brief.md`
+for the fuller reasoning on the two pages that do use it. Products' card
+background is `--red` — the site's one existing accent, not a second color
+— so this still stays inside the one-accent rule even though it breaks the
+chrome rule. Nav, footer, and everything else stay exactly as restrained as
+the rest of this file describes; this is the embed treatment's exception,
+not a system-wide reversal.
 
-**Header line (2026-08-12):** the LoadingLamps strip (previously homepage-
-only, above the video) now renders site-wide directly under Nav, in
-layout.tsx — at D's request, replacing "the leds" as a page-local loading
-flourish with a persistent header line instead. Same component, same
-power-on animation, unchanged internally; only its position and scope
-changed.
+**Products tile (2026-08-12):** dropped the pill-tag row entirely — D: "the
+product card isnt hitting. its too much of a 'flashcard' rather than a
+product item." Price now sits beside the name instead of inside a tag row
+alongside a portfolio-template "Internal" label that never should have been
+customer-facing. See `ProductTile.tsx`.
+
+**Header line (2026-08-12, revised again later same day):** the
+LoadingLamps strip (previously homepage-only, above the video) renders
+site-wide directly under Nav, in layout.tsx. It went through an infinite
+wave and then a one-shot sweep-then-static entrance before D asked for
+neither: "just leave the leds on 24/7... i dont want it like that" (the
+sweep version's edge cases around load-in). Every lamp now renders lit
+unconditionally, with no animation of any kind — see `LoadingLamps.tsx` for
+the full history if the motion is ever wanted back.

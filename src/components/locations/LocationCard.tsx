@@ -26,20 +26,18 @@
 // horizontal there), so it is chosen to give the illustration room without
 // detaching it from its label.
 //
-// The image stays OUTSIDE ScrollReveal, unchanged from before — an opacity
+// The image stays OUTSIDE ScrollReveal, unchanged from before: any opacity
 // transition on an ancestor forces a new stacking context for its duration,
-// which would clip the card's own shadow mid-reveal. Only the text half
-// reveals.
+// which blocks mix-blend-mode from reading the real page background behind
+// it and breaks the flush blend mid-reveal. Only the text half reveals.
 //
-// 2026-08-12: dropped the flush mix-blend-multiply treatment for the shared
-// .vv-embed card (rounded + shadow, see globals.css) — D asked for Home,
-// Products, and Locations to read as one cohesive embed language rather
-// than three different treatments (a flush ink-on-paper blend here, a plain
-// 12px-radius video on Home, a bold shadowed card on Products). A blend
-// mode that dissolves into the page and a framed card are different
-// metaphors; once the page is moving toward "framed card" everywhere, the
-// blend doesn't have anything to dissolve into anymore. Width (610px) and
-// aspect (16:9) now match Products' card exactly, same reasoning.
+// 2026-08-12: briefly swapped the flush mix-blend-multiply treatment for
+// the shared .vv-embed card (rounded + shadow) to match Products, then
+// reverted the same day — D: "make the locations back to how it was before
+// where the image was embedded. i dont want it like the product page."
+// .vv-embed stays in use on Home and Products; this page just isn't part of
+// that language. See DESIGN.md's embed-treatment note, narrowed back to
+// those two.
 
 import Image from "next/image";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
@@ -56,16 +54,13 @@ export function LocationCard({
 }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="vv-embed relative aspect-[16/9] w-full max-w-[610px] overflow-hidden bg-[var(--placeholder-light)]">
-        <Image
-          src={skyline}
-          alt="New York City skyline"
-          priority
-          fill
-          sizes="(max-width: 810px) 100vw, 610px"
-          className="object-cover"
-        />
-      </div>
+      <Image
+        src={skyline}
+        alt="New York City skyline"
+        priority
+        sizes="(max-width: 810px) 100vw, 560px"
+        className="w-full max-w-[560px] mix-blend-multiply"
+      />
 
       <ScrollReveal className="mt-10 flex flex-col items-center">
         <h3 className="mimi-lead">{name}</h3>

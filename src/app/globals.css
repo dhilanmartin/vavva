@@ -1043,62 +1043,18 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
-/* The lamp strip (LoadingLamps.tsx) — sweeps on once, on load, then stays
-   lit for good.
+/* The lamp strip (LoadingLamps.tsx) — no CSS here anymore. It went through
+   an infinite wave, then a one-shot sweep-then-static entrance (both had
+   their own `.vv-lamp` / `@keyframes vvLampsOn` rules, see git history for
+   the full mechanism), before D killed the whole idea of a load-in: "just
+   leave the leds on 24/7... i dont want it like that" — a direct response
+   to the sweep version occasionally leaving a lamp stuck off across a
+   backgrounded-tab edge case, confirmed and fixed once already, but D's
+   answer wasn't "keep fixing it," it was "there should be nothing to fix."
+   Every lamp now renders lit unconditionally in the component itself, so
+   there's no animation, no delay math, and no reduced-motion case to carve
+   out here — nothing left for this stylesheet to own. */
 
-   Rewritten 2026-08-12, reversing the 2026-08-11 "entrance, not a loop"
-   decision (git history / LoadingLamps.tsx has the full reasoning trail),
-   into an infinite loop: D's ask then was "move like a wave... on and off
-   and on and forever... taking the same length as a rotation of the video
-   so they're concurrent and symmetric," later sped up on "make it faster."
-
-   Reverted to one shot, 2026-08-12 (later, same day): D — "make it static
-   once it loads in... i want all the leds on." Two things carry over from
-   the loop era rather than reverting with it, because both are unrelated
-   improvements: the ONE flip per lamp instead of the old six-jump flicker
-   stutter (that was about a genuine complaint — "dont maek them skip
-   randomly... no jumping" — not about looping vs. one-shot), and
-   `step-end` for the same reason it always was: these are LEDs, and hard
-   cuts read as a lamp switching, not fading.
-
-   `animation-fill-mode: both` is doing the two jobs the original one-shot
-   entrance's `both` did (see the vvPowerOn note above, and LoadingLamps.tsx
-   git history): backwards holds the 0% keyframe (off) during a lamp's own
-   delay, so a lamp that hasn't had its turn in the sweep yet reads as OFF
-   rather than defaulting to on; forwards holds the 100% keyframe (on)
-   after the animation completes, permanently, since there's no `infinite`
-   here to bring it back down. No JS is involved in "freezing" the end
-   state — the animation simply has nowhere further to go.
-
-   Duration is a nominal 10ms, not 0: with `step-end` the held value for
-   the whole duration is the SEGMENT'S START value, and the jump to the end
-   value happens only in the last frame, so any short duration produces the
-   same instant-looking cut — 10ms avoids relying on a zero-duration
-   animation actually firing, which is unreliable cross-browser. The real
-   pacing lives entirely in each lamp's `animation-delay` (set inline in
-   LoadingLamps.tsx as `i * (SWEEP_MS / count)`), which is what reads as a
-   wave sweeping the row once rather than N lamps switching on at random. */
-@keyframes vvLampsOn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.vv-lamp {
-  animation: vvLampsOn 10ms step-end both;
-}
-
-/* The strip's resting state — animation never runs, or has already
-   finished — is "on": `.vv-lamp` carries no opacity outside this animation,
-   so an SVG group's own default (1, opaque) is what shows, and the on-lamp
-   artwork sits directly over the off-lamp artwork beneath it. That's true
-   whether reduced motion is off (the sweep runs once, ends here) or on
-   (the animation is skipped outright below) — "all lamps lit" is the one
-   resting state both paths land on, which is the point: a header line
-   reads as broken if it settles anywhere else. */
 @media (prefers-reduced-motion: reduce) {
   .idx-cursor {
     animation: none;
@@ -1107,10 +1063,6 @@ html.intro-js .scroll-reveal.is-visible {
   .vv-power-on {
     animation: none;
     opacity: 1;
-  }
-
-  .vv-lamp {
-    animation: none;
   }
 }
 
@@ -1159,14 +1111,18 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
-/* ---- embed shadow, shared by Home/Products/Locations ---------------------
+/* ---- embed shadow, shared by Home/Products -------------------------------
 
-   2026-08-12: D asked for the home page and Locations to read visually
-   cohesive with the Products page's internetlabs.co-style card (see
-   ProductTile.tsx and the DESIGN.md Products-page exception note). One
-   token instead of the same shadow value copy-pasted three times — if the
-   embed treatment ever changes, it changes once here. Same 24px/28px radius
-   step as ProductTile (mobile/tablet) for the same reason. */
+   2026-08-12: D asked for the home page to read visually cohesive with the
+   Products page's internetlabs.co-style card (see ProductTile.tsx and the
+   DESIGN.md Products-page exception note). One token instead of the same
+   shadow value copy-pasted twice — if the embed treatment ever changes, it
+   changes once here. Same 24px/28px radius step as ProductTile
+   (mobile/tablet) for the same reason.
+
+   Locations briefly used this too, same day, then reverted back to its own
+   flush mix-blend-multiply treatment — D didn't want it read as "the
+   product page." See LocationCard.tsx. */
 :root {
   --embed-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
 }

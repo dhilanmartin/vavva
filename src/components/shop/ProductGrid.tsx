@@ -7,18 +7,18 @@ import trio from "../../assets/house-pbj-trio.png";
 // RotatingProductImage.tsx, and the original two House PB&J photos are
 // untouched — paused, not gone.
 //
-// Still one real product. Price folded into the tag row as a pill, same as
-// the reference's own tag pattern (Internal/External + category) extended
-// by one — their cards don't show price at all, this one still needs to
-// since Vavva actually sells the thing (eventually).
+// Still one real product. `tags` (and the "Internal" categorization label
+// specifically) is gone as of the same-day redesign — see ProductTile.tsx
+// — and `price` is now its own field, given equal billing with `name`
+// rather than folded into a pill row.
 const PRODUCTS = [
   {
     wordmark: "PB&J",
     emoji: "🥪",
     name: "House PB&J",
+    price: "$9",
     description:
       "A real peanut butter and jelly sandwich, rebuilt from the inside.",
-    tags: ["Internal", "Food", "$9"],
     image: trio,
   },
 ];
