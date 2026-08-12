@@ -52,6 +52,15 @@
 // .mimi-* sets `margin: 0` and that rule is authored after Tailwind's
 // utilities in globals.css — an `mt-[68px]` alongside it loses on source
 // order at equal specificity and silently collapses to zero. (It did.)
+// Copy rewritten again 2026-08-11 at D's instruction — simpler, and
+// deliberately non-revealing this time: no product mention, no health/
+// nutrition specifics. Generic "creative studio, coming soon" teaser
+// register, on purpose — the actual product isn't ready to be public (see
+// plans/002-house-pbj-product.md's outstanding gates). Home page hero copy
+// is untouched — this rewrite is scoped to the Story page only. The block
+// was previously hand-measured to a specific height against a reference
+// site (see git history) — that measurement doesn't apply to new copy;
+// re-check height at both breakpoints rather than assuming it lines up.
 export function LeadBlock() {
   return (
     <div className="px-6">
@@ -59,18 +68,10 @@ export function LeadBlock() {
         <h1 className="mimi-display">The Vavva Story</h1>
 
         <p className="mimi-lead">
-          <strong>
-            Vavva was built to make fewer things, and to make them properly.
-          </strong>{" "}
-          It started with a mark, drawn once by hand, and a question: what
-          would a studio feel like if it slowed down. New York rewards speed,
-          and most of what gets made here is made fast — briefed on Monday,
-          shipped on Friday, forgotten by the quarter. We wanted the opposite
-          of that: fewer projects than we could take, longer on each than most
-          would spend, and the second look treated as the only test that
-          matters. Everything we make from here is in service of that same
-          idea — work that holds up when you look at it twice, made at the
-          pace that takes.
+          <strong>Casa Vavva is a creative studio, coming soon.</strong> We
+          build products worth waiting for, working with a small set of
+          frontier brands doing something genuinely new. Everything we make
+          is in service of one idea — a better future, built properly.
         </p>
       </div>
     </div>

@@ -12,10 +12,9 @@ export const metadata: Metadata = { title: "Shop — VAVVA" };
 /* Reopened 2026-08-07 alongside Story — the per-route notFound() gate is
    gone site-wide (see src/lib/site.ts).
 
-   Every product image on this page is still an AssetPlaceholder, at D's
-   instruction ("on the products page have it all placeholders still"). The
-   catalog names and prices under them are invented too, and stay flagged as
-   such in ProductGrid.tsx rather than reading as a real product list.
+   2026-08-11: briefly replaced this grid with a single-product ProductHero,
+   reverted the same day at D's instruction — same grid, same ProductCard
+   sizing as before, just trimmed to the one real item (see ProductGrid.tsx).
 
    h1 uses the 43px .mimi-title rather than Story's 48px .mimi-display: both
    sizes exist on the reference site and 43px is the one its non-Story
