@@ -16,7 +16,7 @@ export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
 //
 // Flip to true and Locations / Shop / Our Story return, links and sitemap
 // entries included. Nothing else needs touching.
-export const SECONDARY_PAGES_LIVE = false;
+export const SECONDARY_PAGES_LIVE = true;
 
 // GATED_ROUTES_LIVE removed 2026-08-07.
 //

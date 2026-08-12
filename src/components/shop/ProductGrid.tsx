@@ -8,7 +8,16 @@ import { ProductCard } from "./ProductCard";
 // [VAVVA COPY TBD] — invented catalog. Neither the names nor the prices are
 // real; they exist so the grid has something to lay out while every image
 // slot is still an AssetPlaceholder. Nothing here is a commitment.
+//
+// House PB&J added 2026-08-11, from the office-hours design doc at
+// ~/.gstack/projects/dhilanmartin/dhilanmartin-unknown-design-20260811-210752.md.
+// Price is a placeholder, same as everything else here — the doc's own
+// back-of-envelope COGS is $2-4/unit and no retail price is locked. Stays
+// behind SECONDARY_PAGES_LIVE like the rest of this array: the doc's Day-0
+// gates (NYC permit check, an actual recipe) haven't cleared, so this does
+// not go public on its own.
 const PRODUCTS = [
+  { name: "House PB&J", price: "$9" },
   { name: "Table Candle", price: "$38" },
   { name: "Ceramic Vessel", price: "$64" },
   { name: "Studio Print", price: "$48" },
