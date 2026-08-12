@@ -751,27 +751,14 @@ html.intro-js .scroll-reveal.is-visible {
    the caret is --ink and the ghost is flat --ghost-grey — no second hue and
    no colour animation. The brush red keeps the nav hover and the submit
    button, which leaves the house on one accent again. */
-/* The landing-only `:root:has(.idx-stage) { --paper: #fff }` override that
-   used to sit here is gone — --paper is white for the whole site now, so
-   the override was restating the default. Deleted rather than left in as a
-   no-op: a rule that looks like it scopes something but doesn't is worse
-   than no rule. */
-.idx-stage {
-  padding: 24px;
-}
-
-@media (min-width: 768px) {
-  .idx-stage {
-    display: grid;
-    place-items: center;
-    /* svh not vh: same mobile-toolbar reason the home page's own min-height
-       already carries (see page.tsx) — vh grows as the address bar hides and
-       shoves a vertically-centred column mid-scroll. */
-    min-height: calc(100svh - 64px);
-    padding: 32px;
-  }
-}
-
+/* `.idx-stage` (grid + place-items:center + min-height: calc(100svh - 64px))
+   is gone as of 2026-08-12 — it existed to centre a small composition in
+   one screen, and stopped applying to anything the moment the home page's
+   hero grew to mimis.nyc's own video size (see page.tsx). Deleted rather
+   than left orphaned; git history has it if a small-composition page ever
+   wants that trick again. `.idx-col` (below) is the one piece of the old
+   landing system still in use — plain width/centring, unaffected by any
+   of this. */
 .idx-col {
   width: 100%;
   max-width: 460px;
@@ -1111,18 +1098,23 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
-/* ---- embed shadow, shared by Home/Products -------------------------------
+/* ---- embed shadow, Home only ----------------------------------------------
 
-   2026-08-12: D asked for the home page to read visually cohesive with the
-   Products page's internetlabs.co-style card (see ProductTile.tsx and the
-   DESIGN.md Products-page exception note). One token instead of the same
-   shadow value copy-pasted twice — if the embed treatment ever changes, it
-   changes once here. Same 24px/28px radius step as ProductTile
-   (mobile/tablet) for the same reason.
+   2026-08-12: introduced when D asked for the home page to read visually
+   cohesive with the Products page's then-new internetlabs.co-style card
+   (see MediaFrame.tsx). Kept as a named token rather than an inline value
+   even now that only one component uses it, since a video embed elsewhere
+   on the site is a real possibility and this is where its radius/shadow
+   would live.
 
-   Locations briefly used this too, same day, then reverted back to its own
-   flush mix-blend-multiply treatment — D didn't want it read as "the
-   product page." See LocationCard.tsx. */
+   Two components dropped it the same day, both against mimis.nyc
+   references rather than against each other: Locations reverted to its
+   own flush mix-blend-multiply treatment (D: didn't want it read as "the
+   product page" — see LocationCard.tsx), and Products' own card was
+   rebuilt flat — no radius, no shadow at all — to match mimis.nyc's own
+   /shop grid exactly (D: "the same font and design" — see ProductTile.tsx
+   and the DESIGN.md Products-page note). MediaFrame (Home's hero video) is
+   the only remaining user. */
 :root {
   --embed-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
 }

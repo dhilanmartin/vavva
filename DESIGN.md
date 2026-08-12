@@ -160,28 +160,62 @@ The third option won: the page has one wordmark now. That resolves the two-VAVVA
 - A second VAVVA anywhere, at any scale — there is one logo, and the exemption the footer stamp used to run under is withdrawn
 - A second centred object — centring is what marks the head; spend it once
 
-**Scoped exception, media embeds only (2026-08-12, revised twice same day):**
-a rounded card + soft drop shadow (`.vv-embed` in globals.css) is used on
-Home's video and the Products card, deliberately breaking the chrome ban
-above. Started as a Products-only match to internetlabs.co's portfolio-card
-pattern (D attached the CHIP card as a reference), briefly widened to
-Locations too for cross-page cohesion, then narrowed back — D: "make the
-locations back to how it was before where the image was embedded. i dont
-want it like the product page." Locations keeps its own pre-existing flush
-mix-blend-multiply treatment instead; see `LocationCard.tsx`. See
-`ProductTile.tsx`, `MediaFrame.tsx`, and `plans/003-viral-direction-brief.md`
-for the fuller reasoning on the two pages that do use it. Products' card
-background is `--red` — the site's one existing accent, not a second color
-— so this still stays inside the one-accent rule even though it breaks the
-chrome rule. Nav, footer, and everything else stay exactly as restrained as
-the rest of this file describes; this is the embed treatment's exception,
-not a system-wide reversal.
+**Scoped exception, Home's video only (2026-08-12, revised three times same
+day):** a rounded card + soft drop shadow (`.vv-embed` in globals.css) sits
+on Home's hero video, deliberately breaking the chrome ban above. Started as
+a Products-only match to internetlabs.co's portfolio-card pattern (D
+attached the CHIP card as a reference), widened to Locations and Products
+for cross-page cohesion, then both let go of it the same day: Locations
+reverted to its own pre-existing flush mix-blend-multiply treatment (D:
+didn't want it read as "the product page" — see `LocationCard.tsx`), and
+Products was rebuilt flat against a mimis.nyc reference instead (see the
+Products-tile note below). `.vv-embed` now styles exactly one thing on the
+whole site — Home's video, see `MediaFrame.tsx` — and stays a named token
+rather than an inline value on the chance a second video embed shows up
+later. Nav, footer, and everything else stay exactly as restrained as the
+rest of this file describes; this is one component's exception, not a
+system-wide reversal.
 
-**Products tile (2026-08-12):** dropped the pill-tag row entirely — D: "the
-product card isnt hitting. its too much of a 'flashcard' rather than a
-product item." Price now sits beside the name instead of inside a tag row
-alongside a portfolio-template "Internal" label that never should have been
-customer-facing. See `ProductTile.tsx`.
+**Products page (2026-08-12, rebuilt twice same day):** first redesigned to
+internetlabs.co's portfolio-card pattern — single flat-shadow card, 610px
+container. Rebuilt again the same day, this time against mimis.nyc's own
+`/shop` — D: "resize our product page to look like mimis with the same font
+and design." Measured live at 1710px rather than eyeballed: a flat 4-column
+grid (no radius, no shadow) at this site's standard 1710px/24px-gutter page
+width, not a single narrow card. The page heading also moved from
+`.mimi-title` (43px, Locations' size) to `.mimi-display` (48px) — mimis'
+actual `/shop` heading is 48px; `.mimi-title` had been borrowed from the
+wrong page of the same reference. The tag row from the first redesign
+(including "Internal," a categorization label that never should have been
+customer-facing) is gone with it — price now sits centred under the name,
+matching mimis' own card, not beside it. One populated grid cell today, for
+one real product, is the honest state of a real catalog with one SKU — not
+a sign the grid is wrong. See `ProductTile.tsx`, `ProductGrid.tsx`,
+`products/page.tsx`.
+
+**Home hero (2026-08-12, corrected same day):** D — "resize the video
+looping on the landing to the same size as the landing video on mimis.nyc.
+and where the text on mimis 'meet me' is is where the email signup and copy
+should go." The video grew from a 460px centred column to mimis' own
+measured hero proportions (2.4334:1, 1662×683 at 1710px), first at full
+page width, and the waitlist paragraph + field moved to sit directly below
+it, centred — the same position mimis gives "Meet me at Mimi's."
+
+Width corrected immediately after: D — full width was "too big... blurry
+since its not 4k." The source clip is a re-encode at a literal 800×450 (see
+MediaFrame.tsx); anything wider than 800px CSS width is upscaling past the
+file's actual resolution, so the video is now capped at `max-w-[800px]`,
+keeping the same 2.4334:1 shape at a size the source can actually cover. A
+"no scroll to see the copy" requirement came with it and is satisfied at
+800px with room to spare — verified, not assumed.
+
+Vavva's own footage, copy, and 460px-tuned paragraph typography are
+untouched throughout; only the video's size/proportions and the copy
+block's position changed. This also retired the old `.idx-stage` grid-
+centre-in-one-screen trick (page.tsx / globals.css) — it existed for a
+small composition that needed help not looking lost in a tall viewport,
+which this hero doesn't have at either size tried. See `page.tsx`,
+`MediaFrame.tsx`.
 
 **Header line (2026-08-12, revised again later same day):** the
 LoadingLamps strip (previously homepage-only, above the video) renders
