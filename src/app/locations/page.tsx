@@ -30,7 +30,9 @@ const LOCATIONS = [
    is a genuinely different size from the 48px their Story h1 uses, and is
    fixed rather than fluid: it measured 43px at both 1280 and 375 on their
    site, so the `desktop:` size jump this file used to carry is gone. Page
-   gutter is their 24px, and the h1 sits 40px below the 64px header. */
+   gutter is their 24px, and the h1 sits 40px below the header — mimis' own
+   measured rhythm, independent of Vavva's own header height (grown to
+   200px tablet+ as of 2026-08-12, see Nav.tsx). */
 export default function LocationsPage() {
   // Disabled 2026-08-07 — see SECONDARY_PAGES_LIVE in src/lib/site.ts.
   if (!SECONDARY_PAGES_LIVE) notFound();

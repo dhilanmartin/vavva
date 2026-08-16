@@ -29,7 +29,9 @@
 // half its width in D's 2x capture — so the capture reads 1:1 in points and
 // every offset below could be verified against it):
 //
-//   header height        64px            (unchanged — this was already h-16)
+//   header height        64px, flat at every width (re-measured on
+//                         mimis.nyc 2026-08-14; it briefly ran 200px
+//                         tablet+ / 80px mobile — see the mark note below)
 //   page gutter          24px            (was 16/20/24 stepped; now flat 24)
 //   panel link type      Inter 600 / 16px / uppercase, same as the desktop
 //                        row — the mobile links are NOT scaled up
@@ -225,17 +227,46 @@ export function Nav() {
             style={{ ["--i" as string]: 1 }}
           >
           {/* Sized by HEIGHT, not width: a nav bar sizes marks by height,
-              which is what sets the row's optical rhythm, and the two
-              wordmarks have different proportions (the brush mark is
-              2.16:1 against the reference's 2.73:1) so matching width
-              would leave this one visibly taller.
+              which is what sets the row's optical rhythm.
 
-              31px is the midpoint D asked for, 2026-08-07. The mark was
-              40.8px tall (88px wide); matching the reference's 22px bar
-              exactly overshot — the brush script carries real ascenders
-              and descenders where "Mimi's" sits compact, so the same
-              numeric height reads much smaller on this wordmark. 31px
-              splits the difference and lands it ~67px wide. */}
+              ---- 2026-08-14: back to 64px / 31px, flat ----
+
+              D: "fix the size of the vavva logo... it should be much
+              smaller so that the header is the same size as mimis."
+
+              This reverts the 2026-08-12 casajondal.es pass, which had
+              grown the bar to 200px (tablet+) to hold a 152px mark,
+              matching the wordmark on a site whose wordmark IS its header
+              — no bar, no persistent nav, sitting alone over a full-bleed
+              illustration. Vavva's header is real chrome on every route,
+              so that was always a strained comparison; against mimis it
+              is simply the wrong number.
+
+              Re-measured on mimis.nyc at 1280 rather than recalled:
+
+                bar        64px, flat — it does not step at any width
+                logo       60x22px, an SVG, centred, top: 21 in the bar
+                gutter     24px
+                nav links  Inter 600 / 16px / 20px tall
+
+              The bar is now `h-16` at every width, matching theirs
+              exactly. It had been 80px on mobile and 200px above tablet.
+
+              The MARK stays 31px rather than dropping to their literal
+              22px, and that is a deliberate departure with history: 31px
+              is the number D landed on for this exact question on
+              2026-08-07, when matching 22px was tried and rejected as
+              overshooting. The reason still holds — the brush script
+              carries real ascenders and descenders where "Mimi's" sits
+              compact, so the same numeric height reads visibly smaller on
+              this wordmark. 31px lands it ~67px wide, close to their 60px
+              of width, and sits in a 64px bar with ~16px of air above and
+              below.
+
+              So: the header is the same size as mimis' (the ask), and the
+              mark is the size this repo already decided it should be at
+              that bar height. See not-found.tsx for the one other file
+              that has to know the bar height. */}
             <VavvaMark className="h-[31px] w-auto" />
           </Link>
         </div>
@@ -277,9 +308,14 @@ export function Nav() {
         className={`nav-panel tablet:hidden ${open ? "is-open" : ""}`}
       >
         <div>
+          {/* `--i` per row drives the staggered entrance in globals.css —
+              the same index-as-custom-property mechanism .home-rise uses
+              in the header row above and the product grid uses on its
+              tiles. Contact is the last row, so its index continues the
+              list's rather than restarting at 0. */}
           <ul className="flex flex-col px-6 pb-8 pt-6">
-            {links.map((link) => (
-              <li key={link.href}>
+            {links.map((link, i) => (
+              <li key={link.href} style={{ ["--i" as string]: i }}>
                 <NavItem
                   {...link}
                   className="block leading-[32px]"
@@ -287,7 +323,7 @@ export function Nav() {
                 />
               </li>
             ))}
-            <li>
+            <li style={{ ["--i" as string]: links.length }}>
               <a
                 href={CONTACT_HREF}
                 onClick={() => setOpen(false)}

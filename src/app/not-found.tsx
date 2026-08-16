@@ -8,10 +8,15 @@ import Link from "next/link";
 
    - `min-h-dvh` measured the whole viewport while sitting *below* a 64px
      nav, so the document overflowed by exactly the nav's height and put a
-     scrollbar on a page holding two lines of text. Now `100svh - 64px`, the
-     same arithmetic the landing stage uses. svh not dvh for the reason
-     page.tsx already documents: dvh recalculates as the mobile address bar
-     collapses and shoves centred content mid-scroll.
+     scrollbar on a page holding two lines of text. Now `100svh - 64px`.
+     svh not dvh for the reason page.tsx already documents: dvh
+     recalculates as the mobile address bar collapses and shoves centred
+     content mid-scroll.
+
+     The nav briefly ran 80px mobile / 200px tablet+ (2026-08-12,
+     casajondal.es) and this carried both numbers to match. Reverted
+     2026-08-14 — the bar is a flat 64px again, mimis' own, so one number
+     is correct here again. See Nav.tsx.
    - The background was a hardcoded `#E8E8E8` rather than `var(--paper)` —
      the same colour today, but a second place to remember on a palette
      change. There is no second place now.

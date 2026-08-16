@@ -138,6 +138,61 @@ raises none. The history stays so the reasoning is visible rather than lost.
 
 One accent only. No second brand colour (no Instagram purple, no gradient buttons).
 
+### The landing inverts figure and ground (2026-08-14)
+
+D: *"make the landing page VAVVA red and flip the logo color to white... (a
+brand landing)."*
+
+The one-accent rule is **not broken by this, it is inverted.** On `/`, `--red`
+stops being an accent applied to a white page and becomes the page itself,
+with the paper colour demoted to the ink. No new hue was introduced to do it —
+it is the same single house colour used as ground rather than figure. Every
+other route keeps white paper with the red accent exactly as before, so the
+rule still describes the site; the landing is the one place the relationship
+flips, which is what makes it read as a cover rather than as another page.
+
+Consequences worth knowing:
+
+- **The wordmark reverses to white** via `filter: brightness(0) invert(1)`,
+  not a second PNG. The asset is a single-colour brush mark with a real alpha
+  channel, so the filter drives every opaque pixel to white and leaves the
+  antialiased edges intact. A parallel white file would be 42KB to maintain
+  and would drift the day the mark is re-cut.
+- **`.place` cannot be used there.** The city is set in `--red` everywhere
+  else; on a red page it would vanish. `.brand-place` carries the same
+  emphasis through weight and full white instead.
+- **The lamp strip is hidden on `/`.** Green lamps on `#B32622` put a second,
+  clashing hue on the one page whose entire job is to be the brand colour. The
+  strip is decorative and `aria-hidden`, so it has no meaning to lose.
+- **The whole skin is driven by `html:has(.brand-stage)`**, not by branching
+  Nav on `usePathname()`. Nav renders on the server first, so a JS branch
+  paints the white header for one frame and flips it on hydration — a red page
+  that flashes a white bar on every load, which is the same class of load-in
+  bug this repo has already fixed twice. `:has()` is resolved by the style
+  engine on first paint, server markup included.
+- **Contrast was measured, not assumed**, against `#B32622` (luminance
+  0.1109): white 6.53:1, cream `#F5EFE6` 5.71:1, white at 85% (nav rest)
+  5.09:1. All clear the 4.5:1 body floor. The status line shipped at 72% cream
+  for one pass, which composites to 3.61:1 and **failed** — it is full cream
+  now, with hierarchy carried by size, weight, case and tracking instead.
+
+### The landing's one CTA is Instagram (2026-08-14)
+
+The video and the email field are both gone. `MediaFrame` and `WaitlistForm`
+stay on disk under the usual paused-not-gone convention.
+
+Dropping the field rather than setting it beside the Instagram link is the
+honest call, not just the tidy one: `WaitlistForm` posts to
+`NEXT_PUBLIC_ACCESS_ENDPOINT`, and with no endpoint configured its actual live
+behaviour was already `window.open(instagram)`. The form was a door painted on
+the wall in front of the real door.
+
+One clause of copy changed with it and is flagged rather than quietly kept:
+*"Join the waitlist for behind-the-scenes updates"* became *"Follow along for
+behind-the-scenes updates,"* because a sentence pointing at a control that no
+longer exists is worse than an edited sentence. Everything else is D's own
+wording, untouched.
+
 ## The ambient wordmark, and why it is gone
 
 Removed 2026-07-26. `src/components/blur-glow/` — a WebGL "VAVVA" that sat fixed at the bottom of the frame and cycled five colour worlds — is deleted. Restore with `git show 213a2c9 -- src/components/blur-glow`.
@@ -176,7 +231,10 @@ later. Nav, footer, and everything else stay exactly as restrained as the
 rest of this file describes; this is one component's exception, not a
 system-wide reversal.
 
-**Products page (2026-08-12, rebuilt twice same day):** first redesigned to
+**Products page (2026-08-12, rebuilt twice same day).** *Superseded in part
+by the 2026-08-14 note above — the "no radius" claim below is wrong, and the
+grid is square rather than 4:3. Kept because the rest of it still holds and
+the measurement trail is the point.* First redesigned to
 internetlabs.co's portfolio-card pattern — single flat-shadow card, 610px
 container. Rebuilt again the same day, this time against mimis.nyc's own
 `/shop` — D: "resize our product page to look like mimis with the same font
@@ -192,6 +250,65 @@ matching mimis' own card, not beside it. One populated grid cell today, for
 one real product, is the honest state of a real catalog with one SKU — not
 a sign the grid is wrong. See `ProductTile.tsx`, `ProductGrid.tsx`,
 `products/page.tsx`.
+
+**Products page (2026-08-14, seven tees + a re-measure).** D supplied seven
+tee packshots and asked for placeholder names, for nothing to be purchasable,
+and for mimis.nyc/shop to stay the reference. The catalogue goes from one
+product to eight. Three things changed beyond the data.
+
+*Two corrections to what this file recorded about the reference.* Re-measured
+live, not trusted from notes:
+
+- **The cards are rounded.** This file said "flat — no radius, no shadow."
+  mimis' image wrapper computes `border-radius: 24px` with `overflow: hidden`.
+  The flat reading came off an outer container that carries no radius of its
+  own. Products' tiles are 24px now, matching them. Still no shadow — that
+  part was right, and it is what keeps this distinct from `.vv-embed`, which
+  is radius **plus** a drop shadow and is still Home's video only.
+- **No hover state, confirmed again.** Their two stacked image layers look
+  like a hover swap and are not — they are SSR responsive variants, one
+  `display: none` per breakpoint. A real pointer hover changes nothing on
+  their card. Vavva's tile does have a hover, for a reason their catalogue
+  does not have (below).
+
+*Three deliberate departures, each because the inventory differs.*
+
+- **Square tiles, not their 4:3.** Every tee source is 480×600 with the
+  garment inked y=125..476. Covered into 4:3 the crop is y=120..480 and the
+  shoulders and hem land within 5px of the frame. Covered into a square it is
+  y=60..540 — ~64px of air top and bottom. Their photos are full-bleed
+  lifestyle shots that fill any frame; these are packshots whose subject
+  brings its own margins.
+- **A 1px hairline** (`rgba(0,0,0,0.10)`, inset, on `::after`). It first
+  shipped at 0.06, which computes to #F0F0F0 — a 1.05:1 edge that measured as
+  present and rendered as nothing.
+
+  Its *reason* changed the same day and the current one is worth stating,
+  because the original no longer applies. It arrived because the tees were
+  shot on pure #FFFFFF against a #FFFFFF paper and floated with no tile around
+  them; D then re-exported all seven on **#F2F2F2**, which fixes that at the
+  source. It stays because the catalogue's backgrounds are not uniform — the
+  PB&J is photographed on #FBFBFB, the tees on #F2F2F2 — and the rule is what
+  makes all eight tiles read as the same kind of object regardless of what
+  each photograph happened to be shot against.
+- **No price line.** Their card is image → name → price. Nothing is for sale,
+  no tee has a price, and eight tiles each repeating "COMING SOON" in the
+  price slot is noise. `price` is out of the data model entirely; the PB&J's
+  $9 is in git.
+
+*Not for sale, stated twice on purpose.* The page carries one line of copy
+under the heading — "A first look. Nothing is for sale yet." — and each tile
+answers on hover with a "COMING SOON" chip plus a deepened hairline. The page
+line is not redundant with the hover: a hover-only fact does not exist on a
+touch device, and it is what makes a pointer-only affordance acceptable at
+all. The chip is `aria-hidden` for the same reason. Tiles are `<figure>`, not
+links — there is no product page to link to, and a dead `<a>` announces as a
+link and takes a tab stop.
+
+The chip is a pill, which the anti-pattern list below bans. It is the second
+scoped exception in this file, and it is the smallest thing that answers
+"why can't I buy this" at the moment a visitor tries. Nothing else in the
+grid gets a border, a pill or a shadow.
 
 **Home hero (2026-08-12, corrected same day):** D — "resize the video
 looping on the landing to the same size as the landing video on mimis.nyc.

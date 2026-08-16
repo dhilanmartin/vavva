@@ -16,8 +16,9 @@
 //   run-in    the opening sentence is <strong> at 700 inside the same
 //             paragraph — not a separate standout block above it
 //   measure   716px
-//   rhythm    h1 sits 40px below the 64px header; the lead block starts
-//             68px below the h1
+//   rhythm    h1 sits 40px below the header (mimis' own measured rhythm,
+//             independent of Vavva's own header height); the lead block
+//             starts 68px below the h1
 //
 // The sizes are fixed, not fluid: their /locations h1 measured identically
 // at 1280 and 375, so the `desktop:` size jump this file used to carry is

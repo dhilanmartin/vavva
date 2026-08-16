@@ -20,8 +20,10 @@ export const metadata: Metadata = { title: "Our Story — VAVVA" };
 
    Type is now mimis.nyc/story's own scale, measured off their live computed
    styles and reproduced exactly (.mimi-* in globals.css); the words are
-   Vavva's. Page rhythm matches too: 24px gutters, h1 40px below the 64px
-   header, lead 68px below the h1.
+   Vavva's. Page rhythm matches too: 24px gutters, h1 40px below the header
+   (that 40px is mimis' own measured rhythm, independent of Vavva's own
+   header height — see Nav.tsx for the 2026-08-12 change to that), lead 68px
+   below the h1.
 
    Trimmed 2026-08-07 per the owner: the "why we believe" icon+text section
    and the Timeline stay cut from this route (not deleted — IconTextBlock.tsx

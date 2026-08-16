@@ -78,8 +78,10 @@ export function WaitlistForm() {
   if (state === "done") {
     // role="status" because this replaces the form rather than adding to it —
     // without it a screen reader user gets silence where the door used to be.
+    // `.idx-swap` fades + rises this in via @starting-style rather than
+    // letting it replace the field on the same frame — see globals.css.
     return (
-      <p className="idx-note" role="status">
+      <p className="idx-note idx-swap" role="status">
         noted.
       </p>
     );
@@ -126,7 +128,7 @@ export function WaitlistForm() {
         </button>
       </form>
       {state === "error" && (
-        <p className="idx-note" role="status">
+        <p className="idx-note idx-swap" role="status">
           {"didn't send — "}
           <a
             href={PROFILE}

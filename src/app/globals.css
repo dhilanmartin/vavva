@@ -23,7 +23,26 @@
   /* Sampled from the brush wordmark — the one accent the house prints in. */
   --red: #b32622;
   --red-rgb: 179 38 34;
+  /* Two ease-out curves, and they are NOT interchangeable — the split is the
+     point, which is why both are tokens now instead of one token and five
+     hand-typed copies of the other (they were literals at six call sites
+     before 2026-08-14; the audit found them by counting).
+
+     --ease-out is the shorter, snappier curve. It belongs on states the
+     user drives: a press, a hover, the hamburger morph — motion that has to
+     land the instant the finger does.
+
+     --ease-rise is longer-tailed. It belongs on entrances the PAGE drives:
+     the header's staggered blur-rise, the scroll reveals, the mobile panel.
+     Those want a curve that decelerates for longer, because nobody is
+     waiting on them to finish.
+
+     Both are strong ease-outs, and either would pass a squint test in the
+     other's place — that similarity is exactly why they had drifted into
+     being typed by hand. Naming them is what stops the next one from being
+     a sixth literal that is 0.02 off. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-rise: cubic-bezier(0.19, 1, 0.22, 1);
 
   /* Apple HIG systemGray4/systemGray — flat AssetPlaceholder fills, not a
      brand color choice. Kept as tokens alongside the rest so a palette
@@ -157,7 +176,7 @@ html.intro-js:not(.intro-go) .home-rise {
 }
 
 html.intro-go .home-rise {
-  animation: homeRise 0.5s cubic-bezier(0.19, 1, 0.22, 1) backwards;
+  animation: homeRise 0.5s var(--ease-rise) backwards;
   animation-delay: calc(0.06s + var(--i, 0) * 0.08s);
   /* No will-change here on purpose. CSS has no way to release it when an
      animation ends, so it pinned four elements — each carrying a blur filter —
@@ -293,10 +312,15 @@ p {
   color: var(--mute);
   text-decoration: none;
   /* transform is listed so the press-scale is interruptible — releasing
-     mid-press eases back instead of snapping. */
+     mid-press eases back instead of snapping.
+     The two easings are different on purpose (2026-08-14): colour is a
+     hover change and takes plain `ease`; the press-scale is feedback and
+     takes --ease-out, which front-loads the movement. `ease` starts slow,
+     which is the one thing a press must never do — the whole job of a
+     press-scale is to answer on the same frame as the finger. */
   transition:
     color 180ms ease,
-    transform 120ms ease;
+    transform 120ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -360,10 +384,11 @@ p {
   font-size: 0.9375rem;
   color: var(--mute);
   cursor: pointer;
+  /* transform on --ease-out, colour/opacity on ease — see .social-link. */
   transition:
     color 180ms ease,
     opacity 180ms ease,
-    transform 120ms ease;
+    transform 120ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -485,10 +510,50 @@ p {
    mid-scale eases back instead of snapping. */
 .nav-link,
 .nav-toggle {
+  /* transform on --ease-out, colour on ease — see .social-link. */
   transition:
     color 180ms ease,
-    transform 120ms ease;
+    transform 120ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* HIT AREA, header row only.
+   The bar's links render 92x20 — 20px of height for the site's primary
+   navigation, which is a small thing to hit even with a mouse. This grows
+   the target to 40px without moving a pixel of layout: an absolutely
+   positioned ::after inset -10px on the block axis, which is the standard
+   way to buy hit area that costs nothing visually.
+
+   Measured before it was written, because an extended target that collides
+   with its neighbour is worse than a small one. In the bar the link centres
+   sit 111px apart horizontally and nothing sits above or below them inside
+   the 200px header, so a vertical-only extension cannot touch anything.
+
+   The MOBILE PANEL is deliberately excluded. Its rows pitch at 32px
+   centre-to-centre; extending them to 40px would overlap adjacent targets by
+   4px on each side, and two navigation links sharing hit area is a worse bug
+   than a 32px row. 32px already clears WCAG 2.5.8's 24px floor, which the
+   bar's 20px only clears via the spacing exception.
+
+   The exclusion is written as a cancel rather than a narrower selector on
+   purpose. The bar and the panel are BOTH `header > div` with no class
+   between them, so every "just target the bar" selector available here is
+   either positional (`:first-child`, which breaks the day something is
+   inserted above it) or requires a new class in Nav.tsx. Granting the hit
+   area to every .nav-link and taking it back inside .nav-panel says the
+   thing out loud and does not care about DOM order. */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset: -10px 0;
+}
+
+.nav-panel .nav-link::after {
+  content: none;
 }
 
 /* A label is one word even when it is two words.
@@ -567,9 +632,9 @@ html.intro-js .scroll-reveal {
 
 .scroll-reveal {
   transition:
-    opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1),
-    transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
-    filter 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity 0.5s var(--ease-rise),
+    transform 0.5s var(--ease-rise),
+    filter 0.5s var(--ease-rise);
 }
 
 html.intro-js .scroll-reveal.is-visible {
@@ -591,6 +656,36 @@ html.intro-js .scroll-reveal.is-visible {
   }
 }
 
+/* ---- .reveal-stagger: the wrapper hands its motion to its children -------
+
+   Added 2026-08-14, when the Products grid went from one tile to eight.
+
+   As one block, the reveal had two problems that only showed up at eight.
+
+   COHESION. Eight tiles arriving on the same frame is the one entrance this
+   site does not otherwise make: the header has staggered since it was
+   written (`--i`, 80ms apart, see .home-rise). A grid that lands all at once
+   next to a header that cascades reads like two different sites.
+
+   COST. `filter` is the expensive property in that transition, and blurring
+   a CONTAINER rasterises the whole subtree into one texture and blurs that.
+   Measured on this page: 1392x766 = 1.07 megapixels at desktop, and at 375px
+   the grid is 3076px tall — 1.15 megapixels of which seven tiles' worth is
+   below the fold, blurred for nobody. Per tile the same work is 333x373 =
+   0.12 megapixels, composited independently and skippable when offscreen.
+
+   The wrapper keeps the IntersectionObserver and the `intro-js` gate — all
+   the parts that decide WHEN — and stops animating itself. Specificity is
+   why that works: `html.intro-js .scroll-reveal.reveal-stagger` is (0,3,1)
+   against the base rule's (0,2,1), so it wins on weight rather than on
+   source order. The per-child rules live with the product tile further down
+   this file, not here, so ScrollReveal stays generic. */
+html.intro-js .scroll-reveal.reveal-stagger {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
 /* Nav mobile panel (nav.spec.md): "an in-flow panel pushes page content
    down" on hamburger open — not an overlay/drawer. The grid-rows technique
    animates from an unknown content height without JS measuring it, and
@@ -599,7 +694,7 @@ html.intro-js .scroll-reveal.is-visible {
 .nav-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 320ms cubic-bezier(0.19, 1, 0.22, 1);
+  transition: grid-template-rows 320ms var(--ease-rise);
 }
 
 .nav-panel.is-open {
@@ -611,9 +706,52 @@ html.intro-js .scroll-reveal.is-visible {
   min-height: 0;
 }
 
+/* The panel's rows, staggered (2026-08-14, find-animation-opportunities
+   row 3). The panel itself opened on a 320ms grid-rows transition while its
+   four links sat inside it fully formed, arriving in one lump the moment
+   there was room for them — the container animated and its contents did
+   not.
+
+   40ms per row, so the last of four lands 120ms after the first and the
+   whole cascade finishes inside the 320ms the panel is already taking. That
+   is the constraint that set the number: a stagger that outlives its own
+   container reads as lag, not as sequence.
+
+   `--i` is set inline in Nav.tsx, the same mechanism .home-rise and the
+   product grid already use — three staggers on this site, one idiom.
+
+   Opacity and transform only. The panel is mid-height-animation while this
+   runs, so anything that touched layout here would be fighting the
+   grid-rows transition for the same frames. */
+.nav-panel li {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 260ms var(--ease-rise),
+    transform 260ms var(--ease-rise);
+}
+
+.nav-panel.is-open li {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nav-panel {
     transition: none;
+  }
+
+  /* No rise, no cascade — and critically no opacity gate either. With the
+     panel's own height transition switched off above, the rows would be the
+     only thing left animating, which is the opposite of the intent. They
+     just appear with the panel. */
+  .nav-panel li,
+  .nav-panel.is-open li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    transition-delay: 0s;
   }
 }
 
@@ -669,6 +807,20 @@ html.intro-js .scroll-reveal.is-visible {
   font-weight: 440;
   color: var(--ink);
   text-align: center;
+}
+
+/* `balance` on the two heading roles only — NOT on .mimi-lead, which sits
+   in the same family but pins itself to greedy `wrap` further down for a
+   documented reason (the Story lead's bold run-in has to resolve on one
+   line). Headings are short enough that balance is cheap and it is the one
+   place the browser can even out a two- or three-word ragged break.
+
+   No visible effect on today's copy — "Products" and "Locations" are single
+   words. It is here so the next multi-word heading does not have to
+   rediscover it. */
+.mimi-display,
+.mimi-title {
+  text-wrap: balance;
 }
 
 .mimi-display {
@@ -802,7 +954,15 @@ html.intro-js .scroll-reveal.is-visible {
 
 /* Literata, not --font-serif: the reference sets this list in a Century
    Schoolbook-class face, which is a different skeleton from the GT Alpina
-   stand-in the mimis-referenced pages use. See layout.tsx. */
+   stand-in the mimis-referenced pages use.
+
+   --font-literata NO LONGER RESOLVES. The loader was removed from
+   layout.tsx on 2026-08-14 — SlugList, the only user of this selector, is
+   not mounted on any route, so the font was being preloaded on every page
+   in the site to set text that never rendered. This declaration is left
+   naming it first on purpose: it is the restore instruction (see the note
+   in layout.tsx), and until then the undefined variable simply falls
+   through to Georgia. */
 .idx-slug {
   font-family: var(--font-literata), Georgia, "Times New Roman", serif;
   font-size: 20px;
@@ -1092,6 +1252,57 @@ html.intro-js .scroll-reveal.is-visible {
   cursor: default;
 }
 
+/* ---- the waitlist's answer ------------------------------------------------
+
+   Added 2026-08-14 (find-animation-opportunities sweep). Submitting the form
+   replaced the whole field with the word "noted." on the same frame — the
+   one moment on this site where a visitor does something irreversible and
+   the interface answers, and it answered by teleporting. Same for the error
+   line, which appeared under the field out of nothing.
+
+   This is the rare/first-time tier: seen once per visitor, ever. It is the
+   only place on the site that has any delight budget at all, and it is spent
+   here rather than on anything a returning visitor would sit through twice.
+
+   `@starting-style` rather than a `mounted` flag in React: the element is
+   genuinely entering, and this is the platform's own answer for that — no
+   state, no effect, no re-render. Browsers without it skip straight to the
+   settled style, which is exactly today's behaviour, so the fallback is the
+   status quo rather than a broken frame.
+
+   260ms and --ease-out, inside the under-300ms budget. 6px of rise, not a
+   scale: this is a line of text taking the place of a control, and text that
+   scales reads as a notification rather than as an answer. */
+.idx-swap {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 260ms var(--ease-out);
+}
+
+@starting-style {
+  .idx-swap {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* The rise goes, the fade stays — the fade is what explains that the form
+   became a message, which is comprehension rather than decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .idx-swap {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+
+  @starting-style {
+    .idx-swap {
+      transform: none;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .idx-submit:active {
     transform: none;
@@ -1153,4 +1364,245 @@ html.intro-js .scroll-reveal.is-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ---- landing, set against system.studio (measured, 1:1) -------------------
+
+   D: "view https://system.studio/ for how the text should sit / be colored /
+   be padded (emulate it)."
+
+   Read off their live computed styles at 1440x900 on 2026-08-14, not
+   eyeballed. This site already borrows one idea from them — the `--hl`
+   selection/focus colour at the top of this file — so the reference is a
+   returning one rather than a new direction.
+
+     paper        #FFFFFF
+     colour       rgb(0,0,0) — PURE black, not a muted ramp step
+     size         14px / 21px  (1.5 exactly)
+     tracking     normal (0)
+     weight       400
+     align        centre
+     measure      max-width 288px
+     paragraph
+       spacing    16px, as flex `gap` rather than margins
+     position     dead centre of the viewport — their block's centre measured
+                  450px against a 450px half-viewport, an offset of 0
+
+   THE ONE SUBSTITUTION is the face. Theirs is ABCCameraPlain (licensed);
+   this house sets Inter, which is also what the landing has always used, so
+   "keep the same font" and "emulate system.studio" are not in conflict —
+   the family is unchanged and only the metrics around it moved.
+
+   TWO DEPARTURES, both because Vavva's page is not their page:
+
+   1. The centring subtracts this site's chrome. system.studio has no header
+      at all, so viewport-centre IS content-centre for them. Vavva carries a
+      64px bar plus the 40px lamp strip, so centring in the raw viewport
+      would sit the block visibly low. `calc(100svh - 104px)` centres it in
+      the space that actually remains, which is the honest translation of
+      "dead centre" rather than a copy of their number.
+
+      svh, not dvh or vh: dvh recalculates as a mobile address bar collapses
+      and would shove centred content mid-scroll — the same reason
+      not-found.tsx documents for its own arithmetic.
+
+   2. `.place` keeps the brush red. Their block is pure black throughout with
+      an underlined black link as its only emphasis. DESIGN.md's copy rule —
+      "The city name is the only red in the copy" — predates this reference
+      and was not part of what D asked to emulate, so the city stays red and
+      is the one colour in the block. */
+.home-stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: calc(100svh - 104px);
+  padding: 24px;
+}
+
+.home-note {
+  width: 100%;
+  max-width: 288px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  letter-spacing: normal;
+  text-align: center;
+  color: #000;
+  /* Greedy wrapping, overriding the global `p { text-wrap: balance }`.
+     Their paragraphs fill greedily and the 288px measure is narrow enough
+     that balancing visibly shortens the last line for no gain. */
+  text-wrap: wrap;
+}
+
+/* ---- product tile --------------------------------------------------------
+
+   Two rules, both explained at length in ProductTile.tsx — the short version:
+
+   .vv-product-frame  24px radius (mimis.nyc's own, re-measured live
+                      2026-08-14 — the "flat, no radius" note this repo
+                      carried was read off the wrong element) plus a 1px
+                      hairline.
+
+                      THE HAIRLINE'S REASON CHANGED, so this says the
+                      current one rather than the original. It arrived
+                      because the tees were shot on pure #FFFFFF against a
+                      #FFFFFF --paper and the garments floated with no tile
+                      around them. D re-exported all seven on #F2F2F2 later
+                      the same day, which fixes that outright — those tiles
+                      now have their own edge.
+
+                      It stays because the catalogue is not uniform:
+                      house-pbj-trio.png is photographed on #FBFBFB, nearly
+                      white, while the tees are #F2F2F2. Without the
+                      hairline the PB&J tile would sit almost invisibly on
+                      the paper while its seven neighbours read as solid
+                      objects. The rule is what makes all eight the same
+                      kind of thing regardless of what each photograph
+                      happened to be shot against — which is also why it
+                      should stay when the next product arrives on a
+                      background nobody controlled.
+
+                      It is drawn on ::after, and that is the fix for a bug
+                      rather than a style: as an inset box-shadow on the
+                      frame itself it was completely invisible, because
+                      next/image's `fill` renders an absolutely-positioned
+                      <img> covering the whole box, and a child paints over
+                      its parent's own background and inset shadows. ::after
+                      is the frame's last child in tree order, so it paints
+                      above the image. `border-radius: inherit` keeps it on
+                      the same 24px curve.
+
+                      Not `outline: 1px solid` (which is the usual advice for
+                      image hairlines, since it costs no layout box): the
+                      image has no radius of its own — the frame clips it —
+                      so an outline on it would run straight through the
+                      corners the frame just rounded. box-shadow inset on a
+                      radius-inheriting overlay is the version that follows
+                      the curve in every browser.
+
+                      0.10 black, not the 0.06 this first shipped at. 0.06 on
+                      white is #F0F0F0, a 1.05:1 edge — it measured as
+                      present and rendered as nothing.
+
+   .vv-product-chip   the "not for sale" answer, pointer-only. aria-hidden
+                      and duplicated in visible page copy above the grid, so
+                      nothing depends on being able to hover. It sits at the
+                      bottom edge instead of washing the whole image: a scrim
+                      over a white-on-white packshot erases the product in
+                      order to say a sentence about it.
+
+   Deliberately NOT .vv-embed, which is the other rounded thing on this site:
+   that class carries a drop shadow, Home's video is its only user, and
+   mimis' product card has no shadow at all. Same radius, different object.
+
+   This is chrome, and DESIGN.md's anti-pattern list bans chrome — that list
+   was written for the one-page landing and the Products grid has been a
+   documented exception since 2026-08-12. The hairline and the chip are the
+   two smallest pieces that make "here is an object, and you cannot buy it
+   yet" legible; nothing else here gets a border, a pill or a shadow. */
+/* The staggered entrance itself — see `.reveal-stagger` above for why the
+   motion moved off the wrapper and onto these.
+
+   50ms, not the header's 80ms. The header staggers three items (240ms of
+   cascade); this staggers eight, and at 80ms the last tile would start
+   560ms after the first and finish past the one-second mark, which stops
+   reading as one gesture and starts reading as items loading in one by one.
+   50ms puts the whole cascade at 350ms — still inside AUDIT.md's 30-80ms
+   band per step, and the tail lands at 850ms.
+
+   Values are otherwise the house entrance verbatim (14px rise, 6px blur,
+   0.5s, --ease-rise), so the grid arrives the same WAY the header does,
+   just offset. That is the entire point of the change. */
+html.intro-js .reveal-stagger .vv-product {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  filter: blur(6px);
+  transition:
+    opacity 0.5s var(--ease-rise),
+    transform 0.5s var(--ease-rise),
+    filter 0.5s var(--ease-rise);
+}
+
+html.intro-js .reveal-stagger.is-visible .vv-product {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0px);
+  transition-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* Reduced motion: the rise and the blur go, and so does the CASCADE. A
+   stagger is motion in time rather than in space, but it is still the
+   interface moving on its own schedule instead of showing up — and the
+   reason to keep opacity (it explains that content arrived) is fully served
+   by one fade for the whole grid. */
+@media (prefers-reduced-motion: reduce) {
+  html.intro-js .reveal-stagger .vv-product {
+    transform: none;
+    filter: none;
+    transition: opacity 0.3s ease;
+  }
+
+  html.intro-js .reveal-stagger.is-visible .vv-product {
+    transition-delay: 0s;
+  }
+}
+
+.vv-product-frame {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.vv-product-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 200ms ease;
+}
+
+.vv-product-chip {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    opacity 200ms ease,
+    transform 200ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-product:hover .vv-product-frame::after {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  }
+
+  .vv-product:hover .vv-product-chip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* The rise goes; the fade stays. Same call the .scroll-reveal block above
+   makes, for the same reason — opacity aids comprehension and carries no
+   movement, and killing the transform in the resting state too (not just its
+   transition) is what stops a reduced-motion user getting the identical 6px
+   jump, only instantly. */
+@media (prefers-reduced-motion: reduce) {
+  .vv-product-chip {
+    transform: translate(-50%, 0);
+    transition: opacity 200ms ease;
+  }
 }

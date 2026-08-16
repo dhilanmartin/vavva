@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Newsreader, Literata } from "next/font/google";
+import { Inter, Newsreader } from "next/font/google";
 import { Nav } from "@/components/nav/Nav";
 import { LoadingLamps } from "@/components/waitlist/LoadingLamps";
 import "./globals.css";
@@ -33,26 +33,36 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
-/* Second serif, for the landing's URL list only.
-   The two reference sites do not share a serif, so matching both honestly
-   takes two faces — index.how itself ships three. Its list is set in a
-   licensed "Schoolbook" (the woff2 is literally schoolbook_book-*.woff2), a
-   Century Schoolbook-class face: very large x-height, low stroke contrast,
-   sturdy bracketed serifs, wide. Newsreader — the GT Alpina stand-in
-   carrying Story/Locations — is the opposite shape: narrower, higher
-   contrast, more transitional, and at 20px in a tight list that difference
-   was the most visible thing separating this page from the reference.
-   Literata is the closest freely-licensed face to that Schoolbook skeleton.
-   Scoped to .idx-slug in globals.css; it touches nothing else. */
-const literata = Literata({
-  subsets: ["latin"],
-  variable: "--font-literata",
-  axes: ["opsz"],
-  display: "swap",
-});
+/* ---- Literata, and why it is no longer loaded ----------------------------
+
+   Removed 2026-08-14. It was the third face in the stack, a Century
+   Schoolbook-class serif chosen to stand in for index.how's licensed
+   "Schoolbook" in the landing's URL list — Newsreader (the GT Alpina
+   stand-in on Story/Locations) is a narrower, higher-contrast, more
+   transitional shape, and at 20px in a tight list that difference was the
+   most visible thing separating that page from its reference.
+
+   The list it was chosen for is `SlugList`, and SlugList has not been
+   mounted on any route since the landing was rebuilt. So `.idx-slug` — the
+   one selector that ever named this font — matched nothing, while
+   next/font kept injecting a `<link rel=preload>` and an @font-face table
+   for it into every page on the site. Confirmed live, not assumed: reading
+   document.styleSheets on /products showed Literata's latin .woff2
+   downloaded and the browser then warning it went unused.
+
+   A component sitting unused on disk costs nothing and this repo keeps
+   several on purpose. A webfont sitting unused in <head> is a request on
+   every page load, and that is a different kind of thing.
+
+   To restore it with SlugList: put the Literata import and this loader
+   back, and re-add `${literata.variable}` to <html>. `.idx-slug` still
+   names `var(--font-literata)` first and falls through to Georgia, so the
+   list degrades to a system serif until that happens rather than breaking.
+*/
+
+import { INSTAGRAM_HREF } from "@/lib/site";
 
 const SITE = "https://vavva.xyz";
-const INSTAGRAM = "https://instagram.com/casavavva";
 
 /* A studio says what it is and where it is. The previous pair withheld both on
    purpose, because the page was a private house; that is no longer what this
@@ -117,7 +127,7 @@ const ORGANIZATION_JSONLD = {
   logo: `${SITE}/icon.png`,
   image: `${SITE}/opengraph-image.png`,
   areaServed: { "@type": "City", name: "New York City" },
-  sameAs: [INSTAGRAM],
+  sameAs: [INSTAGRAM_HREF],
 };
 
 export const viewport: Viewport = {
@@ -139,13 +149,75 @@ export default function RootLayout({
     // so the server markup can't match — that mismatch is the point, not a bug.
     <html
       lang="en"
-      className={`${inter.variable} ${newsreader.variable} ${literata.variable}`}
+      className={`${inter.variable} ${newsreader.variable}`}
       suppressHydrationWarning
     >
       <head>
+        {/* THE HEADER-DISAPPEARS BUG (found and fixed 2026-08-14).
+            D: "there seems to be a bug with how the vavva header is loading."
+
+            This script used to be: add `intro-js`, then add `intro-go` inside
+            a double requestAnimationFrame. `html.intro-js:not(.intro-go)
+            .home-rise` sets `opacity: 0` (globals.css), and all three zones
+            of the header — links, mark, Contact — carry `.home-rise`.
+
+            requestAnimationFrame does not fire in a tab that is not being
+            rendered. So on any load into a background tab — cmd-click, "open
+            in new tab", a link tapped while the browser is not frontmost, a
+            session restored at browser launch — `intro-js` landed, hid the
+            header, and `intro-go` never arrived to bring it back. Measured
+            live, not theorised: 48 seconds after such a load the <html>
+            classes were still `["intro-js"]`, all three header zones
+            computed `opacity: 0`, and the page had recorded zero paint
+            entries. A site with no logo and no navigation.
+
+            That is an animation mechanism gating CONTENT, which is the same
+            failure D already rejected once on the lamp strip ("the load in
+            is always bugging"). The entrance is a nicety; the header is not.
+
+            The fix is NOT "add intro-go anyway" — that was tried first and
+            measured, and it does not work. `.home-rise`'s keyframes run with
+            `animation-fill-mode: backwards` behind an `animation-delay`, so
+            an element whose animation has been queued but not yet advanced
+            holds the `from` frame, which is `opacity: 0`. A hidden tab does
+            not advance CSS animations any more than it fires rAF, so
+            `intro-go` landed and the header stayed at zero regardless.
+
+            What actually works is to NOT ENTER the intro system at all when
+            the page starts hidden. `intro-js` is the class that hides
+            things; if it is never added, neither the hiding rule nor the
+            animation rule matches, and the header renders plain, static and
+            visible. That is the no-JS fallback globals.css was already
+            written to degrade to — this just routes the can't-animate case
+            down the same path, instead of into a state that needs an
+            animation to escape.
+
+            Two paths, for two different moments:
+
+              visibilityState  checked before anything is hidden. Covers the
+                               page that loads into a background tab.
+              setTimeout       the backstop for what that check cannot see:
+                               the tab was visible when this ran and got
+                               backgrounded before the second frame. Timers
+                               are throttled in background tabs but they
+                               still FIRE, which is exactly the property rAF
+                               lacks. At 400ms — far past the ~16ms a healthy
+                               double-rAF needs, so this is a no-op on a
+                               normal load — it either lets the entrance
+                               proceed or, if we are hidden by then, backs
+                               the whole thing out to the static state.
+              catch            un-hides rather than swallowing. If anything
+                               here throws, the failure mode has to be a
+                               visible header with no animation, never an
+                               invisible one.
+
+            Backing out removes `intro-js`, which also disarms `.scroll-
+            reveal` (same class gates it, see globals.css). That is correct
+            and deliberate: both are entrances, and a page that cannot play
+            one should not be holding content back for the other either. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{document.documentElement.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.add('intro-go');});});}catch(e){}})();`,
+            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
           }}
         />
         <script

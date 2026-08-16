@@ -4,6 +4,16 @@
 export const CONTACT_EMAIL = "hello@vavva.xyz";
 export const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
 
+// Instagram. Promoted from a private const in layout.tsx to this file on
+// 2026-08-14, when the landing was rebuilt around it (see app/page.tsx): it
+// is now the single call to action on the front door AND the JSON-LD
+// `sameAs` entry AND WaitlistForm's fallback target, and three copies of a
+// URL is how one of them goes stale. The handle is stored separately
+// because the landing prints it as visible copy — deriving it by slicing
+// the URL would be a clever way to make a display string fragile.
+export const INSTAGRAM_HANDLE = "@casavavva";
+export const INSTAGRAM_HREF = "https://instagram.com/casavavva";
+
 // The whole site is the landing page as of 2026-08-07, at D's instruction:
 // "disable every page but the home page."
 //
