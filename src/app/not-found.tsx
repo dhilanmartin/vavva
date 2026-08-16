@@ -8,15 +8,23 @@ import Link from "next/link";
 
    - `min-h-dvh` measured the whole viewport while sitting *below* a 64px
      nav, so the document overflowed by exactly the nav's height and put a
-     scrollbar on a page holding two lines of text. Now `100svh - 64px`.
-     svh not dvh for the reason page.tsx already documents: dvh
-     recalculates as the mobile address bar collapses and shoves centred
-     content mid-scroll.
+     scrollbar on a page holding two lines of text. svh not dvh for the
+     reason page.tsx already documents: dvh recalculates as the mobile
+     address bar collapses and shoves centred content mid-scroll.
 
      The nav briefly ran 80px mobile / 200px tablet+ (2026-08-12,
      casajondal.es) and this carried both numbers to match. Reverted
-     2026-08-14 — the bar is a flat 64px again, mimis' own, so one number
-     is correct here again. See Nav.tsx.
+     2026-08-14 — the bar is a flat 64px again, mimis' own.
+
+     **104px, not 64px** (fixed 2026-08-14). The subtraction was still only
+     counting the nav after the LoadingLamps strip was added below it, so
+     this page had quietly regressed into the exact bug described above:
+     measured live, the document ran 940px against a 900px viewport and
+     overflowed by 40px — the strip's height precisely — putting a scrollbar
+     back on a page holding two lines of text. The chrome is 64px of bar
+     plus 40px of strip (24px of py-3 around a 16px row). `.home-stage` in
+     globals.css subtracts the same 104px; if either the bar or the strip
+     ever changes height, both numbers move together. See Nav.tsx.
    - The background was a hardcoded `#E8E8E8` rather than `var(--paper)` —
      the same colour today, but a second place to remember on a palette
      change. There is no second place now.
@@ -27,7 +35,7 @@ import Link from "next/link";
    still on that stepped scale. */
 export default function NotFound() {
   return (
-    <main className="flex min-h-[calc(100svh-64px)] w-full flex-col bg-[var(--paper)] antialiased">
+    <main className="flex min-h-[calc(100svh-104px)] w-full flex-col bg-[var(--paper)] antialiased">
       {/* px-4 / md:px-5 to match the home column. This was px-1, which put the
           copy 4px off the bezel on a 320px phone while the home page held 16 —
           the two pages are the same site and should not gutter differently.

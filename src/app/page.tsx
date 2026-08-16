@@ -27,11 +27,16 @@
    a visitor can read the sentence and use the nav, and there is nothing
    else to do here. The nav is the only way out.
 
-   The copy is D's own wording. One clause still differs from the original
-   and is left as-is rather than silently reverted: "Join the waitlist for
-   behind-the-scenes updates" became "Follow along for behind-the-scenes
-   updates" when the waitlist field was removed, and there is still no
-   waitlist on the page for the original sentence to point at.
+   The copy is now ONE sentence. The second — "Join the waitlist for
+   behind-the-scenes updates," briefly "Follow along for…" once the field
+   was gone — was removed entirely on D's instruction. That resolves a
+   thread rather than cutting one short: the sentence had been pointing at
+   a control that no longer existed since the waitlist came out, and every
+   rewrite of it was working around that. Deleting it is the version that
+   does not need a workaround.
+
+   What is left says what the studio is and when it arrives, which is the
+   whole job of the page.
 
    The type is set against system.studio at D's instruction — "view
    https://system.studio/ for how the text should sit / be colored / be
@@ -53,8 +58,7 @@ export default function HomePage() {
     <main className="home-stage">
       <p className="home-note home-rise" style={{ ["--i" as string]: 3 }}>
         Casa Vavva is a new kind of creative studio based in{" "}
-        <span className="place">New York City</span>, arriving fall 2026. Follow
-        along for behind-the-scenes updates.
+        <span className="place">New York City</span>, arriving fall 2026.
       </p>
     </main>
   );

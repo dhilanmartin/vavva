@@ -230,37 +230,30 @@ export default function RootLayout({
       <body className={`${inter.className} flex min-h-svh flex-col antialiased`}>
         {/* Nav stays — persistent, route-agnostic chrome on every page.
 
-            Footer removed 2026-08-07 at D's instruction ("keep the vavva
-            header, and remove its footer"), site-wide rather than
-            landing-only, which is what "remove the footer" said twice.
-            The reference landing this page now follows carries no footer at
-            all; a full-height vertically-centred column and a footer below
-            it are two different pages fighting over the same viewport.
-
-            Footer.tsx is left on disk, not deleted — same "paused, not
-            gone" treatment this branch already gives FeatureBlock,
-            CtaTileRow, Newsletter, IconTextBlock and Timeline. The sticky-
-            footer flex scaffolding (min-h-svh + flex-1) is kept too: it
-            costs nothing and is what the footer needs the day it returns.
-
-            The footer's removal orphaned /gift-card, which was reachable
-            only from it. D's answer was to drop that route entirely
-            ("remove the gift card page for now"), so src/app/gift-card/ is
-            gone and every remaining route is reachable from the nav. */}
-        {/* Nav stays — persistent, route-agnostic chrome on every page.
-
-            NO FOOTER. It was briefly remounted on 2026-08-10 and taken back
-            off the same day at D's instruction, which restores the 08-07
-            decision and its original reasoning: the landing is a full-height
-            vertically-centred column, and a footer below it is a second page
-            fighting the first over the same viewport. The reference landing
-            this page follows carries no footer either.
+            NO FOOTER, and it is settled rather than pending. Removed
+            2026-08-07 at D's instruction ("keep the vavva header, and remove
+            its footer"), site-wide rather than landing-only, which is what
+            "remove the footer" said twice. Briefly remounted 2026-08-10 and
+            taken back off the same day, which restored the 08-07 decision
+            along with its reasoning: the landing is a full-height vertically
+            centred column, and a footer below it is a second page fighting
+            the first over the same viewport. The reference landings this
+            page has followed — index.how, then system.studio — carry no
+            footer either.
 
             Footer.tsx is left on disk, not deleted — same "paused, not gone"
-            treatment as SlugList, Hero, AccessGate, FeatureBlock, CtaTileRow,
-            Newsletter, IconTextBlock and Timeline. The sticky-footer flex
-            scaffolding below (min-h-svh + flex-1) is kept too: it costs
-            nothing and is exactly what the footer needs the day it returns. */}
+            treatment as SlugList, Hero, AccessGate, MediaFrame, WaitlistForm,
+            FeatureBlock, CtaTileRow, Newsletter, IconTextBlock and Timeline.
+            The sticky-footer flex scaffolding below (min-h-svh + flex-1) is
+            kept too: it costs nothing and is exactly what the footer needs
+            the day it returns.
+
+            The footer's removal orphaned /gift-card, which was reachable only
+            from it. D's answer was to drop that route entirely ("remove the
+            gift card page for now"), so src/app/gift-card/ is gone and every
+            remaining route is reachable from the nav.
+
+            This note existed twice, near-verbatim, until 2026-08-14. */}
         <Nav />
 
         {/* Header line, added 2026-08-12. Was a homepage-only strip above

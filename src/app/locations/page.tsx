@@ -39,7 +39,13 @@ export default function LocationsPage() {
 
   return (
     <main className="w-full bg-[var(--paper)] px-6 pb-24 pt-10">
-      <div className="mx-auto max-w-[1400px]">
+      {/* 1710px, matching Nav, the lamp strip and Products — this was the
+          one route still on 1400px. No visual change: the entry inside is a
+          centred stack capped at 560px, so the container width has never
+          been what positions it. Aligning it means the site has one page
+          width rather than two, and the next full-bleed element added here
+          lines up with the header instead of being 310px narrower. */}
+      <div className="mx-auto max-w-[1710px]">
         <h1 className="mimi-title mb-20">Locations</h1>
         <div className="flex flex-col gap-14 tablet:gap-16">
           {LOCATIONS.map((location) => (

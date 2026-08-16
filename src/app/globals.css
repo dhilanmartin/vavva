@@ -1190,6 +1190,32 @@ html.intro-js .scroll-reveal.reveal-stagger {
   }
 }
 
+/* The lamp strip's continuous slide (2026-08-14). See LoadingLamps.tsx for
+   why this is NOT a reinstatement of the one-shot entrance D killed: there
+   are no per-lamp delays, no on/off state and no terminal frame here, so
+   the "a few of them off" failure has nothing to attach to.
+
+   Seamless by construction — the lamps repeat on a 24px pitch, so a -24px
+   translate lands on an identical pattern. `translate3d` rather than
+   `translateX` to keep it on the compositor; `linear` because constant
+   motion with any easing reads as a stutter every cycle.
+
+   6s per lamp-width is deliberately slow: this sits under the header on
+   every page of the site, and anything quick enough to notice is something
+   you have to keep not-noticing. */
+@keyframes vvLampSlide {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-24px, 0, 0);
+  }
+}
+
+.vv-lamp-row {
+  animation: vvLampSlide 6s linear infinite;
+}
+
 /* The lamp strip (LoadingLamps.tsx) — no CSS here anymore. It went through
    an infinite wave, then a one-shot sweep-then-static entrance (both had
    their own `.vv-lamp` / `@keyframes vvLampsOn` rules, see git history for
@@ -1210,6 +1236,12 @@ html.intro-js .scroll-reveal.reveal-stagger {
   .vv-power-on {
     animation: none;
     opacity: 1;
+  }
+
+  /* Stops at the start of the cycle, which is the full lit row — i.e.
+     exactly what shipped before the slide existed. */
+  .vv-lamp-row {
+    animation: none;
   }
 }
 
