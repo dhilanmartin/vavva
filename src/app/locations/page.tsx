@@ -46,7 +46,24 @@ export default function LocationsPage() {
           width rather than two, and the next full-bleed element added here
           lines up with the header instead of being 310px narrower. */}
       <div className="mx-auto max-w-[1710px]">
-        <h1 className="mimi-title mb-20">Locations</h1>
+        {/* On-load entrance, 2026-08-18 — same `.home-rise`, same `--i: 3`
+            slot as the Products heading, for the reason spelled out there.
+
+            The SKYLINE BELOW IT STAYS STATIC, and that is a constraint
+            rather than an omission: the image carries `mix-blend-multiply`
+            (LocationCard.tsx), and an ancestor animating opacity or filter
+            forces a stacking context for the duration of the animation,
+            which cuts the blend off from the page background and shows a
+            hard white box around the artwork until the entrance finishes.
+            That is exactly why the image already sits outside this page's
+            ScrollReveal. The heading and the text block are the two things
+            here that can move, so they are the two things that do. */}
+        <h1
+          className="mimi-title home-rise mb-20"
+          style={{ ["--i" as string]: 3 }}
+        >
+          Locations
+        </h1>
         <div className="flex flex-col gap-14 tablet:gap-16">
           {LOCATIONS.map((location) => (
             <LocationCard key={location.name} {...location} />

@@ -43,7 +43,7 @@ export const metadata: Metadata = { title: "Products — VAVVA" };
    this is said: a hover-only fact is invisible on every touch device and to
    anything that is not a pointer. So the page states it once, in text, for
    everyone — and the tiles answer it on hover, where a visitor is closest to
-   trying to buy. Saying it once here rather than eight times in the grid is
+   trying to buy. Saying it once here rather than once per tile in the grid is
    also why the tiles carry no price slot at all; eight repetitions of the
    same two words is noise, not information.
 
@@ -58,7 +58,27 @@ export default function ProductsPage() {
   return (
     <main className="w-full bg-[var(--paper)] px-6 pb-24 pt-10">
       <div className="mx-auto max-w-[1710px]">
-        <h1 className="mimi-display">Products</h1>
+        {/* On-load entrance, 2026-08-18. D: "add animation to the Products
+            and Locations on their respective pages on refresh/load-in (see
+            mimis.nyc)" — their page headings fade + rise on load, the same
+            shape Vavva's header already uses.
+
+            So this is `.home-rise`, not a new mechanism: the class is
+            site-wide (globals.css), armed by the `intro-js`/`intro-go`
+            classes layout.tsx stamps on <html>, and it fires on a hard
+            refresh AND on a client-side navigation into this route — the h1
+            is a freshly-inserted element either way, and a freshly-inserted
+            element matching `html.intro-go .home-rise` starts its animation
+            on insert.
+
+            `--i` continues the header's own count (0/1/2 = links, mark,
+            Contact) rather than restarting, which is the same thing the
+            landing's one paragraph does at index 3. The page reads as one
+            cascade from the top of the window down, not as two competing
+            ones. */}
+        <h1 className="mimi-display home-rise" style={{ ["--i" as string]: 3 }}>
+          Products
+        </h1>
         {/* `.mimi-body`'s own --ink-body, deliberately — this carried a
             `text-[var(--mute)]` utility for one pass and that class styled
             NOTHING. globals.css authors `.mimi-body` outside any cascade
@@ -72,11 +92,38 @@ export default function ProductsPage() {
             visitor nothing can be bought. It is body copy, not a footnote,
             and 12.63:1 is where it belongs. `mt-3` still applies — the same
             comment in globals.css explains why no `margin: 0` is set there. */}
-        <p className="mimi-body mt-3">A first look. Nothing is for sale yet.</p>
+        <p
+          className="mimi-body home-rise mt-3"
+          style={{ ["--i" as string]: 4 }}
+        >
+          A first look. Nothing is for sale yet.
+        </p>
         {/* `reveal-stagger` moves the entrance off this wrapper and onto the
-            eight tiles, 50ms apart — see globals.css. The wrapper still owns
-            the observer and the intro-js gate. */}
-        <ScrollReveal className="reveal-stagger mt-11">
+            tiles, 50ms apart — see globals.css. The wrapper still owns the
+            observer and the intro-js gate.
+
+            `--stagger-lead` (2026-08-18) holds the grid until the heading
+            block above it has arrived. It exists because the two entrances
+            are on DIFFERENT CLOCKS and nothing otherwise orders them: the
+            heading's delay is measured from the intro classes landing on
+            <html>, while the tiles' delays start from zero the moment the
+            IntersectionObserver fires — one effect tick after hydration,
+            which on a warm load can beat the h1's own 0.30s. Whichever wins
+            is a race, and the losing arrangement is the page assembling
+            backwards. 0.42s puts the first tile just after the 0.38s note
+            and takes the race out of it.
+
+            It is set here rather than in globals.css because it is a fact
+            about THIS page's stack, not about the stagger: `.reveal-stagger`
+            defaults the property to 0ms, so a grid revealed on scroll
+            somewhere else still starts the instant it is seen, which is what
+            a scroll reveal has to do. The 50ms step between tiles is
+            untouched — the cascade is still 350ms wide, it just begins
+            later. */}
+        <ScrollReveal
+          className="reveal-stagger mt-11"
+          style={{ ["--stagger-lead" as string]: "0.42s" }}
+        >
           <ProductGrid />
         </ScrollReveal>
       </div>

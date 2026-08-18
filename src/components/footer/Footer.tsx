@@ -44,8 +44,13 @@
 import { CONTACT_HREF, SECONDARY_PAGES_LIVE } from "@/lib/site";
 
 // Filtered by the same flag Nav uses, so remounting this can't resurrect
-// links to disabled routes. Contact is a mailto rather than a route, so it
-// always stays — which is why the list can't go empty.
+// links to disabled routes. Contact is not a route, so it always stays —
+// which is why the list can't go empty.
+//
+// `external` exists because Contact stopped being a `mailto:` on 2026-08-18
+// and became an https link off-site (src/lib/site.ts). It cannot be a blanket
+// target on the whole list: the other two are internal routes, and opening
+// your own pages in new tabs is how a site ends up with six of itself.
 const LINKS = [
   ...(SECONDARY_PAGES_LIVE
     ? [
@@ -53,7 +58,7 @@ const LINKS = [
         { href: "/products", label: "Products" },
       ]
     : []),
-  { href: CONTACT_HREF, label: "Contact" },
+  { href: CONTACT_HREF, label: "Contact", external: true },
 ];
 
 export function Footer() {
@@ -67,6 +72,8 @@ export function Footer() {
             <li key={link.label}>
               <a
                 href={link.href}
+                target={link.external ? "_blank" : undefined}
+                rel={link.external ? "noopener noreferrer" : undefined}
                 className="footer-link text-[13px] font-medium uppercase tracking-[0.04em] text-[var(--mute)] transition-colors"
               >
                 {link.label}

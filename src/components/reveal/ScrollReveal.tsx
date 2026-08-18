@@ -13,9 +13,17 @@ import { useEffect, useRef, useState } from "react";
 export function ScrollReveal({
   children,
   className = "",
+  style,
 }: {
   children: React.ReactNode;
   className?: string;
+  // Pass-through for custom properties the CSS reads — `--stagger-lead` on
+  // the Products grid is the only user today (see products/page.tsx). A
+  // whole prop for one number is worth it over a bespoke `lead` prop: this
+  // component's job is to decide WHEN, and everything about HOW already
+  // lives in CSS. Adding a second channel for motion values would split
+  // that.
+  style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -58,6 +66,7 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
+      style={style}
       className={`scroll-reveal${visible ? " is-visible" : ""} ${className}`}
     >
       {children}

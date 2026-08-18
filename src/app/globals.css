@@ -1190,43 +1190,17 @@ html.intro-js .scroll-reveal.reveal-stagger {
   }
 }
 
-/* The lamp strip's continuous slide (2026-08-14). See LoadingLamps.tsx for
-   why this is NOT a reinstatement of the one-shot entrance D killed: there
-   are no per-lamp delays, no on/off state and no terminal frame here, so
-   the "a few of them off" failure has nothing to attach to.
+/* The lamp strip (LoadingLamps.tsx) — NO CSS HERE AT ALL, and as of
+   2026-08-18 no strip either. D: "remove the rotating header."
 
-   Seamless by construction — the lamps repeat on a 24px pitch, so a -24px
-   translate lands on an identical pattern. `translate3d` rather than
-   `translateX` to keep it on the compositor; `linear` because constant
-   motion with any easing reads as a stutter every cycle.
-
-   6s per lamp-width is deliberately slow: this sits under the header on
-   every page of the site, and anything quick enough to notice is something
-   you have to keep not-noticing. */
-@keyframes vvLampSlide {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-24px, 0, 0);
-  }
-}
-
-.vv-lamp-row {
-  animation: vvLampSlide 6s linear infinite;
-}
-
-/* The lamp strip (LoadingLamps.tsx) — no CSS here anymore. It went through
-   an infinite wave, then a one-shot sweep-then-static entrance (both had
-   their own `.vv-lamp` / `@keyframes vvLampsOn` rules, see git history for
-   the full mechanism), before D killed the whole idea of a load-in: "just
-   leave the leds on 24/7... i dont want it like that" — a direct response
-   to the sweep version occasionally leaving a lamp stuck off across a
-   backgrounded-tab edge case, confirmed and fixed once already, but D's
-   answer wasn't "keep fixing it," it was "there should be nothing to fix."
-   Every lamp now renders lit unconditionally in the component itself, so
-   there's no animation, no delay math, and no reduced-motion case to carve
-   out here — nothing left for this stylesheet to own. */
+   It had already lost its per-lamp rules once ("just leave the leds on
+   24/7... i dont want it like that"), then regained a continuous slide and
+   an on-load mask wipe, and all three are now gone with the element. The
+   component stays on disk unmounted and still renders — as a static lit row,
+   which is what it looks like with no stylesheet support. Git carries the
+   slide (`vvLampSlide`) and the wipe (`vvLampWipe` / `vvLampSettle`) if the
+   motion is ever wanted back; layout.tsx documents what else moved when the
+   strip came out. */
 
 @media (prefers-reduced-motion: reduce) {
   .idx-cursor {
@@ -1238,11 +1212,6 @@ html.intro-js .scroll-reveal.reveal-stagger {
     opacity: 1;
   }
 
-  /* Stops at the start of the cycle, which is the full lit row — i.e.
-     exactly what shipped before the slide existed. */
-  .vv-lamp-row {
-    animation: none;
-  }
 }
 
 .idx-submit {
@@ -1429,10 +1398,16 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
    1. The centring subtracts this site's chrome. system.studio has no header
       at all, so viewport-centre IS content-centre for them. Vavva carries a
-      64px bar plus the 40px lamp strip, so centring in the raw viewport
-      would sit the block visibly low. `calc(100svh - 104px)` centres it in
-      the space that actually remains, which is the honest translation of
-      "dead centre" rather than a copy of their number.
+      64px bar, so centring in the raw viewport would sit the block visibly
+      low. `calc(100svh - 64px)` centres it in the space that actually
+      remains, which is the honest translation of "dead centre" rather than a
+      copy of their number.
+
+      **64px, not 104px** (2026-08-18). It subtracted the nav bar plus a
+      40px lamp strip until D removed the strip ("remove the rotating
+      header"). Left at 104 this page would reserve room for a band that is
+      no longer rendered and sit 40px high. not-found.tsx carries the same
+      number for the same reason and moves with it — see layout.tsx.
 
       svh, not dvh or vh: dvh recalculates as a mobile address bar collapses
       and would shove centred content mid-scroll — the same reason
@@ -1447,7 +1422,7 @@ html.intro-js .scroll-reveal.reveal-stagger {
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: calc(100svh - 104px);
+  min-height: calc(100svh - 64px);
   padding: 24px;
 }
 
@@ -1537,11 +1512,16 @@ html.intro-js .scroll-reveal.reveal-stagger {
    motion moved off the wrapper and onto these.
 
    50ms, not the header's 80ms. The header staggers three items (240ms of
-   cascade); this staggers eight, and at 80ms the last tile would start
-   560ms after the first and finish past the one-second mark, which stops
-   reading as one gesture and starts reading as items loading in one by one.
-   50ms puts the whole cascade at 350ms — still inside AUDIT.md's 30-80ms
-   band per step, and the tail lands at 850ms.
+   cascade); this staggers the whole grid, and at 80ms an eight-tile
+   catalogue put the last tile 560ms after the first and finishing past the
+   one-second mark, which stops reading as one gesture and starts reading as
+   items loading in one by one.
+
+   The catalogue is six as of 2026-08-18 (two licensed tees came out — see
+   ProductGrid.tsx), so the cascade is now 250ms wide rather than 350ms and
+   the tail lands at 750ms. The 50ms STEP is what is fixed here, not the
+   total: it sits inside AUDIT.md's 30-80ms band and holds at any count the
+   grid grows back to.
 
    Values are otherwise the house entrance verbatim (14px rise, 6px blur,
    0.5s, --ease-rise), so the grid arrives the same WAY the header does,
@@ -1556,11 +1536,15 @@ html.intro-js .reveal-stagger .vv-product {
     filter 0.5s var(--ease-rise);
 }
 
+/* `--stagger-lead` defaults to 0s — a stagger seen on scroll has to start
+   the instant it is seen. The Products page sets it (see products/page.tsx)
+   because its grid is above the fold on load and would otherwise beat its
+   own heading into place. */
 html.intro-js .reveal-stagger.is-visible .vv-product {
   opacity: 1;
   transform: translate3d(0, 0, 0);
   filter: blur(0px);
-  transition-delay: calc(var(--i, 0) * 50ms);
+  transition-delay: calc(var(--stagger-lead, 0s) + var(--i, 0) * 50ms);
 }
 
 /* Reduced motion: the rise and the blur go, and so does the CASCADE. A
@@ -1636,5 +1620,117 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   .vv-product-chip {
     transform: translate(-50%, 0);
     transition: opacity 200ms ease;
+  }
+}
+
+/* ---- the coming-soon sign (components/glitch/) ----------------------------
+
+   D, 2026-08-18: "implement a more nyc street sign look into the coming
+   soon." The reference is an Interstate guide sign — the green panel with a
+   white rule set in from its edge that hangs over every approach into the
+   city.
+
+   WHAT MAKES IT READ AS ONE, in order of how much each is doing:
+
+     1. the inset rule         the single most identifiable feature, and the
+                               one thing a rounded pill does not have
+     2. MUTCD guide green      #00693E, ~Pantone 342, with a white legend and
+                               a white rule. Not a green anyone picks by eye;
+                               it is the green of a destination panel
+     3. flat, no gloss         retroreflective sheeting has no top-lit
+                               gradient and no inner highlight. An early pass
+                               was a glossy button, and every one of those
+                               layers is gone
+     4. Title Case legend      signs set destinations in initial caps, not
+                               all caps. "Coming Soon", not "COMING SOON"
+
+   THE ARROW IS GONE (D, 2026-08-18). It pointed down at the sentence, then
+   up at it when the order flipped; the sentence is gone now, so it pointed
+   at nothing. An arrow on a sign with nothing to point at is the one detail
+   here that would have read as decoration.
+
+   THE RULE IS TWO INSET SHADOWS, NOT A BORDER, and the trick is explained at
+   length in glitch/engine.ts where its twin lives. Short version: green ring
+   at 3px paints on top of a white ring at 5px, leaving a 2px white rule
+   floating 3px inside the edge, and both follow the radius the engine is
+   animating. A real `border` is separate geometry that would disagree with
+   that radius frame by frame — which is the same reason the previous
+   material used a ring instead of a border, for a different ring.
+
+   Keep this stack in sync with REST_SHADOW in glitch/engine.ts. A keyframe
+   that sets `box-shadow` replaces the WHOLE stack, so the engine restates
+   every layer in every frame of a burst; if the two drift apart the sign
+   loses its border for a third of a second whenever it tears.
+
+   ---- green, after yellow and red, back to green ---------------------------
+
+   Four colours in one day: guide-sign green, caution yellow, Vavva red, and
+   green again. D's calls throughout; green is where it landed.
+
+   EACH SWAP WAS A CHANGE OF SIGN CLASS, NOT A REPAINT, which is why the
+   legend and the rule inverted twice on the way round. Green + white legend
+   is the GUIDE sign (what is ahead). Yellow + black legend is the WARNING
+   sign (something is not normal). Red + white is the REGULATORY sign (you
+   may not proceed). All three are MUTCD and all three are legible; the
+   argument for each was about which sentence the panel is saying.
+
+   Green wins on the thing that outlasts the argument: it is the only one of
+   the three that does not fight the site. Red is the house accent and the
+   header mark, so a red panel put two reds on a page holding one object and
+   made the sign read as branding rather than as a found object. Yellow was
+   loud enough to be the only thing anyone saw. Green is a genuine second
+   accent — DESIGN.md carries it as a named exception, and that is the honest
+   cost of it.
+
+   White on #00693E measures 6.24:1. Black on it would be 3.4:1 and fail, so
+   the legend is white; anything still black on this panel is a leftover from
+   the yellow pass.
+
+   +/-5deg. Measured through the browser's own hue-rotate matrix rather than
+   guessed: on #00693E that lands between rgb(0,105,55) and rgb(0,105,70),
+   which is a seam rather than a second colour. Past about 8deg it starts
+   reading as teal one way and olive the other, which is a colour change and
+   not a bad decode.
+
+   It runs on EACH COPY, each with a different negative animation-delay (set
+   inline in ComingSoon.tsx). That is the whole point of it: when a slice
+   tears the sign, the exposed copy is at a different point in the drift than
+   the one it tore out of, so the surface disagrees with itself along the
+   seam. */
+.gw-badge {
+  background-color: #00693e;
+  box-shadow:
+    inset 0 0 0 3px #00693e,
+    inset 0 0 0 5px #ffffff,
+    0 1px 2px rgba(0, 32, 18, 0.26),
+    0 6px 14px -6px rgba(0, 32, 18, 0.32);
+  animation: gwDrift 14s linear infinite;
+}
+
+@keyframes gwDrift {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  33% {
+    filter: hue-rotate(5deg);
+  }
+  66% {
+    filter: hue-rotate(-5deg);
+  }
+}
+
+/* `.gw-legend` and `.gw-arrow` are gone with the arrow (2026-08-18). The
+   legend was a flex row only because it had two children; with one, the text
+   span carries `relative` itself and puts itself above the panel — same
+   stacking level as its absolutely positioned sibling, so DOM order decides
+   and the panel is written first. See ComingSoon.tsx. */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The engine does not start at all under reduced motion (ComingSoon.tsx),
+     which leaves this drift as the only thing still moving — a sign quietly
+     changing colour on a page that has agreed not to move. */
+  .gw-badge {
+    animation: none;
   }
 }

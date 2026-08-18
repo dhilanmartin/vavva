@@ -78,9 +78,17 @@
    SEAMLESS, structurally rather than by tuning. The lamps repeat on a
    fixed PITCH, so translating the row by exactly one PITCH lands on a
    pattern identical to where it started. LOOP_LAMPS extra lamps are drawn
-   past the right edge to fill the gap the slide opens, and the wrapper
-   clips them until they are needed. Nothing here depends on the duration or
-   the viewport width — change either and it stays seamless.
+   past the right edge to cover the pitch of drawn width the travel costs,
+   and the wrapper clips them until they are needed. Nothing here depends on
+   the duration or the viewport width — change either and it stays seamless.
+
+   The travel runs LEFT TO RIGHT as of 2026-08-18 (globals.css carries the
+   reasoning: the header above and the strip's own arrival both move that
+   way, and this was the one thing on the page going against them). It is
+   keyframed -24px -> 0 rather than 0 -> +24px so the row starts a pitch to
+   the LEFT of its drawn origin: a positive translate would open a 24px band
+   of bare paper at the left edge with no lamp drawn to fill it, since the
+   row is laid out from x=0 rightward.
 
    Reduced motion stops it dead, and the resting state is the full lit row,
    which is exactly what shipped before this.
@@ -96,9 +104,10 @@ const LAMP_W = 16;
 const LAMP_H = 9;
 const ROW_H = 16;
 
-// Extra lamps drawn past the right edge, to fill the gap the slide opens as
-// the row travels left. The animation only ever travels a single PITCH, so
-// one would do; two costs nothing and leaves no doubt.
+// Extra lamps drawn past the right edge. The slide starts one PITCH to the
+// left (see the direction note above), which pulls the drawn row's right end
+// back by the same amount; these put it back. One would do; two costs
+// nothing and leaves no doubt.
 const LOOP_LAMPS = 2;
 
 // Enough lamps to overflow the widest row this strip can ever occupy. It

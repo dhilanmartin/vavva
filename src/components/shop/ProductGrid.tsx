@@ -1,21 +1,38 @@
 import { ProductTile } from "./ProductTile";
 import trio from "../../assets/house-pbj-trio.png";
 import teeScript from "../../assets/products/tee-script.jpg";
-import teeStar from "../../assets/products/tee-star.jpg";
 import teeFairies from "../../assets/products/tee-fairies.jpg";
 import teeDobermans from "../../assets/products/tee-dobermans.jpg";
-import teeSpider from "../../assets/products/tee-spider.jpg";
 import teeGrid from "../../assets/products/tee-grid.jpg";
 import teeBlankBlack from "../../assets/products/tee-blank-black.jpg";
 
 // Seven tees added 2026-08-14 (D supplied the packshots; src/assets/products/).
 //
+// FIVE NOW. The star tee and the web tee came out 2026-08-18.
+//
+// The note they used to sit under said the two were "deliberately described
+// rather than titled... so the site copy does not print those names," and
+// treated that as sufficient. It was not, for two reasons.
+//
+// The smaller one: not printing a name does nothing about the artwork, and
+// the artwork is what a rights holder acts on. This is a public, indexed page
+// (see `robots` in layout.tsx) showing a Marvel character and a Nintendo
+// power-up on garments presented as a catalogue.
+//
+// The larger one: the claim was FALSE ABOUT ITS OWN ASSET. tee-spider.jpg
+// prints the SPIDER-MAN wordmark across the chest, in Marvel's own logotype,
+// above the character. The workaround the note describes was defeated by the
+// image it was written to protect, and nobody had opened the file since.
+//
+// The .jpgs stay on disk — same paused-not-gone convention as the unmounted
+// components — because removing them from the CATALOGUE is what matters:
+// unimported assets under src/ are never served or bundled. Do not reinstate
+// either without a licence, and check the artwork rather than the caption.
+//
 // THE NAMES ARE PLACEHOLDERS, at D's instruction, and they are named for what
 // is printed on them because a placeholder still has to be legible in a grid —
-// "Star Tee" tells a visitor more than "Tee 02" and costs nothing to rename.
-// Two of them are deliberately described rather than titled: the web-slinger
-// and the star are licensed characters, so the site copy does not print those
-// names. Replace all seven the moment real names exist.
+// "Grid Tee" tells a visitor more than "Tee 02" and costs nothing to rename.
+// Replace all five the moment real names exist.
 //
 // `price` is gone from the model, not just from the tile. Nothing is for sale
 // (see ProductTile.tsx and products/page.tsx), no tee has a price yet, and a
@@ -29,9 +46,12 @@ import teeBlankBlack from "../../assets/products/tee-blank-black.jpg";
 // belongs on a product page, which does not exist yet.
 //
 // Order is deliberate: the one real product leads, the house wordmark tee
-// leads the tees, the blank closes. At four columns that is two full rows with
-// no gap — the grid was built for a second product on 2026-08-12 and this is
-// it arriving, no rebuild required.
+// leads the tees, the blank closes.
+//
+// It was eight items — two clean rows of four. At six it is a row of four and
+// a row of two, and that is left alone rather than padded back up: a short
+// last row is what a real catalogue of six things looks like, and inventing
+// two products to square the grid would be the grid deciding the inventory.
 const PRODUCTS = [
   {
     name: "House PB&J",
@@ -44,11 +64,6 @@ const PRODUCTS = [
     alt: "White cotton tee with the Vavva brush wordmark printed in red across the chest.",
   },
   {
-    name: "Star Tee",
-    image: teeStar,
-    alt: "White cotton tee with a yellow star printed at centre chest.",
-  },
-  {
     name: "Fairies Tee",
     image: teeFairies,
     alt: "White cotton tee with two blue fairies printed at centre chest.",
@@ -57,11 +72,6 @@ const PRODUCTS = [
     name: "Dobermans Tee",
     image: teeDobermans,
     alt: "White cotton tee with three black dobermans printed at centre chest.",
-  },
-  {
-    name: "Web Tee",
-    image: teeSpider,
-    alt: "White cotton tee with a comic-book web-slinger printed at centre chest.",
   },
   {
     name: "Grid Tee",

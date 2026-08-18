@@ -140,6 +140,15 @@ One accent only. No second brand colour (no Instagram purple, no gradient button
 
 ### The landing inverts figure and ground (2026-08-14)
 
+> **SUPERSEDED the same day it was written.** D reverted the landing to white
+> paper within hours, taking the reversed wordmark, `.brand-place` and the
+> `html:has(.brand-stage)` skin with it. Kept in full because the reasoning is
+> reusable — the figure/ground argument, the filter-over-second-asset call and
+> the measured contrast table all hold if a brand-colour page ever returns —
+> but **nothing below describes the live site.** The lamp strip is visible on
+> `/` again. See "The landing as of 2026-08-18" below for what is actually
+> there.
+
 D: *"make the landing page VAVVA red and flip the logo color to white... (a
 brand landing)."*
 
@@ -178,6 +187,12 @@ Consequences worth knowing:
 
 ### The landing's one CTA is Instagram (2026-08-14)
 
+> **SUPERSEDED.** The Instagram link went too, later the same day, along with
+> the COMING SOON line that sat under it. The landing carried no call to
+> action at all from then until 2026-08-18, and still carries none — the sign
+> that arrived on the 18th is an object, not a control. The reasoning about
+> `WaitlistForm` below is still the reason not to reinstate a field.
+
 The video and the email field are both gone. `MediaFrame` and `WaitlistForm`
 stay on disk under the usual paused-not-gone convention.
 
@@ -192,6 +207,50 @@ One clause of copy changed with it and is flagged rather than quietly kept:
 behind-the-scenes updates,"* because a sentence pointing at a control that no
 longer exists is worse than an edited sentence. Everything else is D's own
 wording, untouched.
+
+### The landing as of 2026-08-18: one sign, and nothing else
+
+> The header lamp strip was removed on this date too, site-wide, so every
+> route lost 40px of chrome and its brightest element. `.home-stage` and
+> not-found.tsx both subtract 64px now rather than 104. See layout.tsx.
+
+The landing is a single centred object: an MUTCD guide sign reading **Coming
+Soon**, green panel, white rule set in from the edge, white Title Case legend,
+tearing itself apart in bursts. There is no other content. D replaced the
+studio's one sentence with it outright — *"replace the text in total (creative
+studio....) with the coming soon component"* — and the arrow the sign used to
+carry went with the copy, since it had nothing left to point at.
+
+**WHAT THIS COSTS, stated plainly:** that sentence was the only place the site
+said what the studio is, where it is, and when it opens. It survives in
+layout.tsx's `description` and JSON-LD, so search results and link previews
+still carry it, but a visitor now reads two words. `.home-note` and `.place`
+stay in globals.css unused, and the sentence is one line up in git. A
+`sr-only` <h1> keeps the route from shipping with no heading and no text node
+at all — see page.tsx for why that is not decoration.
+
+**One exception to the list below, not three.** The sign is chrome and it is a
+second accent; it is no longer a second centred object, because it is the only
+one. The colour moved four times in a day — guide green, caution yellow, Vavva
+red, back to green — and each move was a change of MUTCD sign class rather
+than a repaint, which is why the legend and rule inverted twice on the way
+round. globals.css carries the full argument. Green is a genuine second accent
+and that is the honest cost; red would have avoided it but put two reds on a
+page holding one object, and made the sign read as branding rather than as a
+found thing.
+
+**The header is parked.** Locations, Products and Our Story are still real
+links with real hover and press states, and all three go to `/` — D:
+*"disable the header buttons. (make them clickable and hoverable) but just
+link to the same home page."* This is deliberately NOT
+`SECONDARY_PAGES_LIVE = false`, which renders inert labels and 404s the
+routes. The routes stay live and stay in sitemap.xml, so a search result can
+still land on /products even though nothing in the UI points there — flip that
+flag if they should go dark too. Contact is untouched; it goes to Instagram,
+which is a real destination.
+
+**What has not changed:** one wordmark, one measure, white paper, red as the
+house accent on every route.
 
 ## The ambient wordmark, and why it is gone
 
@@ -214,6 +273,13 @@ The third option won: the page has one wordmark now. That resolves the two-VAVVA
 - A second accent colour
 - A second VAVVA anywhere, at any scale — there is one logo, and the exemption the footer stamp used to run under is withdrawn
 - A second centred object — centring is what marks the head; spend it once
+
+**Scoped exception, the landing's coming-soon sign (2026-08-18):** it breaks
+the chrome ban and the one-accent rule, both deliberately and both argued in
+"The landing as of 2026-08-18" above. That section is the authority on `/`;
+this list is the authority everywhere else. The one-centred-object rule is NOT
+excepted — it was broken for part of that day by a second and third object,
+both since removed, and the landing is a single centred object again.
 
 **Scoped exception, Home's video only (2026-08-12, revised three times same
 day):** a rounded card + soft drop shadow (`.vv-embed` in globals.css) sits

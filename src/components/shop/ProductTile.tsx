@@ -47,7 +47,7 @@
 //   all eight read as the same kind of object anyway. See globals.css.
 //
 //   NO PRICE LINE. Their card is image → name → price. Nothing here is for
-//   sale, no tee has a price yet, and eight tiles each repeating the same
+//   sale, no tee has a price yet, and every tile repeating the same
 //   "COMING SOON" in the price slot is noise, not information. Availability
 //   is stated once, in page copy, and answered per-tile on hover.
 //

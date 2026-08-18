@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import { Nav } from "@/components/nav/Nav";
-import { LoadingLamps } from "@/components/waitlist/LoadingLamps";
 import "./globals.css";
 
 const inter = Inter({
@@ -256,34 +255,34 @@ export default function RootLayout({
             This note existed twice, near-verbatim, until 2026-08-14. */}
         <Nav />
 
-        {/* Header line, added 2026-08-12. Was a homepage-only strip above
-            the video (see the note it replaced in app/page.tsx) — moved
-            here, site-wide, at D's instruction ("remove the leds from the
-            homepage and i want to create a cool header line with them
-            rather"). Same LoadingLamps component, same 24px gutter Nav
-            uses, unchanged internally: it still only lights up once on
-            first mount per page load, so it re-plays its power-on flicker
-            on every navigation rather than staying lit across routes — a
-            real behavior change from being homepage-only, and arguably the
-            point of a "header line" (every page gets the entrance), not an
-            oversight.
+        {/* ---- the header lamp strip is gone (2026-08-18) ----------------
 
-            Width-capped 2026-08-12 (later, same day): D noticed the lamp
-            count didn't match "the entire header." The bug: this row was
-            bare `w-full` — full raw viewport width — while Nav's own row is
-            `mx-auto max-w-[1710px]`. Below 1758px (1710 + two 24px gutters)
-            they coincide and nothing looked wrong, which is why it shipped;
-            above it, Nav sits centred with margin on both sides but the
-            lamp row kept going, so it computed a lamp count for a wider
-            strip than the header actually is. The outer div stays `w-full`
-            so the paper background still fills edge to edge; the new inner
-            div reproduces Nav's own centring so LoadingLamps' ResizeObserver
-            measures the same content width Nav uses, not the viewport. */}
-        <div aria-hidden className="w-full bg-[var(--paper)] py-3">
-          <div className="mx-auto max-w-[1710px] px-6">
-            <LoadingLamps />
-          </div>
-        </div>
+            D: "remove the rotating header." Foreshadowed by the request two
+            hours earlier to speed it up — "before we remove it so i can see
+            how it looks" — so this is the decision that pass was staged for,
+            not a reversal of it.
+
+            What it was: a full-bleed row of green LEDs under the nav on
+            every route, sliding continuously. Its whole history is in
+            LoadingLamps.tsx, which stays on disk unmounted under the same
+            paused-not-gone convention as Footer, MediaFrame and
+            WaitlistForm. It still renders correctly if remounted — as a
+            static lit row, since the slide and the on-load wipe went with it
+            from globals.css. Recover those from git if the motion is wanted
+            back.
+
+            TWO NUMBERS MOVED WITH IT, and they are the reason this is not
+            just a deleted line: the site's chrome was 64px of nav bar plus
+            40px of strip, and both `.home-stage` (globals.css) and
+            not-found.tsx subtracted that 104px to centre their content. It
+            is 64px now. Left at 104 those two pages would centre against a
+            band that no longer exists and sit visibly high.
+
+            It also settles a conflict rather than only removing an element:
+            the strip's LED green (#5CF05C over #00C000) was the second green
+            on the landing once the coming-soon sign arrived, and DESIGN.md
+            had it logged as an open problem. There is one accent per route
+            again. */}
 
         <div className="flex-1">{children}</div>
       </body>

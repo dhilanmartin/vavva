@@ -56,7 +56,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
-import { CONTACT_HREF, SECONDARY_PAGES_LIVE } from "@/lib/site";
+import {
+  CONTACT_HREF,
+  NAV_DESTINATIONS_PARKED,
+  SECONDARY_PAGES_LIVE,
+} from "@/lib/site";
 
 // "Merch" reverted to "Shop" 2026-08-07, then "Shop" renamed to "Products"
 // 2026-08-12 (label and route together, same rule as the 2026-08-07 move —
@@ -138,12 +142,28 @@ function NavItem({
     );
   }
 
+  /* PARKED: a real link that goes home (see NAV_DESTINATIONS_PARKED in
+     src/lib/site.ts). D asked for the header to stay "clickable and
+     hoverable" while every button lands on the coming-soon page, which is a
+     different thing from the `SECONDARY_PAGES_LIVE` branch above — that one
+     renders inert <span>s with no href and no hover.
+
+     `active` is forced FALSE rather than recomputed. Every parked item
+     resolves to `/`, so on the landing all three would satisfy
+     `pathname === href` at once and the header would show three current
+     pages — `aria-current="page"` on three links, three underlines. A
+     header where everything is current tells a visitor nothing, and tells a
+     screen reader something false. */
+  const parked = NAV_DESTINATIONS_PARKED;
+  const target = parked ? "/" : href;
+  const isCurrent = parked ? false : active;
+
   return (
     <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
+      href={target}
+      aria-current={isCurrent ? "page" : undefined}
       onClick={onNavigate}
-      className={`${className} ${navLinkClass(active)}`}
+      className={`${className} ${navLinkClass(isCurrent)}`}
     >
       {label}
     </Link>
@@ -292,8 +312,18 @@ export function Nav() {
 
               A wrapper separates the two concerns: it owns display, the link
               owns inline-block, and neither can override the other. */}
+          {/* target/rel because CONTACT_HREF is an external https link as of
+              2026-08-18, not a `mailto:` — see src/lib/site.ts. A mailto
+              hands off to a mail client and leaves the page where it is;
+              this one navigates away, and opening it in a new tab is what
+              preserves that behaviour. */}
           <div className="hidden tablet:block">
-            <a href={CONTACT_HREF} className={`leading-5 ${navLinkClass(false)}`}>
+            <a
+              href={CONTACT_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`leading-5 ${navLinkClass(false)}`}
+            >
               Contact
             </a>
           </div>
@@ -326,6 +356,8 @@ export function Nav() {
             <li style={{ ["--i" as string]: links.length }}>
               <a
                 href={CONTACT_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
                 className={`block leading-[32px] ${navLinkClass(false)}`}
               >
