@@ -220,6 +220,38 @@ function steps(o: GlitchOptions): number {
   return Math.max(1, Math.floor((o.velocity * o.duration) / 1000) + 1);
 }
 
+/* Does this engine honour `composite: "add"`?
+
+   Two animations write `transform` on the base element — the per-cycle shake
+   and the slow resting drift — and additive compositing is what lets both
+   apply instead of the later one replacing the earlier. Browsers that do not
+   support it vary in how they say so: some ignore the option, some throw
+   from `animate()`. The second is the dangerous one, because the throw lands
+   inside `run()`, which is called from an IntersectionObserver callback, and
+   the whole engine dies before its first cycle with nothing in the DOM to
+   show for it — a sign that simply never glitches.
+
+   Detected once, lazily, on a detached element: at module scope this would
+   run during SSR where there is no `document`. */
+let addSupport: boolean | null = null;
+
+function supportsAdditive(): boolean {
+  if (addSupport !== null) return addSupport;
+  if (typeof document === "undefined") return (addSupport = false);
+  try {
+    const probe = document.createElement("div");
+    const a = probe.animate([{ transform: "translate3d(1px,0,0)" }], {
+      duration: 1,
+      composite: "add",
+    });
+    addSupport = (a.effect as KeyframeEffect)?.composite === "add";
+    a.cancel();
+  } catch {
+    addSupport = false;
+  }
+  return addSupport;
+}
+
 function sliceFrames(o: GlitchOptions, index: number, rogue: number): Keyframe[] {
   const n = steps(o);
 
@@ -246,7 +278,7 @@ function sliceFrames(o: GlitchOptions, index: number, rogue: number): Keyframe[]
       // only, so the quiet stretches are not empty.
       const flicker = index === 0 && Math.random() < 0.035;
       if (!flicker) {
-        out.push({ opacity: "0", transform: "none", clipPath: "unset" });
+        out.push({ opacity: "0", transform: "none", clipPath: "none" });
         continue;
       }
       const b = band(o);
@@ -383,6 +415,13 @@ export class GlitchWord {
      wins outright and the earlier one silently does nothing. */
   private startDrift() {
     if (this.drift || this.reduced) return;
+    /* No additive compositing, no drift. The alternative is worse than
+       skipping it: without `add` this animation and the shake both write
+       `transform` in replace mode, and since a new shake starts every cycle
+       it would clobber the drift permanently anyway — leaving a paused
+       animation holding a transform nobody can see, plus one more thing on
+       the compositor. */
+    if (!supportsAdditive()) return;
     const px = this.opts.driftPx;
     this.drift = this.base.animate(
       [
@@ -439,7 +478,10 @@ export class GlitchWord {
     }
 
     this.anims = [
-      this.base.animate(shakeFrames(o), { ...timing, composite: "add" }),
+      this.base.animate(
+        shakeFrames(o),
+        supportsAdditive() ? { ...timing, composite: "add" } : timing,
+      ),
       ...this.layers
         .slice(0, o.sliceCount)
         .map((el, i) => el.animate(sliceFrames(o, i, rogue), timing)),

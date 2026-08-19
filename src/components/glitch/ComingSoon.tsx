@@ -57,7 +57,27 @@ export function ComingSoon() {
 
     const engine = new GlitchWord(base, layers, WORD, reduced);
 
-    let onScreen = false;
+    /* START OPTIMISTICALLY, PAUSE ON SIGNAL — `onScreen` begins TRUE.
+
+       It began false, which meant the engine could not run until an
+       IntersectionObserver callback said the element was visible. That reads
+       as careful and is the wrong default for this element: the sign is the
+       only thing on the landing, it is centred in the viewport, and it is
+       therefore visible on essentially every load. Gating it on an observer
+       callback buys nothing and risks everything — if that callback is
+       delayed, throttled, or never delivered, the page's entire content sits
+       permanently static with no way to recover.
+
+       That is not hypothetical. It is exactly what happens in this repo's
+       headless capture path, where the observer never delivers and the sign
+       renders dead every time; the same shape as the ResizeObserver bug that
+       once left the lamp strip stretched, and the rule this repo already
+       settled on there — the most reliable version of "no load-in bug" is
+       "no load-in".
+
+       The observer still runs and still pauses the engine when the sign
+       genuinely scrolls away. It just no longer holds the keys. */
+    let onScreen = true;
     let hidden = document.hidden;
     let hovered = false;
 
@@ -65,6 +85,7 @@ export function ComingSoon() {
       if (onScreen && !hidden) engine.start();
       else engine.stop();
     };
+    sync();
 
     // Pauses offscreen and when the tab is hidden. Not an optimisation for
     // its own sake: the cycle chains off `finished`, and a throttled tab
