@@ -2217,6 +2217,85 @@ html:not(:has(.home-stage)) .vv-announce {
   display: none;
 }
 
+/* Dismissed. Stamped on <html> by the inline script in layout.tsx BEFORE
+   first paint, so a bar that was closed on a previous visit is never painted
+   and then removed — see AnnouncementBar.tsx. */
+html.announce-off .vv-announce {
+  display: none;
+}
+
+/* ---- the bar arrives ------------------------------------------------------
+
+   Opacity and an 8px drop, NOT a slide from -100%. The bar sits in normal
+   flow at the top of the document, so translating it its own full height
+   would expose 45px of whatever is behind it — the artwork on the landing —
+   and read as a gap opening rather than a bar arriving. A short drop into
+   its own box has no such hole.
+
+   Gated on `intro-js`/`intro-go` like every other entrance here, which also
+   means a page loaded into a background tab (where the script backs out)
+   renders the bar plainly rather than leaving it at opacity 0. It leads the
+   header's cascade at 0.02s — the bar is above the nav, so it should arrive
+   first. */
+@keyframes announceIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+html.intro-js:not(.intro-go) .vv-announce {
+  opacity: 0;
+}
+
+html.intro-go .vv-announce {
+  animation: announceIn 0.42s var(--ease-rise) 0.02s backwards;
+}
+
+/* The close control. Absolutely positioned so it cannot shift the centred
+   line — theirs has no dismiss, so the text is centred on the bar, not on
+   the space left over beside a button.
+
+   36px square: over the 24px WCAG 2.5.8 floor without crowding a 45px bar.
+   The glyph inside is 11px; the target is the padding around it. */
+.vv-announce-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mute);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-close:hover {
+    color: #000;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.intro-go .vv-announce {
+    animation-name: homeFade;
+  }
+
+  .vv-announce-close {
+    transition: none;
+  }
+}
+
 /* `font-weight: 500` on the span and 700 on the link, which is their served
    CSS verbatim.
 
@@ -2341,4 +2420,63 @@ html:not(:has(.home-stage)) .vv-announce {
   .vv-petals {
     display: none;
   }
+}
+
+/* ---- long-form prose (the Story page) ------------------------------------
+
+   LEFT-ALIGNED, and that is the whole point of the role. Every other text
+   block on this site is centred, which is right for a page title, a caption
+   or a two-line address and wrong for four consecutive paragraphs: centring
+   ragged-left prose forces the eye to re-find the start of every line, and
+   "centre everything" is on this repo's own AI-slop list.
+
+   The COLUMN is still centred on the page and the h1 above it still is too,
+   so the page reads as part of the site. Only the running text turns.
+
+   Satoshi, not the serif. GT Alpina carries the display role and the lead;
+   the reading role is the sans, which keeps the two-family system intact
+   rather than making the serif do both jobs.
+
+   17px/1.68 at a 32em measure. THE UNIT MATTERS AND `ch` WAS THE WRONG ONE:
+   `ch` is the advance width of the zero glyph, and Satoshi's is wide, so a
+   `62ch` column resolved to 716px and measured 88 characters per line —
+   above the 45-75 band where line length stops costing comprehension, and
+   the opposite of what the unit was chosen to guarantee. 32em lands the
+   column at 544px and the running text at ~66 characters, measured rather
+   than assumed. `text-wrap: pretty` only fixes the rag; the measure does
+   the work. */
+.vv-prose {
+  text-align: left;
+  font-size: 17px;
+  line-height: 1.68;
+  letter-spacing: -0.1px;
+  color: var(--ink-body);
+  text-wrap: pretty;
+}
+
+.vv-prose p {
+  margin: 0;
+}
+
+/* Paragraph spacing as a gap on the stack, not margins on the children —
+   margins here would collapse against the section gaps and the rhythm would
+   depend on which sibling won. */
+.vv-prose-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+}
+
+/* ONE COLUMN, ONE LEFT EDGE. The lead and the prose are different sizes, so
+   sizing each in its own `em`-based max-width centred them independently and
+   their left edges landed 14px apart — two left-aligned blocks that do not
+   start in the same place, which reads as a mistake because it is one. The
+   column is set once here in px and both blocks fill it. */
+.vv-story-col {
+  max-width: 544px;
+  margin: 0 auto;
+}
+
+.vv-story-lead {
+  text-align: left;
 }

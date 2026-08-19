@@ -217,7 +217,7 @@ export default function RootLayout({
             one should not be holding content back for the other either. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
+            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;if(localStorage.getItem('vv-announce:v1'))d.classList.add('announce-off');d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
           }}
         />
         <script

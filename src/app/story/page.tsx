@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
-import { Triptych } from "@/components/story/Triptych";
-import { ScrollReveal } from "@/components/reveal/ScrollReveal";
-import skyline from "../../assets/nyc-skyline.png";
 
 // Route stays /story, label reads "Our Story" (D, 2026-08-07) — see Nav.tsx.
 // The page's own h1 stays "The Vavva Story": that's the heading, not the nav
@@ -54,21 +50,23 @@ export default function StoryPage() {
      touching. */
 
   return (
+    /* ---- 2026-08-18: the triptych and the skyline are gone -------------
+
+       D: "remove on the story page the 3 cards with diff colors, and the
+       nyc skyline."
+
+       Both were filling space rather than saying anything. The triptych was
+       three empty placeholders that had never held real photography — they
+       took solid colours earlier the same day, which made them prettier and
+       no more informative. The skyline was a stock line drawing already
+       carried by the Locations page, so the Story page closed on a picture
+       that belonged somewhere else.
+
+       Removing them leaves the page as what it should have been: a heading
+       and a writeup. Triptych.tsx stays on disk unused under the usual
+       paused-not-gone convention; the skyline asset is still Locations'. */
     <main className="w-full bg-[var(--paper)] pb-24 pt-10">
-      <div className="flex flex-col gap-20">
-        <LeadBlock />
-
-        <ScrollReveal className="px-6">
-          <Triptych />
-        </ScrollReveal>
-
-        <Image
-          src={skyline}
-          alt="New York City skyline"
-          sizes="100vw"
-          className="mix-blend-multiply mx-auto w-full max-w-[1200px]"
-        />
-      </div>
+      <LeadBlock />
     </main>
   );
 }
