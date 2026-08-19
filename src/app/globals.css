@@ -193,9 +193,25 @@
   box-sizing: border-box;
 }
 
+/* NO `-webkit-font-smoothing: antialiased` HERE ANY MORE (2026-08-18).
+
+   D, comparing our announcement bar against shadowlion.com's: "ensure the
+   color of the 'We have news to share' text is fully black idk why. it
+   doesnt seem as strong."
+
+   The colour was already `rgb(0, 0, 0)` — measured. The weakness was
+   antialiasing. On macOS, `-webkit-font-smoothing: antialiased` replaces
+   subpixel rendering with greyscale, which makes DARK-ON-LIGHT text render
+   visibly thinner and lighter at the same colour, size and weight. It was
+   set twice over: here, and again by Tailwind's `antialiased` class on
+   <body>. The reference does not set it, so identical type looked stronger
+   on their side.
+
+   This site is dark ink on white paper nearly everywhere, so the default
+   (subpixel) is the right choice globally. It is switched back ON in the one
+   place the trade reverses — the landing's white nav over the artwork, where
+   light-on-dark text is what greyscale smoothing actually helps. */
 html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   /* Reserve the scrollbar's gutter on EVERY route, whether or not that route
      scrolls (2026-08-18). Without it, a browser using classic (non-overlay)
      scrollbars gives a scrolling page ~15px less viewport width than a short
@@ -2079,14 +2095,21 @@ html:has(.home-stage) header::before {
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgba(8, 22, 34, 0.42) 0%,
-    rgba(8, 22, 34, 0.24) 45%,
+    rgba(8, 22, 34, 0.58) 0%,
+    rgba(8, 22, 34, 0.34) 45%,
     rgba(8, 22, 34, 0) 100%
   );
 }
 
 /* The bar's own type inverts; the mobile panel's does NOT — it opens against
    paper, where white would be invisible. */
+/* Light type on a photograph is the case greyscale smoothing improves —
+   the inverse of the note at the top of this file. */
+html:has(.home-stage) header {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 html:has(.home-stage) .nav-link {
   color: #fff;
 }
@@ -2111,9 +2134,31 @@ html:has(.home-stage) .nav-toggle span span {
    raise recognisability, and a wordmark that is recognised does not need to
    be read.
 
-   The honest fix remains the artwork. A dusk sky behind it would put warm
-   amber under the red instead of cerulean, which is the one change that
-   makes this legible without touching the mark at all. */
+   ---- 2026-08-18, second pass: a DARK shadow, not a light one ------------
+
+   D: "we need to fix the contrast issue." Red and that sky sit at almost the
+   same luminance (#B32622 is 0.111, the scrimmed sky was 0.146), which is
+   exactly why the ratio was 1.2 — it is a hue difference with no value
+   difference, and value is what contrast measures.
+
+   Two levers point in opposite directions here, which is what made the first
+   attempt a white glow: the WHITE NAV LINKS want the sky darker, the RED
+   MARK wants its surround further from 0.111 in either direction. Darker
+   serves both — it moves the sky away from the red AND toward the links. So
+   the scrim goes from 0.42 to 0.58 at the top, and the mark casts a soft
+   dark shadow that deepens the pixels immediately around its strokes.
+
+   A dark shadow rather than a light one is also why this does not read as
+   the glow D rejected: a mark casting a shadow onto a sky is depth, where a
+   mark surrounded by white haze is a sticker.
+
+   The honest fix remains the artwork. A dusk sky would put warm amber under
+   the red instead of cerulean, which fixes this without touching the mark —
+   see the prompt already handed over. */
+html:has(.home-stage) header a[aria-label="Vavva — home"] img {
+  filter: drop-shadow(0 1px 2px rgba(4, 12, 20, 0.55))
+    drop-shadow(0 0 10px rgba(4, 12, 20, 0.45));
+}
 
 html:has(.home-stage) .nav-panel {
   background: var(--paper);

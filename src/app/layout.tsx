@@ -227,7 +227,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-svh flex-col antialiased">
+      <body className="flex min-h-svh flex-col">
         {/* Nav stays — persistent, route-agnostic chrome on every page.
 
             NO FOOTER, and it is settled rather than pending. Removed
