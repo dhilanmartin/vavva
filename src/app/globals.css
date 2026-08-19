@@ -2191,7 +2191,30 @@ html:has(.home-stage) footer {
   text-align: center;
   /* .9rem — theirs exactly. */
   font-size: 0.9rem;
+  /* EXPLICIT, so the bar is exactly 45px: 12px padding + 21px line + 12px
+     padding. Left to `normal` it inherited Satoshi's own ~1.5 and the bar
+     came out 45.6px, which D read as a couple of pixels too tall against the
+     reference. A declared line-height also means the height stops depending
+     on which face is loaded — the fallback would have shifted it again. */
+  line-height: 21px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- the bar is the LANDING's, not the site's (2026-08-18) ---------------
+
+   D: "remove the We have news to share ... on every other page but the home."
+
+   Hidden with the same `:has(.home-stage)` test the landing's transparent
+   header and hidden footer already use, rather than a `usePathname()` branch
+   in layout.tsx — that would make the root layout a client component and
+   paint the bar for one frame on every route before hydration removed it.
+
+   The markup still ships on every page and is display:none off the landing.
+   That is the cost of doing it in CSS: one hidden anchor in the DOM
+   site-wide. If that ever matters, the fix is a route group with its own
+   layout, not a JS route check. */
+html:not(:has(.home-stage)) .vv-announce {
+  display: none;
 }
 
 /* `font-weight: 500` on the span and 700 on the link, which is their served

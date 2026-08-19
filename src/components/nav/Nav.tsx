@@ -283,19 +283,24 @@ export function Nav() {
               of width, and sits in a 64px bar with ~16px of air above and
               below.
 
-              ---- 2026-08-18: 31px -> 40px ----
+              ---- 2026-08-18: 31 -> 40 -> back to 31 ----
 
-              D: "just make it a lil bigger to b more visual." This was the
-              same day the white glow behind it came off on the landing,
-              where the mark sits on a bright blue sky at 1.2:1. Size does
-              not fix contrast, but a bigger wordmark is recognised rather
-              than read, and recognition is what a logo needs. 40px in a
-              64px bar still leaves 12px of air above and below.
+              It went to 40px for one pass ("just make it a lil bigger to b
+              more visual"), the same day the white glow came off on the
+              landing where the mark sits on sky at 1.2:1 — size does not fix
+              contrast, but a bigger wordmark is recognised rather than read.
+              D put it back the same day, so 31px stands.
+
+              That returns this to the number reached on 2026-08-07, when
+              matching mimis' literal 22px was tried and rejected as
+              overshooting: the brush script carries real ascenders and
+              descenders where "Mimi's" sits compact, so the same numeric
+              height reads visibly smaller on this wordmark.
 
               So: the header is the same size as mimis' (the ask), and the
-              mark is as large as that bar can carry. See not-found.tsx for the one other file
+              mark is the size this repo has now decided on twice. See not-found.tsx for the one other file
               that has to know the bar height. */}
-            <VavvaMark className="h-10 w-auto" />
+            <VavvaMark className="h-[31px] w-auto" />
           </Link>
         </div>
 
