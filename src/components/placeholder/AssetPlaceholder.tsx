@@ -13,14 +13,22 @@
 // Values live as --placeholder-light/-dark in globals.css, alongside the
 // rest of the palette tokens, not hardcoded here.
 
+// `fill` (2026-08-18) overrides the grey for callers that want a solid colour
+// instead of layout blocking — see Triptych.tsx. `tone` keeps its job either
+// way: it decides the LABEL's contrast, not the background, so a caller that
+// sets a dark fill passes tone="dark" and gets a light label. Deliberately
+// not derived from `fill`: the value can be a CSS custom property, which no
+// amount of JS can read a luminance out of at render time.
 const SYSTEM_GRAY = { light: "var(--placeholder-light)", dark: "var(--placeholder-dark)" };
 
 export function AssetPlaceholder({
   tone = "light",
+  fill,
   label = "VAVVA ASSET TBD",
   className = "",
 }: {
   tone?: "light" | "dark";
+  fill?: string;
   label?: string;
   className?: string;
 }) {
@@ -31,7 +39,7 @@ export function AssetPlaceholder({
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{ background: SYSTEM_GRAY[tone] }}
+        style={{ background: fill ?? SYSTEM_GRAY[tone] }}
       />
       {label ? (
         <span

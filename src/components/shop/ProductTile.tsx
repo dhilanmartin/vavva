@@ -75,18 +75,28 @@ import Image, { type StaticImageData } from "next/image";
 // gaps); between 1200 and 1758 the grid is still 4 columns but fluid, hence
 // the 25vw step. The sources are 480px wide, so Next caps there regardless —
 // this exists to stop a phone downloading the widest candidate.
+// 2 columns, then 3 at tablet, then 6 at desktop. 1758px is 1710 + two 24px
+// gutters, past which the container stops growing and the cell is fixed at
+// (1662 - 5*5) / 6.
 const SIZES =
-  "(min-width: 1758px) 401px, (min-width: 1200px) 25vw, (min-width: 810px) 50vw, 100vw";
+  "(min-width: 1758px) 273px, (min-width: 1200px) 17vw, (min-width: 810px) 33vw, 50vw";
 
 export function ProductTile({
   name,
   image,
   alt,
+  price,
+  variants,
   eager = false,
   index = 0,
 }: {
   name: string;
   image: StaticImageData;
+  // Display strings, not money — see ProductGrid.tsx for why.
+  price: string;
+  // Sizes on the tees, flavours on the sandwich. One slot, because the
+  // reference has one row there and the product decides what fills it.
+  variants: string[];
   // The photograph, described. `name` is the product's name, which is not the
   // same sentence — "Star Tee" does not tell a screen reader there is a white
   // tee with a yellow star on it.
@@ -103,11 +113,8 @@ export function ProductTile({
   index?: number;
 }) {
   return (
-    <figure
-      className="vv-product m-0 flex flex-col gap-5"
-      style={{ ["--i" as string]: index }}
-    >
-      <div className="vv-product-frame relative aspect-square w-full">
+    <figure className="vv-product m-0" style={{ ["--i" as string]: index }}>
+      <div className="vv-product-frame relative aspect-[4/5] w-full">
         <Image
           src={image}
           alt={alt}
@@ -115,15 +122,62 @@ export function ProductTile({
           sizes={SIZES}
           loading={eager ? "eager" : "lazy"}
           placeholder="blur"
-          className="object-cover"
+          className="object-contain"
         />
-        <span aria-hidden className="vv-product-chip">
-          Coming soon
-        </span>
       </div>
 
-      <figcaption className="text-center text-[16px] font-semibold uppercase leading-5 text-[var(--ink)]">
-        {name}
+      <figcaption className="vv-product-info">
+        <span className="vv-product-name">{name}</span>
+        <span className="vv-product-price">{price}</span>
+        {/* The reference's hover row. It is a real list, not a decorative
+            string: a <ul> so the count and the boundaries between items are
+            announced, and NOT aria-hidden — sizes and flavours are product
+            information, and hiding them would leave a screen reader with a
+            price and no idea what it buys.
+
+            Its height is reserved at rest (globals.css), so revealing it
+            cannot push the rows below it down. */}
+        <ul className="vv-product-variants">
+          {variants.map((v) => (
+            <li key={v}>{v}</li>
+          ))}
+        </ul>
+      </figcaption>
+    </figure>
+  );
+}
+
+/* An empty slot in the same cell shape — a product that exists as a plan and
+   not yet as a photograph. D, 2026-08-18: "add another row with all coming
+   soon items."
+
+   IT REUSES `.vv-product-frame` RATHER THAN AssetPlaceholder, and that is
+   the whole design decision here. AssetPlaceholder paints Apple systemGray4
+   (#D1D1D6) and stamps "VAVVA ASSET TBD" in the corner — it is a tool for
+   reading layout rhythm on an unfinished page, and it looks like one. These
+   slots sit directly under six finished products at the same size, so they
+   have to read as part of the same grid: the frame keeps the #F2F2F2 field
+   the real photographs are shot on, and the only difference between a filled
+   cell and an empty one is that the empty one has nothing in it.
+
+   THE CAPTION SAYS IT ONCE. An empty grey rectangle under a row of garments
+   is ambiguous on its own — it could be an image that failed — and a label
+   inside the frame AND under it would be saying the same thing twice in a
+   cell that only has room for two lines. The name slot is where a visitor
+   already looks for what a cell is, so that is where it goes.
+
+   No price and no variant row: there is nothing to price and nothing to
+   choose. That makes these cells shorter than the ones above, which is
+   correct — they are a row of their own, uniform with each other. */
+export function ComingSoonTile({ index = 0 }: { index?: number }) {
+  return (
+    <figure className="vv-product m-0" style={{ ["--i" as string]: index }}>
+      <div
+        aria-hidden
+        className="vv-product-frame relative aspect-[4/5] w-full"
+      />
+      <figcaption className="vv-product-info">
+        <span className="vv-product-name">Coming soon</span>
       </figcaption>
     </figure>
   );

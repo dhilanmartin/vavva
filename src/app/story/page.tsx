@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import { LeadBlock } from "@/components/story/LeadBlock";
 import { Triptych } from "@/components/story/Triptych";
@@ -38,15 +37,21 @@ export const metadata: Metadata = { title: "Our Story — VAVVA" };
    for its duration, which blocks mix-blend-mode from reading the real
    background behind it — same fix as LocationCard's image. */
 export default function StoryPage() {
-  // Disabled again 2026-08-12, independent of SECONDARY_PAGES_LIVE (which
-  // still gates Locations/Products) — D wants "Our Story" specifically off:
-  // the nav link stays visible and hoverable, but clicking it (or hitting
-  // /story directly) redirects to home instead of 404ing. A redirect, not
-  // notFound(), on purpose: a dead-looking nav link with a live hover state
-  // would read as broken; landing on the homepage reads as intentional. The
-  // page is intact below the return — only the door is shut, same
-  // paused-not-gone convention as the rest of this repo's disabled sections.
-  redirect("/");
+  /* ---- the door is open again (2026-08-18) -------------------------------
+
+     This carried `redirect("/")` from 2026-08-12, when D wanted "Our Story"
+     specifically off — independent of SECONDARY_PAGES_LIVE, which gates
+     Locations and Products. A redirect rather than notFound(), so a live
+     nav link landed somewhere intentional instead of on an error.
+
+     Removed because D is working on this page: "host the dev again so i can
+     work on the products and about page." A page that redirects before it
+     renders cannot be worked on. The body below never changed while the
+     door was shut — same paused-not-gone convention as the rest of this
+     repo — so this is one line coming out, not a rebuild.
+
+     Put `redirect("/")` back here to shut it again; nothing else needs
+     touching. */
 
   return (
     <main className="w-full bg-[var(--paper)] pb-24 pt-10">

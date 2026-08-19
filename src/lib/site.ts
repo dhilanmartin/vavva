@@ -57,7 +57,16 @@ export const CONTACT_HREF = INSTAGRAM_HREF;
 
    Contact is untouched. It is not parked because it is not a placeholder:
    it goes to Instagram, which is a real destination (see CONTACT_HREF). */
-export const NAV_DESTINATIONS_PARKED = true;
+export const NAV_DESTINATIONS_PARKED = false;
+
+/* ^ FALSE as of 2026-08-18, at D's instruction — "enable a dev server with
+   all the pages working." Parking the header was the right call for a
+   pre-launch front door and is one word away from returning; it is off now
+   because the secondary pages are being worked on and a header that always
+   goes home makes them unreachable by clicking.
+
+   THIS IS A PRODUCTION-FACING FLAG, not a dev-only one. Flip it back to true
+   before the next push if the public header should still be parked. */
 
 // The whole site is the landing page as of 2026-08-07, at D's instruction:
 // "disable every page but the home page."

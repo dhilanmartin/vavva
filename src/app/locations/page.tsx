@@ -25,14 +25,32 @@ const LOCATIONS = [
   },
 ];
 
-/* Type matches mimis.nyc/locations exactly as of 2026-08-07 — h1 at
-   43px / 56px leading / -0.86px tracking / weight 400 (.mimi-title), which
-   is a genuinely different size from the 48px their Story h1 uses, and is
-   fixed rather than fluid: it measured 43px at both 1280 and 375 on their
-   site, so the `desktop:` size jump this file used to carry is gone. Page
-   gutter is their 24px, and the h1 sits 40px below the header — mimis' own
-   measured rhythm, independent of Vavva's own header height (grown to
-   200px tablet+ as of 2026-08-12, see Nav.tsx). */
+/* ---- 2026-08-18: the h1 matches Products' ------------------------------
+
+   D: "match the Locations and the Products title text on each given page
+   (should b same font/size/bold)."
+
+   This carried `.mimi-title` — 43px/-0.86px — against Products' 48px/-0.96px
+   `.mimi-display`. Both were faithful: mimis.nyc really does set its
+   locations heading at 43px and its shop heading at 48px, measured on their
+   live styles, and this repo reproduced each page against its own
+   counterpart.
+
+   THAT IS EXACTLY THE PROBLEM WITH REFERENCING PER PAGE. The two headings
+   were never compared to each other, only to their sources, so the site
+   ended up with two page-title sizes 5px apart — close enough to look like
+   drift rather than intent. One title role for the whole site is worth more
+   than matching a reference that was never trying to be consistent with
+   itself.
+
+   `.mimi-display` is the survivor because it is the display role by name
+   and Products already used it. Everything else is unchanged: both classes
+   already shared family (serif), weight 440, colour and centre alignment,
+   so this moves font-size and letter-spacing only. `.mimi-title` now has no
+   users; it stays in globals.css with the measurement note that justifies
+   it, in case a genuinely smaller heading role is ever wanted.
+
+   Page gutter is still 24px, and the h1 still sits 40px below the header. */
 export default function LocationsPage() {
   // Disabled 2026-08-07 — see SECONDARY_PAGES_LIVE in src/lib/site.ts.
   if (!SECONDARY_PAGES_LIVE) notFound();
@@ -59,7 +77,7 @@ export default function LocationsPage() {
             ScrollReveal. The heading and the text block are the two things
             here that can move, so they are the two things that do. */}
         <h1
-          className="mimi-title home-rise mb-20"
+          className="mimi-display home-rise mb-20"
           style={{ ["--i" as string]: 3 }}
         >
           Locations

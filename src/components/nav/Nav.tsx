@@ -283,11 +283,19 @@ export function Nav() {
               of width, and sits in a 64px bar with ~16px of air above and
               below.
 
+              ---- 2026-08-18: 31px -> 40px ----
+
+              D: "just make it a lil bigger to b more visual." This was the
+              same day the white glow behind it came off on the landing,
+              where the mark sits on a bright blue sky at 1.2:1. Size does
+              not fix contrast, but a bigger wordmark is recognised rather
+              than read, and recognition is what a logo needs. 40px in a
+              64px bar still leaves 12px of air above and below.
+
               So: the header is the same size as mimis' (the ask), and the
-              mark is the size this repo already decided it should be at
-              that bar height. See not-found.tsx for the one other file
+              mark is as large as that bar can carry. See not-found.tsx for the one other file
               that has to know the bar height. */}
-            <VavvaMark className="h-[31px] w-auto" />
+            <VavvaMark className="h-10 w-auto" />
           </Link>
         </div>
 

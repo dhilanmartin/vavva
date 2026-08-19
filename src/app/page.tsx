@@ -1,4 +1,7 @@
+import Image from "next/image";
 import { ComingSoon } from "@/components/glitch/ComingSoon";
+import { Petals } from "@/components/hero/Petals";
+import skyline from "../assets/nyc-skyline-lander.png";
 
 /* Landing.
    ===========================================================================
@@ -111,7 +114,32 @@ export default function HomePage() {
       <h1 className="sr-only">
         Casa Vavva — a creative studio in New York City. Coming soon.
       </h1>
-      <div className="home-rise" style={{ ["--i" as string]: 3 }}>
+      {/* `priority`: this is the largest contentful paint on the front door
+          and there is nothing above it to defer to. */}
+      {/* `draggable={false}` plus `pointer-events: none` in CSS (D: the png
+          "shouldnt b draggable and should b embed"). It is scenery, not an
+          asset on the page — you should no more be able to peel it off than
+          you could a background colour. Kept as next/image rather than a CSS
+          `background-image` so it still gets a srcset, AVIF/WebP conversion
+          and the blur placeholder; a CSS background would have shipped the
+          full 2.9MB PNG to every visitor to achieve the same thing. */}
+      <div className="vv-hero-art">
+        <Image
+          src={skyline}
+          alt="Pixel-art view of the Manhattan skyline in spring, seen across the water from a park promenade with cherry blossom, a lamppost and an empty bench."
+          sizes="100vw"
+          priority
+          draggable={false}
+          placeholder="blur"
+        />
+      </div>
+
+      <Petals />
+
+      <div
+        className="vv-hero-sign home-rise"
+        style={{ ["--i" as string]: 3 }}
+      >
         <ComingSoon />
       </div>
     </main>

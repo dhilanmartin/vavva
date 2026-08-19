@@ -22,11 +22,13 @@ import Link from "next/link";
      below it, and the document overflowed by the strip's height precisely,
      putting a scrollbar back on a page holding two lines of text.
 
-     **Back to 64px** now that D has removed the strip ("remove the rotating
-     header"). The chrome is the bar and nothing else again. `.home-stage` in
-     globals.css subtracts the same number; if either the bar or anything
-     newly parked under it changes height, both move together — this file and
-     that one are the only two places the figure appears. See Nav.tsx.
+     **THE NUMBER IS GONE** (2026-08-18). A footer was mounted the same day,
+     which would have made it 144 — and 144 only above tablet, since that
+     footer stacks on mobile and its height depends on how its links wrap.
+     Three wrong values in one week is enough: this now uses `flex-1` inside
+     the flex column layout.tsx sets up, which asks for whatever height is
+     left and cannot go stale. `.home-stage` in globals.css does the same and
+     carries the fuller note. See Nav.tsx.
    - The background was a hardcoded `#E8E8E8` rather than `var(--paper)` —
      the same colour today, but a second place to remember on a palette
      change. There is no second place now.
@@ -37,7 +39,7 @@ import Link from "next/link";
    still on that stepped scale. */
 export default function NotFound() {
   return (
-    <main className="flex min-h-[calc(100svh-64px)] w-full flex-col bg-[var(--paper)] antialiased">
+    <main className="flex w-full flex-1 flex-col bg-[var(--paper)] antialiased">
       {/* px-4 / md:px-5 to match the home column. This was px-1, which put the
           copy 4px off the bezel on a 320px phone while the home page held 16 —
           the two pages are the same site and should not gutter differently.

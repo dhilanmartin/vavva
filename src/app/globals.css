@@ -73,6 +73,7 @@
      "selected" at once and stop meaning either. Amber is analogous to the
      brush red rather than clashing with it, and black on amber is 11.6:1. */
   --hl: #ffa600;
+
 }
 
 ::selection {
@@ -104,21 +105,77 @@
 @theme {
   --breakpoint-tablet: 810px;
   --breakpoint-desktop: 1200px;
+  /* Declared in @theme so Tailwind's own `font-sans` utility resolves to it
+     — ComingSoon.tsx uses that class, and it would otherwise fall back to
+     Tailwind's default stack and quietly set a different face than the rest
+     of the site. */
+  --font-sans: "Satoshi", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
   --font-serif: "GT Alpina", var(--font-newsreader), Georgia, "Times New Roman",
     serif;
 }
 
-/* ---- GT Alpina licence slot ----------------------------------------------
-   Buy the webfont from Grilli Type (type.gt/typefaces/gt-alpina), drop the
-   .woff2 files in public/fonts/, and uncomment. Nothing else changes: the
-   --font-serif stack above already prefers "GT Alpina", so the whole serif
-   scale becomes an exact match the moment these resolve. Regular + Bold are
-   the only two cuts this site uses (400 body/headings, 700 for the Story
-   lead's run-in sentence).
+/* ---- GT Alpina, installed 2026-08-18 -------------------------------------
+
+   D downloaded Grilli Type's trial cut and asked for it wired in. It is,
+   and the stack in `--font-serif` already preferred "GT Alpina" — so every
+   heading on Story, Locations and Products now renders in the real face
+   rather than in Newsreader standing in for it.
+
+   ⚠ THIS IS THE TRIAL LICENCE, AND IT DOES NOT COVER A PUBLIC SITE. Grilli
+   Type's trial fonts are licensed for evaluation and internal mockups only;
+   serving them from a production domain needs a purchased webfont licence.
+   These files are here so the design can be judged on the real face before
+   buying. Buy the licence before this ships, or take these two files back
+   out and let the Newsreader fallback do its job again.
+
+   .otf, not .woff2, because there is no woff2 tooling on this machine and
+   the trial cuts are 20KB and 22KB — small enough that the compression
+   gain would be a rounding error. A purchased licence ships .woff2; swap
+   the format() hint when it does.
+
+   Regular and Bold only. Those are the two cuts this site sets: 400 for
+   every heading, 700 for the Story lead's run-in sentence. */
+/* ---- Satoshi, the site's sans (2026-08-18) --------------------------------
+
+   D identified it on shadowlion.com and asked for it. It REPLACES Inter
+   rather than joining it, and that is the point: a third sans would have
+   taken the site to three families, which is the exact finding the audit
+   raised a few minutes earlier. Two families — Satoshi for everything
+   structural, GT Alpina for display — is a cleaner system than three, and
+   Satoshi carries more character than Inter, which is the most default of
+   defaults.
+
+   ONE VARIABLE FILE, 300-900, 42KB. The static cuts would have needed three
+   downloads and would still not have covered the 600 the nav is measured at
+   (Fontshare ships 400/500/700 statics, no 600). The variable axis gives
+   every weight this site already uses at its exact value, so not one
+   measured number had to move.
+
+   Self-hosted from Fontshare under the ITF Free Font Licence, which covers
+   commercial use. Downloaded rather than linked to their CDN: a webfont
+   loaded from someone else's origin is a render-blocking dependency on
+   their uptime.
+
+   WHAT THIS CHANGES that is worth knowing: every nav and footer label was
+   measured against mimis.nyc while both sites were setting Inter. The sizes,
+   weights, leading and tracking are all unchanged, but the glyphs are not,
+   so those rows now render a few pixels wider or narrower than the
+   reference. That was the trade — it is a different typeface, deliberately.
+
+   To revert: delete this block, put the next/font Inter loader back in
+   layout.tsx, and drop --font-sans below. */
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.woff2") format("woff2-variations");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: "GT Alpina";
-  src: url("/fonts/GT-Alpina-Standard-Regular.woff2") format("woff2");
+  src: url("/fonts/GT-Alpina-Standard-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -126,12 +183,11 @@
 
 @font-face {
   font-family: "GT Alpina";
-  src: url("/fonts/GT-Alpina-Standard-Bold.woff2") format("woff2");
+  src: url("/fonts/GT-Alpina-Standard-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
---------------------------------------------------------------------------- */
 
 * {
   box-sizing: border-box;
@@ -140,9 +196,23 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Reserve the scrollbar's gutter on EVERY route, whether or not that route
+     scrolls (2026-08-18). Without it, a browser using classic (non-overlay)
+     scrollbars gives a scrolling page ~15px less viewport width than a short
+     one — so moving between the landing (no scroll) and Products (scrolls)
+     shifts every centred thing on the page by ~7px: the header mark, the
+     page headings, the footer's link row. It reads as the chrome twitching
+     when you change tabs.
+
+     Not reproducible in this repo's headless capture path, which uses
+     overlay scrollbars and reports a 0px gutter — but it costs nothing where
+     there is no gutter to reserve, and it is the standard fix where there
+     is. */
+  scrollbar-gutter: stable;
 }
 
 body {
+  font-family: var(--font-sans);
   margin: 0;
   min-height: 100dvh;
   background: var(--paper);
@@ -784,27 +854,30 @@ html.intro-js .scroll-reveal.reveal-stagger {
    site puts alongside the class. It did exactly that to the Story lead's
    68px gap and to both section headings' bottom margins before this note
    existed. */
-/* font-weight 440, not 400 — and that is a substitution correction, not a
-   drift from the measurement.
+/* font-weight 400 as of 2026-08-18, when the real GT Alpina was installed.
 
-   The reference sets these at weight 400 in GT Alpina. Newsreader at a
-   literal 400 renders visibly lighter: measured on the word "Story" at 48px
-   with the same -0.96px tracking, GT Alpina gives 109.49px and Newsreader
-   400 gives 107.88px, and the stems read thinner still because Newsreader
-   carries more stroke contrast at display sizes. Probing Newsreader's
-   weight axis in 20-step increments, 440 lands "Story" at 109.44px — a
-   0.05px delta, the closest instance available.
+   It ran at 440 for months, and that was a measured substitution correction
+   rather than a taste: Newsreader was standing in for GT Alpina and renders
+   visibly lighter at the same nominal weight. Measured on the word "Story"
+   at 48px with the same tracking — GT Alpina 109.49px, Newsreader 400
+   107.88px — and probing Newsreader's weight axis in 20-step increments put
+   440 at 109.44px, a 0.05px delta and the closest instance available.
+   Newsreader is variable, so 440 was a real interpolated instance and not a
+   synthesized bold.
 
-   Newsreader is a variable font, so 440 is a real interpolated instance
-   rather than a browser-synthesized bold. When a licensed GT Alpina drops
-   into the @font-face slot above, this number should go back to 400 — the
-   stack prefers GT Alpina, and 440 against the real face would be too
-   heavy. That is the one line to change on the day the licence lands. */
+   That note ended: "when a licensed GT Alpina drops into the @font-face slot
+   above, this number should go back to 400 — the stack prefers GT Alpina,
+   and 440 against the real face would be too heavy. That is the one line to
+   change on the day the licence lands."
+
+   The face is installed. This is that line, changed. If the fonts ever come
+   back out (see the trial-licence warning at the top of this file), 440 is
+   the number to restore along with them. */
 .mimi-display,
 .mimi-title,
 .mimi-lead {
   font-family: var(--font-serif);
-  font-weight: 440;
+  font-weight: 400;
   color: var(--ink);
   text-align: center;
 }
@@ -823,10 +896,49 @@ html.intro-js .scroll-reveal.reveal-stagger {
   text-wrap: balance;
 }
 
+/* ---- the page-title role, against mimis' own inspector output ------------
+
+   D pasted their computed h1 custom properties on 2026-08-18:
+
+     --framer-font-family     "GT Alpina Regular", ..., sans-serif
+     --framer-font-size       48px
+     --framer-letter-spacing  -0.02em
+     --framer-line-height     56px
+     --framer-text-alignment  center
+     --framer-text-color      rgb(0, 0, 0)
+
+   Size, leading and alignment already matched. Two things did not, and one
+   cannot.
+
+   COLOUR was `var(--ink)` — rgba(0,0,0,0.9), which resolves to #1A1A1A on
+   this paper. Their headings are PURE BLACK. That is a real difference at
+   48px, and it is now #000 for this role. The other two serif roles
+   (`.mimi-title`, `.mimi-lead`) are deliberately left on --ink: D named the
+   page titles, and the same change on a 26px lead is a separate decision.
+
+   TRACKING is now written as -0.02em rather than -0.96px. At 48px the two
+   are the same number, so nothing moved — but em is what they declare, and
+   it survives a size change where the px value silently would not.
+
+   WEIGHT STAYS AT 440 and this is the one place the inspector should NOT be
+   copied. Their 400 is GT Alpina's 400. Ours is Newsreader standing in for
+   it, and Newsreader at a literal 400 renders visibly lighter — see the
+   substitution note above the shared rule for the measurement that produced
+   440. Setting 400 here would move the rendering further from D's
+   screenshot, not closer.
+
+   THE FACE ITSELF CANNOT BE MATCHED without buying it. GT Alpina is Grilli
+   Type's, sold per-licence, and mimis serves it from framerusercontent —
+   copying that .woff2 into this repo, or hotlinking their CDN, is taking a
+   licensed asset either way. The stack already names "GT Alpina" first and
+   there is a ready @font-face slot at the top of this file: drop the
+   licensed files into public/fonts/, uncomment it, set this weight back to
+   400, and every heading becomes a literal match with no other change. */
 .mimi-display {
   font-size: 48px;
   line-height: 56px;
-  letter-spacing: -0.96px;
+  letter-spacing: -0.02em;
+  color: #000;
 }
 
 .mimi-title {
@@ -1398,16 +1510,25 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
    1. The centring subtracts this site's chrome. system.studio has no header
       at all, so viewport-centre IS content-centre for them. Vavva carries a
-      64px bar, so centring in the raw viewport would sit the block visibly
-      low. `calc(100svh - 64px)` centres it in the space that actually
-      remains, which is the honest translation of "dead centre" rather than a
-      copy of their number.
+      chrome above and below it, so centring in the raw viewport would sit
+      the block visibly low.
 
-      **64px, not 104px** (2026-08-18). It subtracted the nav bar plus a
-      40px lamp strip until D removed the strip ("remove the rotating
-      header"). Left at 104 this page would reserve room for a band that is
-      no longer rendered and sit 40px high. not-found.tsx carries the same
-      number for the same reason and moves with it — see layout.tsx.
+      **IT NO LONGER SUBTRACTS A NUMBER.** This was `calc(100svh - Npx)`, and
+      N was wrong every time the chrome changed: 64 for the bar, then 104
+      when the lamp strip was added under it, then 64 again when the strip
+      was removed, and it would have needed 144 the moment a footer was
+      mounted — which is exactly what happened on 2026-08-18. Measured at
+      375x812 before the fix: 169px of vertical overflow, the footer's height
+      precisely, putting a scrollbar on a page holding one badge. That is the
+      same failure not-found.tsx has now documented twice.
+
+      A responsive N would not have saved it either, because the footer
+      stacks on mobile and its height depends on how its links wrap.
+
+      `flex: 1` inside the flex column layout.tsx already established asks
+      for "whatever is left" and cannot go stale. The one requirement is that
+      the parent is a flex column — layout.tsx's content wrapper, which
+      carries a comment pointing back here.
 
       svh, not dvh or vh: dvh recalculates as a mobile address bar collapses
       and would shove centred content mid-scroll — the same reason
@@ -1419,11 +1540,93 @@ html.intro-js .scroll-reveal.reveal-stagger {
       and was not part of what D asked to emulate, so the city stays red and
       is the one colour in the block. */
 .home-stage {
+  position: relative;
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: calc(100svh - 64px);
+  flex: 1;
+  /* No padding: the artwork is full-bleed to the header and the footer. The
+     sign carries its own breathing room instead. */
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ---- the landing artwork (2026-08-18) ------------------------------------
+
+   D supplied a 1774x887 pixel-art autumn NYC skyline and asked for it
+   "beneath the header, till the footer", with the coming-soon sign sitting
+   OVER it.
+
+   BOTH CHILDREN OCCUPY GRID CELL 1/1, which is what overlays them without a
+   single absolute position to keep in sync — the same trick the glitch
+   engine uses for its stacked copies. `place-items: center` on the stage
+   then centres each of them independently.
+
+   ---- why the art is treated differently on phones ------------------------
+
+   The image is exactly 2:1. The band it has to fill is not, and the mismatch
+   is not uniform — measured against the real slot at each size:
+
+     1920x1080   slot 2.05:1   cover crops 2% of the height
+     1440x900    slot 1.90:1   cover crops 5% of the width
+     1512x982    slot 1.80:1   cover crops 10% of the width
+     390x844     slot 0.69:1   cover crops 65% OF THE WIDTH
+
+   The first three are free. The fourth is not a crop, it is a different
+   picture: at 390px a cover fill keeps the middle third of the skyline and
+   throws away the tree, the bench and the lamp — every element that makes
+   the illustration specific rather than generic.
+
+   That first shipped as a full-width 2:1 plate on phones, centred with paper
+   above and below. It was the right call while the landing still had a paper
+   header and footer — and the wrong one the moment those went: a small band
+   floating in a tall white field is the same "white bars" problem D removed
+   the chrome to fix, only worse.
+
+   So the art fills the band at EVERY size now, and the phone takes the 65%
+   crop. `object-position: 62%` is what makes that survivable: a centred crop
+   keeps the generic midtown skyline and throws away the blossom, the lamp
+   and the bench, while biasing right holds the bridge AND the blossom side —
+   the half of the picture that is actually specific.
+
+   `image-rendering: pixelated` is not optional for this style. The browser's
+   default is a smooth bilinear upscale, which turns hand-placed pixels into
+   mush — the one thing pixel art cannot survive. */
+.home-stage > * {
+  grid-area: 1 / 1;
+}
+
+.vv-hero-art {
+  position: absolute;
+  inset: 0;
+  /* Scenery, not an object on the page: no drag, no long-press-to-save
+     affordance, no accidental selection when someone swipes across it. */
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.vv-hero-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 62% center;
+  image-rendering: pixelated;
+}
+
+.vv-hero-sign {
+  z-index: 1;
   padding: 24px;
+}
+
+/* Above tablet the crop is 2-10% and there is no half of the picture worth
+   favouring, so it re-centres. */
+@media (min-width: 810px) {
+  .vv-hero-art img {
+    object-position: center;
+  }
 }
 
 .home-note {
@@ -1444,70 +1647,122 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
 /* ---- product tile --------------------------------------------------------
 
-   Two rules, both explained at length in ProductTile.tsx — the short version:
+   Rebuilt 2026-08-18 against stussy.com/collections/tees. ProductGrid.tsx
+   carries the measurement table; this file carries the two rules the cell
+   needs and the reasoning for the one place Vavva departs from the
+   reference.
 
-   .vv-product-frame  24px radius (mimis.nyc's own, re-measured live
-                      2026-08-14 — the "flat, no radius" note this repo
-                      carried was read off the wrong element) plus a 1px
-                      hairline.
+   WHAT WENT: a 24px radius, a 1px inset hairline, and a pill-shaped "Coming
+   soon" chip that slid up over the bottom of the photograph. All three were
+   the previous reference's language (mimis.nyc, then internetlabs.co before
+   it) and none of them exist on this one — a Stussy cell is a photograph and
+   two lines of 10px type, with no frame around either. Removing them is most
+   of what makes the grid read as the reference.
 
-                      THE HAIRLINE'S REASON CHANGED, so this says the
-                      current one rather than the original. It arrived
-                      because the tees were shot on pure #FFFFFF against a
-                      #FFFFFF --paper and the garments floated with no tile
-                      around them. D re-exported all seven on #F2F2F2 later
-                      the same day, which fixes that outright — those tiles
-                      now have their own edge.
+   THE ONE DEPARTURE IS `.vv-product-frame`'s BACKGROUND, and it solves a
+   problem the reference does not have. Their catalogue is uniform: every
+   image is 4:5 and every image is shot on the same field. Vavva's is not —
+   the five tees are 480x600 on #F2F2F2, and house-pbj-trio.png is 1672x941
+   on near-white. So:
 
-                      It stays because the catalogue is not uniform:
-                      house-pbj-trio.png is photographed on #FBFBFB, nearly
-                      white, while the tees are #F2F2F2. Without the
-                      hairline the PB&J tile would sit almost invisibly on
-                      the paper while its seven neighbours read as solid
-                      objects. The rule is what makes all eight the same
-                      kind of thing regardless of what each photograph
-                      happened to be shot against — which is also why it
-                      should stay when the next product arrives on a
-                      background nobody controlled.
+     object-contain, not cover   the tees are EXACTLY 4:5 and fill the frame
+                                 with no crop; the PB&J is 16:9 and would
+                                 lose most of its width to a cover crop,
+                                 which is the one image in the set where the
+                                 subject IS the width
+     a #F2F2F2 frame             which the tees already sit on, so they are
+                                 unchanged — and the PB&J now letterboxes
+                                 into the same grey field its neighbours
+                                 occupy instead of floating in white
 
-                      It is drawn on ::after, and that is the fix for a bug
-                      rather than a style: as an inset box-shadow on the
-                      frame itself it was completely invisible, because
-                      next/image's `fill` renders an absolutely-positioned
-                      <img> covering the whole box, and a child paints over
-                      its parent's own background and inset shadows. ::after
-                      is the frame's last child in tree order, so it paints
-                      above the image. `border-radius: inherit` keeps it on
-                      the same 24px curve.
+   That is the same job the old hairline was doing (making eight photographs
+   shot on different backgrounds read as one kind of object) done in a way
+   that costs no border. If every product is ever re-shot at 4:5 on one
+   field, this background can go and the cell becomes the reference exactly.
 
-                      Not `outline: 1px solid` (which is the usual advice for
-                      image hairlines, since it costs no layout box): the
-                      image has no radius of its own — the frame clips it —
-                      so an outline on it would run straight through the
-                      corners the frame just rounded. box-shadow inset on a
-                      radius-inheriting overlay is the version that follows
-                      the curve in every browser.
+   THE CELL IS THREE LINES, matching the reference exactly: name, then price
+   directly under it with no gap, then a variant row 10px below that which is
+   invisible until the cell is hovered. Stussy reveals size variants there;
+   Vavva's tees do the same and the sandwich shows its three flavours
+   instead (2026-08-18 — the row used to carry "Not for sale yet", which
+   stopped being true when prices arrived).
 
-                      0.10 black, not the 0.06 this first shipped at. 0.06 on
-                      white is #F0F0F0, a 1.05:1 edge — it measured as
-                      present and rendered as nothing.
+   ITS HEIGHT IS RESERVED AT REST — that is what the fixed height and the
+   opacity-only transition are for. Revealing it by adding a line would push
+   every row below it down 24px on hover, which in a grid means the whole
+   page moving because a pointer crossed a photograph. */
+.vv-product-frame {
+  overflow: hidden;
+  /* The tees' own shot background — see the note above. */
+  background: #f2f2f2;
+}
 
-   .vv-product-chip   the "not for sale" answer, pointer-only. aria-hidden
-                      and duplicated in visible page copy above the grid, so
-                      nothing depends on being able to hover. It sits at the
-                      bottom edge instead of washing the whole image: a scrim
-                      over a white-on-white packshot erases the product in
-                      order to say a sentence about it.
+.vv-product-info {
+  margin-top: 10px;
+}
 
-   Deliberately NOT .vv-embed, which is the other rounded thing on this site:
-   that class carries a drop shadow, Home's video is its only user, and
-   mimis' product card has no shadow at all. Same radius, different object.
+.vv-product-name,
+.vv-product-price,
+.vv-product-variants {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16.8px;
+  text-transform: uppercase;
+  letter-spacing: normal;
+  color: #000;
+}
 
-   This is chrome, and DESIGN.md's anti-pattern list bans chrome — that list
-   was written for the one-page landing and the Products grid has been a
-   documented exception since 2026-08-12. The hairline and the chip are the
-   two smallest pieces that make "here is an object, and you cannot buy it
-   yet" legible; nothing else here gets a border, a pill or a shadow. */
+/* Reserved, not collapsed. `height` rather than `min-height` so a long
+   variant list cannot silently reintroduce the reflow this exists to
+   prevent — it will overflow the row before it moves the grid, and an
+   overflowing row is a visible problem where a shifting grid is a confusing
+   one.
+
+   `overflow: hidden` with `white-space: nowrap` keeps that overflow from
+   escaping the cell: at four columns a long run of sizes would otherwise
+   print over the neighbour's photograph. */
+.vv-product-variants {
+  display: flex;
+  gap: 0 15px;
+  margin: 10px 0 0;
+  padding: 0;
+  height: 16.8px;
+  overflow: hidden;
+  white-space: nowrap;
+  list-style: none;
+  opacity: 0;
+  transition: opacity 250ms cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-product:hover .vv-product-variants {
+    opacity: 1;
+  }
+}
+
+/* The type steps DOWN at desktop, which is the opposite of the usual
+   direction and is the reference's own: two big columns on a phone can carry
+   12px labels, four narrow ones read better at 10px. */
+@media (min-width: 1200px) {
+  .vv-product-name,
+  .vv-product-price,
+  .vv-product-variants {
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .vv-product-variants {
+    height: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-product-variants {
+    transition: none;
+  }
+}
+
 /* The staggered entrance itself — see `.reveal-stagger` above for why the
    motion moved off the wrapper and onto these.
 
@@ -1564,64 +1819,7 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   }
 }
 
-.vv-product-frame {
-  overflow: hidden;
-  border-radius: 24px;
-}
 
-.vv-product-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 200ms ease;
-}
-
-.vv-product-chip {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translate(-50%, 6px);
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  transition:
-    opacity 200ms ease,
-    transform 200ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .vv-product:hover .vv-product-frame::after {
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
-  }
-
-  .vv-product:hover .vv-product-chip {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-/* The rise goes; the fade stays. Same call the .scroll-reveal block above
-   makes, for the same reason — opacity aids comprehension and carries no
-   movement, and killing the transform in the resting state too (not just its
-   transition) is what stops a reduced-motion user getting the identical 6px
-   jump, only instantly. */
-@media (prefers-reduced-motion: reduce) {
-  .vv-product-chip {
-    transform: translate(-50%, 0);
-    transition: opacity 200ms ease;
-  }
-}
 
 /* ---- the coming-soon sign (components/glitch/) ----------------------------
 
@@ -1732,5 +1930,347 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
      changing colour on a page that has agreed not to move. */
   .gw-badge {
     animation: none;
+  }
+}
+
+/* ---- the Instagram chip (components/social/InstagramLink.tsx) ------------
+
+   Geometry and timing are dhilan.fyi's, read off its live styles; the two
+   colours are inverted for white paper. That file carries the reasoning.
+
+   34px square is comfortably past this repo's 44px control floor? It is NOT
+   — and that is a deliberate exception rather than an oversight. The floor
+   exists for controls a visitor has to hit to use the site; this is one
+   social link in a footer that also lists the same destination as a text
+   link ("Contact"), so the small target is never the only way through. The
+   chip's own 34px plus the footer's 20px padding gives it a comfortable
+   surround on touch regardless. */
+.vv-ig {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8.5px;
+  /* dhilan.fyi lifts a 7% LIGHT chip off a near-black page; this is the same
+     gesture inverted — see InstagramLink.tsx. */
+  background-color: rgba(0, 0, 0, 0.06);
+  color: #7b7b7b;
+  transition:
+    color 220ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 220ms cubic-bezier(0.2, 0, 0, 1),
+    transform 120ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-ig:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #000;
+  }
+}
+
+.vv-ig:active {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-ig {
+    transition: none;
+  }
+
+  .vv-ig:active {
+    transform: none;
+  }
+}
+
+/* The footer's rule, drawn so it costs no layout height.
+
+   `border-top: 1px` adds a pixel to the box, which made the bar 81px against
+   the reference's 80. Theirs draws the same line from a `::after` pseudo-
+   element, which is out of flow and therefore free. An inset box-shadow is
+   the same trick with less markup: it paints inside the padding box at the
+   top edge and participates in no layout at all. Pure black at full weight,
+   theirs exactly. */
+.vv-footer-rule {
+  box-shadow: inset 0 1px 0 0 #000;
+}
+
+/* ---- the landing runs edge to edge (2026-08-18) --------------------------
+
+   D: "mayb remove footer and make header transparent.. idk if i like the
+   white bars." The artwork was framed by a 64px paper bar above and an 80px
+   one below, which read as matting around a picture rather than as a view.
+   Both go on the landing: the header floats over the image and the footer is
+   not rendered there at all.
+
+   SCOPED WITH `:has()`, NOT A ROUTE CHECK IN JS. Nav renders on the server
+   first, so a `usePathname()` branch paints the paper bar for one frame and
+   flips it on hydration — a white bar flashing over the artwork on every
+   load. DESIGN.md already records that exact failure from the red-landing
+   pass, and `:has()` is what it settled on: the style engine resolves it on
+   first paint, server markup included. `.home-stage` exists only on `/`, so
+   it is the selector.
+
+   THE FOOTER IS HIDDEN HERE ONLY. It still renders on Products, Locations
+   and Story, where it is doing real work and nothing is behind it. Change
+   these two rules to remove it site-wide if that is ever wanted — but the
+   complaint was about bars framing a picture, and those pages have no
+   picture.
+
+   The mobile panel gets a paper background it did not need before: it used
+   to open against a paper header, and now it opens against the artwork. */
+html:has(.home-stage) header {
+  position: absolute;
+  /* 0 against the wrapper layout.tsx puts around the header and the page,
+     which already begins below the announcement bar. No offset to maintain. */
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 30;
+  background: transparent;
+}
+
+/* ---- the header over the artwork, and why something has to sit between ---
+
+   D, on the first attempt: "i dont like the whit egraiden ton the top for
+   the header." Fair — a white veil over the top of a picture reads as the
+   bar it replaced, only blurrier. It is gone. What replaced it is not
+   "nothing", because nothing does not work, and the numbers say why.
+
+   Measured with the header sitting straight on the artwork, black ink
+   against the pixels under each item:
+
+     LOCATIONS / PRODUCTS / OUR STORY   1.31 - 2.05 : 1   (dark foliage)
+     CONTACT                            1.59 - 1.83 : 1   (blossom)
+     best case anywhere                 5.16 : 1          (open sky)
+
+   The floor is 4.5:1. Most of the row was under 2 — unreadable, which the
+   capture confirmed.
+
+   NO INK COLOUR FIXES IT, because the top edge is three different pictures:
+   dark foliage in the left corner, bright sky across the middle, pink
+   blossom on the right. Black fails on the corners. White fails on the sky
+   (4.08:1) and fails worse on the blossom (~2.2:1). One flat colour cannot
+   clear 4.5:1 against all three.
+
+   SO THE NAV GOES WHITE AND THE TOP OF THE SKY DARKENS. A dark gradient over
+   an illustrated sky reads as the sky itself deepening — it is what the top
+   of a photograph does — where a white one reads as fog laid over the
+   picture. At 0.42 over the brightest pixel in the band, white type holds
+   about 8:1, and every darker pixel only improves it.
+
+   The mark inverts with the type using the same `brightness(0) invert(1)`
+   the red-landing pass documented: one asset, no second PNG to maintain.
+
+   THE REAL FIX IS THE ARTWORK, not this. If the top ~90px of the image were
+   uniform sky across its full width, black type would clear 5:1 everywhere
+   with no scrim at all and this whole block could go. That is worth asking
+   for on the next generation. */
+html:has(.home-stage) header::before {
+  content: "";
+  position: absolute;
+  /* Extends ABOVE the header by the bar's height so the gradient starts at
+     the artwork's own top edge, not at the header's — otherwise a hard band
+     of undimmed image shows between the white bar and where the scrim
+     begins. */
+  inset: 0 0 auto 0;
+  height: 200px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 22, 34, 0.42) 0%,
+    rgba(8, 22, 34, 0.24) 45%,
+    rgba(8, 22, 34, 0) 100%
+  );
+}
+
+/* The bar's own type inverts; the mobile panel's does NOT — it opens against
+   paper, where white would be invisible. */
+html:has(.home-stage) .nav-link {
+  color: #fff;
+}
+
+html:has(.home-stage) .nav-panel .nav-link {
+  color: #000;
+}
+
+html:has(.home-stage) .nav-toggle span span {
+  background: #fff;
+}
+
+/* THE MARK IS RED, BIGGER, AND CARRIES NO GLOW (D, 2026-08-18: "remove the
+   white glow from the Vavva and just make it a lil bigger to b more
+   visual").
+
+   The glow was two white drop-shadows giving the mark a local ground,
+   because red on that sky measured 1.2:1 — the worst separation on the site.
+   Removing it puts that number back, and D has now called it twice, so it
+   stands as his decision rather than an oversight. Size is the compensation
+   available: 31px -> 40px in Nav.tsx, which does not raise contrast but does
+   raise recognisability, and a wordmark that is recognised does not need to
+   be read.
+
+   The honest fix remains the artwork. A dusk sky behind it would put warm
+   amber under the red instead of cerulean, which is the one change that
+   makes this legible without touching the mark at all. */
+
+html:has(.home-stage) .nav-panel {
+  background: var(--paper);
+}
+
+html:has(.home-stage) footer {
+  display: none;
+}
+
+/* ---- the announcement bar (components/announce/AnnouncementBar.tsx) ------
+
+   Every value below is shadowlion.com's own, read out of their served CSS
+   bundle rather than estimated from a screenshot — their site blocks
+   automated rendering, so measuring it live was not available. See
+   AnnouncementBar.tsx for the source rules and the one deliberate departure.
+
+   The bar carries NO height variable any more. The landing's overlaid header
+   used to offset itself by an `--announce-h` that had to be kept in step with
+   whatever this bar's padding and type actually produced; layout.tsx now
+   wraps the header and the page in a positioning context that already starts
+   below the bar, so `top: 0` is correct by construction. */
+.vv-announce {
+  position: relative;
+  z-index: 40;
+  width: 100%;
+  /* .75rem 1.5rem */
+  padding: 12px 24px;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  /* .9rem — theirs exactly. */
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* `font-weight: 500` on the span and 700 on the link, which is their served
+   CSS verbatim.
+
+   IT WENT TO 400/14px FOR ONE PASS AND THAT WAS A MISREAD — worth recording,
+   because the evidence looked convincing at the time. D compared the two
+   bars and called ours too bold, so this dropped a step. What he was
+   actually looking at was a DUPLICATE `.vv-announce` block still sitting at
+   the end of this file from an earlier pass, winning on source order and
+   rendering neither the size nor the colour intended. Deleting the duplicate
+   and then lightening the weight applied the same correction twice.
+
+   Settled by measuring the shared prefix "We have news to share •" in a
+   side-by-side screenshot — identical string, so directly comparable:
+   theirs is ~4.7% wider than ours was at 400/14px. Going 14 -> 14.4px is
+   +2.9% and 400 -> 500 adds roughly another 2% in this face. The two
+   together land on their number, which is the confirmation their stylesheet
+   was right all along. */
+.vv-announce-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  font-weight: 500;
+}
+
+.vv-announce-link {
+  color: #000;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.3s;
+  /* Layout-neutral hit area: the padding grows the target, the negative
+     margin gives back the space so the line does not move. */
+  display: inline-block;
+  padding: 6px 2px;
+  margin: -6px 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-link:hover {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-announce-link {
+    transition: none;
+  }
+}
+
+/* ---- falling blossom (components/hero/Petals.tsx) ------------------------
+
+   Fourteen petals over the artwork. Petals.tsx carries the reasoning for
+   why this is CSS on divs rather than a canvas; this is the motion itself.
+
+   `translate3d` on both tracks so each petal is its own compositor layer and
+   the main thread does nothing once the animation starts. The fall is
+   `linear` because gravity is; the sway is `ease-in-out` because air is not.
+
+   The two durations are set per petal inline and are deliberately coprime-ish
+   — a 13s fall against a 3s sway means the pair only re-aligns every ~39s,
+   so no petal traces the same path twice in a visit.
+
+   `top: -8%` and a fall to `112%` put both ends of the travel off-screen, so
+   petals are never seen appearing or vanishing. */
+.vv-petals {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vv-petal {
+  position: absolute;
+  top: -8%;
+  display: block;
+  /* Mismatched corners: a leaf rather than a circle. */
+  border-radius: 60% 20% 55% 25%;
+  opacity: 0.85;
+  will-change: transform;
+  animation-name: petalFall, petalSway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
+
+/* Three tints pulled from the artwork's own blossom rather than invented. */
+.vv-petal--0 {
+  background: #f7b8d0;
+}
+
+.vv-petal--1 {
+  background: #ffd7e6;
+}
+
+.vv-petal--2 {
+  background: #efa0c0;
+}
+
+@keyframes petalFall {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(0, 112vh, 0) rotate(220deg);
+  }
+}
+
+@keyframes petalSway {
+  from {
+    transform: translate3d(calc(var(--drift) * -1), 0, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), 0, 0);
+  }
+}
+
+/* Two animations writing `transform` need additive compositing, or the
+   second replaces the first and the petals fall in straight lines. */
+.vv-petal {
+  animation-composition: add;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-petals {
+    display: none;
   }
 }

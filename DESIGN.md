@@ -214,9 +214,11 @@ wording, untouched.
 > route lost 40px of chrome and its brightest element. `.home-stage` and
 > not-found.tsx both subtract 64px now rather than 104. See layout.tsx.
 
-The landing is a single centred object: an MUTCD guide sign reading **Coming
-Soon**, green panel, white rule set in from the edge, white Title Case legend,
-tearing itself apart in bursts. There is no other content. D replaced the
+The landing is a full-bleed pixel-art view of Manhattan in spring, with an
+MUTCD guide sign reading **Coming Soon** — green panel, white rule set in from
+the edge, white Title Case legend — tearing itself apart in bursts over the
+centre of it. The artwork arrived later the same day; the sign and the
+`sr-only` heading are still the only content on top of it. D replaced the
 studio's one sentence with it outright — *"replace the text in total (creative
 studio....) with the coming soon component"* — and the arrow the sign used to
 carry went with the copy, since it had nothing left to point at.
@@ -266,13 +268,50 @@ The third option won: the page has one wordmark now. That resolves the two-VAVVA
 
 ## Anti-patterns
 
-- Full-bleed sky / frosted overlay cards
+- ~~Full-bleed sky~~ / frosted overlay cards — **the landing is now exactly this; see below**
 - Banner-scale logo
 - Dense brand essays
 - Extra chrome (nav, cards, pills)
 - A second accent colour
-- A second VAVVA anywhere, at any scale — there is one logo, and the exemption the footer stamp used to run under is withdrawn
+- ~~A second VAVVA anywhere, at any scale~~ — **amended 2026-08-18, see below**
 - A second centred object — centring is what marks the head; spend it once
+
+**Scoped exception, the landing artwork (2026-08-18).** The landing is a
+full-bleed pixel-art NYC skyline running to all four edges, with the header
+floating transparently over it and no footer rendered. That breaks the
+"Full-bleed sky" entry above about as literally as it can be broken, and it
+is D's call: *"use this new image on our landing page (between the header and
+lander)"*, then *"mayb remove footer and make header transparent.. idk if i
+like the white bars."*
+
+Three things this drags along, all recorded so the next change knows:
+
+- **A scrim exists and is load-bearing.** With the header sitting straight on
+  the artwork the nav's black ink measured **1.31–2.05:1** against the pixels
+  under it — unreadable, not merely low. The top edge is mixed (dark foliage
+  left, bright sky centre, blossom right) so no ink colour fixes it. A white
+  gradient fading out over 150px lifts the worst case to ~11:1 without
+  reintroducing a bar. Do not remove it without re-measuring.
+- **The footer is hidden on `/` only.** It still renders on the other three
+  routes, where nothing is behind it.
+- **`:has()`, not a route check.** Nav renders on the server, so a
+  `usePathname()` branch would paint the paper bar for one frame and flip it
+  on hydration — the same white-flash failure the red-landing pass hit.
+
+**Amendment, the footer mark (2026-08-18).** The second-VAVVA ban above is
+lifted for the footer, and only for the footer. It was written when this site
+was a one-page landing whose whole composition was a single centred wordmark,
+and the previous footer left its left zone deliberately EMPTY under it —
+recording that the exemption "needs D's explicit sign-off, which hasn't
+happened."
+
+It has now: D, rebuilding the footer against mimis.nyc — *"replace their logo
+with ours."* Their footer's left zone is their monogram; a 1:1 emulation with
+that slot empty is not the thing that was asked for.
+
+The narrowness is the point. One mark in the header, one 20px stamp in the
+footer, nowhere else — not in the landing, not in a section heading, not at
+any size in body copy. The ban still describes the rest of the site.
 
 **Scoped exception, the landing's coming-soon sign (2026-08-18):** it breaks
 the chrome ban and the one-accent rule, both deliberately and both argued in

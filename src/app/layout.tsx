@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Newsreader } from "next/font/google";
+import { Newsreader } from "next/font/google";
+import { AnnouncementBar } from "@/components/announce/AnnouncementBar";
 import { Nav } from "@/components/nav/Nav";
+import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
+/* Inter is gone as of 2026-08-18 — Satoshi replaced it as the site's sans,
+   self-hosted and declared in globals.css. See the note there for why it is
+   a replacement rather than a third family. Newsreader stays: it is the
+   fallback under GT Alpina, not a UI face. */
 
 /* Serif role. Recon had never identified mimi's actual face and this slot
    carried Fraunces as an admitted guess; reading their live @font-face table
@@ -148,7 +149,7 @@ export default function RootLayout({
     // so the server markup can't match — that mismatch is the point, not a bug.
     <html
       lang="en"
-      className={`${inter.variable} ${newsreader.variable}`}
+      className={newsreader.variable}
       suppressHydrationWarning
     >
       <head>
@@ -226,7 +227,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} flex min-h-svh flex-col antialiased`}>
+      <body className="flex min-h-svh flex-col antialiased">
         {/* Nav stays — persistent, route-agnostic chrome on every page.
 
             NO FOOTER, and it is settled rather than pending. Removed
@@ -253,7 +254,20 @@ export default function RootLayout({
             remaining route is reachable from the nav.
 
             This note existed twice, near-verbatim, until 2026-08-14. */}
-        <Nav />
+        {/* Above the header, in flow, on every route. The landing's header
+            is absolutely positioned over the artwork and offsets itself by
+            `--announce-h` to clear this — see globals.css. */}
+        <AnnouncementBar />
+
+        {/* THE POSITIONING CONTEXT FOR THE LANDING'S OVERLAID HEADER. On `/`
+            the header is absolute so the artwork can run under it, and it
+            used to be offset by a hardcoded `--announce-h`. This wrapper
+            starts immediately below the bar, so `top: 0` inside it is
+            already the right place and there is no number to keep in step —
+            the same lesson as the 64/104px chrome arithmetic that was wrong
+            three times before `flex-1` retired it. */}
+        <div className="relative flex flex-1 flex-col">
+          <Nav />
 
         {/* ---- the header lamp strip is gone (2026-08-18) ----------------
 
@@ -284,7 +298,21 @@ export default function RootLayout({
             had it logged as an open problem. There is one accent per route
             again. */}
 
-        <div className="flex-1">{children}</div>
+        {/* `flex flex-col` as well as `flex-1`, so a page can ask to fill
+            whatever height is left rather than computing it. See
+            `.home-stage` in globals.css — that rule subtracted a hardcoded
+            chrome height and was wrong three times: 64, then 104 when the
+            lamp strip arrived, then 64 again when it went, then 144 the
+            moment a footer was mounted under it. It now just grows. */}
+          <div className="flex flex-1 flex-col">{children}</div>
+        </div>
+
+        {/* Remounted 2026-08-18 ("emulate their footer"), for the first time
+            since 2026-08-07 when D removed it. Rebuilt against mimis.nyc's
+            own — see Footer.tsx for the measurements and the three places
+            Vavva's constraints forced a departure. The `flex-1` above is
+            what puts it at the bottom of a short page. */}
+        <Footer />
       </body>
     </html>
   );

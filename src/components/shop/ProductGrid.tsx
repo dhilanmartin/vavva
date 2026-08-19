@@ -1,4 +1,4 @@
-import { ProductTile } from "./ProductTile";
+import { ComingSoonTile, ProductTile } from "./ProductTile";
 import trio from "../../assets/house-pbj-trio.png";
 import teeScript from "../../assets/products/tee-script.jpg";
 import teeFairies from "../../assets/products/tee-fairies.jpg";
@@ -34,10 +34,28 @@ import teeBlankBlack from "../../assets/products/tee-blank-black.jpg";
 // "Grid Tee" tells a visitor more than "Tee 02" and costs nothing to rename.
 // Replace all five the moment real names exist.
 //
-// `price` is gone from the model, not just from the tile. Nothing is for sale
-// (see ProductTile.tsx and products/page.tsx), no tee has a price yet, and a
-// field that every consumer ignores is a field that goes stale. The PB&J's $9
-// is recoverable from git — 39a1a0d and earlier — the day the shop opens.
+// `price` and `variants` are back as of 2026-08-18. D: "fix the prices text
+// ($65 per tee)... on hover add sizes like the stussy... for the pbj make the
+// price $15 and the sizes instead show flavors."
+//
+// They are stored as STRINGS, not numbers. There is no cart, no currency
+// formatting and no locale switching on this site, so a number would only be
+// a number that something has to turn back into "$65" — and the moment real
+// commerce arrives, price stops being a display string and becomes a money
+// type with a currency attached. A string is honest about being a label
+// until then.
+//
+// `variants` is the same slot for two different kinds of thing: sizes on the
+// tees, flavours on the sandwich. That is the reference's own row (Stussy
+// reveals size variants under the price on hover) carrying whatever the
+// product actually varies by. `variantLabel` is not stored — nothing prints
+// the word "size" or "flavour", the values speak for themselves, and a label
+// nobody renders is a field that goes stale.
+//
+// THE SIZES ARE PLACEHOLDERS, like the names above them. S/M/L/XL is the
+// default run, not a stock list — no inventory exists behind any of it.
+// The PB&J's three flavours are real: they are printed on the wrappers in
+// house-pbj-trio.png.
 //
 // `description` is gone for the same reason it should not come back per-tile:
 // the PB&J was the only product carrying one, so its cell ran a third text
@@ -57,55 +75,107 @@ const PRODUCTS = [
     name: "House PB&J",
     image: trio,
     alt: "Three foil-wrapped House PB&J sandwich bars stacked — gold, red and purple.",
+    price: "$15",
+    variants: ["PB", "PB&J", "Jam"],
   },
   {
     name: "Script Tee",
     image: teeScript,
     alt: "White cotton tee with the Vavva brush wordmark printed in red across the chest.",
+    price: "$65",
+    variants: ["S", "M", "L", "XL"],
   },
   {
     name: "Fairies Tee",
     image: teeFairies,
     alt: "White cotton tee with two blue fairies printed at centre chest.",
+    price: "$65",
+    variants: ["S", "M", "L", "XL"],
   },
   {
     name: "Dobermans Tee",
     image: teeDobermans,
     alt: "White cotton tee with three black dobermans printed at centre chest.",
+    price: "$65",
+    variants: ["S", "M", "L", "XL"],
   },
   {
     name: "Grid Tee",
     image: teeGrid,
     alt: "White cotton tee printed with a dense grid of small multicoloured figures.",
+    price: "$65",
+    variants: ["S", "M", "L", "XL"],
   },
   {
     name: "Blank Tee, Black",
     image: teeBlankBlack,
     alt: "Black cotton tee with no print.",
+    price: "$65",
+    variants: ["S", "M", "L", "XL"],
   },
 ];
 
-// mimis.nyc's own /shop grid: 4 fixed columns at a 20px gap, re-measured live
-// at 1710px this session (400.5px columns in a 1662px row — this site's
-// standard 24px page gutter, not a bespoke width). `gap-5` is Tailwind's 20px
-// step.
-//
-// `grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-4` down-steps from their
-// desktop count rather than forcing 4 cramped columns on a phone — mimis' own
-// site drops to 1 column under 810px (their tablet step still hasn't been
-// directly observed; 2 is this site's usual middle step, not a measured mimis
-// fact).
-//
-// The first four tiles load eagerly: at desktop they are the entire first row
-// and sit above the fold, and Next's lazy loading would otherwise wait on an
-// IntersectionObserver for images that are already on screen. Below desktop
-// that over-fetches by at most three images on a 2-column tablet and three on
-// a phone, which is the cheaper mistake than a blank first row.
-const EAGER_TILES = 4;
+/* ---- 2026-08-18: rebuilt against stussy.com/collections/tees --------------
+
+   D: "redesign the shop page to look like https://www.stussy.com/collections/
+   tees (the way the items are viewable/cropped/listed with names etc)." The
+   parenthetical scopes it — this is the GRID AND THE CELL, not the page
+   chrome. The h1 and the availability line above stay as they are.
+
+   Measured live off their collection page rather than eyeballed, and only
+   structure and metrics are taken across — no copy, no imagery, no colour
+   values (see .claude/skills/clone-structure for this repo's rule on that):
+
+     columns        2 below 1200px, 4 at and above it. Flat 2 all the way
+                    from 375 to 900+, which is why the middle `tablet:` step
+                    this grid used to carry is gone rather than retuned
+
+                    SIX AT DESKTOP NOW, not the reference's four (D,
+                    2026-08-18: "make it show each row shows 6 items on the
+                    shop"). At the 1710px container that is 272px columns
+                    against their 258px — so the cells land close to the
+                    reference's actual size, and the whole catalogue of six
+                    fits on one row. A `tablet:` step of 3 comes back with
+                    it: 2 -> 6 straight across the 1200px line would have
+                    gone from 560px cells to 188px ones in a single pixel
+     column gap     5px — at every width, and it is the most distinctive
+                    number on the page. The images very nearly touch
+     row gap        40px below desktop, 30px at desktop
+     image          4:5 portrait, flat: no radius, no border, no shadow
+     image -> text  10px
+     name           12px/16.8px below desktop, 10px/14px at desktop, weight
+                    500, uppercase, LEFT aligned
+     hover reveal   a second line fades in under the name, 250ms
+                    cubic-bezier(0.215, 0.61, 0.355, 1), its height reserved
+                    at rest so the grid cannot reflow
+
+   THE 4:5 FRAME IS THE REAL WIN AND IT IS LUCK, not judgement: all five tee
+   packshots are 480x600, which is exactly 4:5. The square frame this grid
+   used to carry was cropping them to y=60..540 — the reference's own aspect
+   ratio happens to show these garments whole, with no crop at all.
+
+   A SECOND ROW OF EMPTY SLOTS follows the six real products (D, 2026-08-18:
+   "add another row with all coming soon items"). Six of them, so the count
+   is the desktop row rather than a number of planned products — nobody has
+   said what is coming, only that something is. They continue the stagger's
+   index from the real tiles so the entrance cascades through both rows as
+   one gesture rather than restarting halfway down the page.
+
+   The eager count follows the desktop row: 6 is the entire first row there,
+   and at two columns it is the first three rows. Both are above the fold on
+   the viewports they apply to, which is the only thing this number is for —
+   Next would otherwise wait on an IntersectionObserver for images already on
+   screen. With six products it happens to be the whole catalogue; leave it
+   at 6 rather than tracking the count, or a seventh product silently starts
+   eager-loading a below-fold image. */
+const EAGER_TILES = 6;
+
+// One desktop row of empty slots under the catalogue.
+const COMING_SOON_SLOTS = 6;
 
 export function ProductGrid() {
   return (
-    <div className="grid grid-cols-1 gap-5 tablet:grid-cols-2 desktop:grid-cols-4">
+    <div className="grid grid-cols-2 gap-x-[5px] gap-y-10 tablet:grid-cols-3 desktop:grid-cols-6 desktop:gap-y-[30px]">
       {PRODUCTS.map((product, i) => (
         <ProductTile
           key={product.name}
@@ -113,6 +183,9 @@ export function ProductGrid() {
           eager={i < EAGER_TILES}
           index={i}
         />
+      ))}
+      {Array.from({ length: COMING_SOON_SLOTS }).map((_, i) => (
+        <ComingSoonTile key={`soon-${i}`} index={PRODUCTS.length + i} />
       ))}
     </div>
   );
