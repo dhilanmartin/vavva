@@ -1,37 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Newsreader } from "next/font/google";
-import { AnnouncementBar } from "@/components/announce/AnnouncementBar";
 import { Nav } from "@/components/nav/Nav";
 import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
-/* Inter is gone as of 2026-08-18 — Satoshi replaced it as the site's sans,
-   self-hosted and declared in globals.css. See the note there for why it is
-   a replacement rather than a third family. Newsreader stays: it is the
-   fallback under GT Alpina, not a UI face. */
+/* Two faces, both self-hosted in globals.css: Satoshi (display, statement,
+   body) and Geist Mono (the ledger role). No next/font loader here any more.
 
-/* Serif role. Recon had never identified mimi's actual face and this slot
-   carried Fraunces as an admitted guess; reading their live @font-face table
-   on 2026-08-07 settled it — mimis.nyc sets **GT Alpina Regular** (Grilli
-   Type), served from framerusercontent.com, with Inter for all nav/UI.
-   Fraunces was the wrong shape for it: soft, wonky, low-contrast where GT
-   Alpina is sharp and transitional.
-
-   GT Alpina is a paid webfont and its .woff2 cannot be vendored here, so
-   this is the stand-in and globals.css names "GT Alpina" ahead of it in
-   --font-serif (with a ready @font-face slot) so a licence swaps it in
-   without touching a single component. Newsreader over the alternatives
-   because the Story lead runs a bold sentence into regular text inside one
-   block: it needs a real 700 in the same family, which rules out Instrument
-   Serif despite that face matching GT Alpina's display proportions more
-   closely. `opsz` is requested explicitly so the 48px headings and 26px lead
-   get their proper optical cuts rather than one compromise master. */
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-newsreader",
-  axes: ["opsz"],
-  display: "swap",
-});
+   Newsreader is gone as of 2026-08-19. It existed only as the fallback under
+   GT Alpina, GT Alpina is gone with the DESIGN.md rewrite — trial files, and
+   a face borrowed from mimis.nyc rather than chosen for this house — and a
+   font loaded to stand in for a font nothing loads is a third family in all
+   but name. Display type is Satoshi 700 cut tight. See globals.css. */
 
 /* ---- Literata, and why it is no longer loaded ----------------------------
 
@@ -135,7 +114,7 @@ export const viewport: Viewport = {
   // read a CSS custom property; it went white with the palette on
   // 2026-08-07. Left stale it would tint mobile browser chrome grey against
   // a white page.
-  themeColor: "#FFFFFF",
+  themeColor: "#FAF8F4",
   colorScheme: "light",
 };
 
@@ -147,11 +126,7 @@ export default function RootLayout({
   return (
     // The intro script stamps `intro-js` / `intro-go` on <html> before hydration,
     // so the server markup can't match — that mismatch is the point, not a bug.
-    <html
-      lang="en"
-      className={newsreader.variable}
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* THE HEADER-DISAPPEARS BUG (found and fixed 2026-08-14).
             D: "there seems to be a bug with how the vavva header is loading."
@@ -217,7 +192,7 @@ export default function RootLayout({
             one should not be holding content back for the other either. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;if(localStorage.getItem('vv-announce:v1'))d.classList.add('announce-off');d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
+            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
           }}
         />
         <script
@@ -227,7 +202,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-svh flex-col">
+      <body className="vv-paper flex min-h-svh flex-col">
         {/* Nav stays — persistent, route-agnostic chrome on every page.
 
             NO FOOTER, and it is settled rather than pending. Removed
@@ -257,7 +232,6 @@ export default function RootLayout({
         {/* Above the header, in flow, on every route. The landing's header
             is absolutely positioned over the artwork and offsets itself by
             `--announce-h` to clear this — see globals.css. */}
-        <AnnouncementBar />
 
         {/* THE POSITIONING CONTEXT FOR THE LANDING'S OVERLAID HEADER. On `/`
             the header is absolute so the artwork can run under it, and it
