@@ -141,13 +141,13 @@ const PANEL = "#00693e";
 /* THE KEYLINE IS BUILT FROM TWO INSET SHADOWS, and the trick is worth
    understanding before touching it. A road sign's border is a rule set IN
    from the panel edge, with panel colour on both sides of it. There is no
-   CSS property for "stroke, inset by 3px". So:
+   CSS property for "stroke, inset by 4px". So:
 
-     inset ... 3px PANEL   paints the outer 3px ring green, ON TOP
-     inset ... 5px RULE    paints the outer 5px ring white, UNDERNEATH
+     inset ... 4px PANEL   paints the outer 4px ring green, ON TOP
+     inset ... 7px RULE    paints the outer 7px ring white, UNDERNEATH
 
-   Earlier shadows paint over later ones, so what survives is green 0-3px and
-   white 3-5px: a 2px rule floating 3px inside the edge. Both follow the
+   Earlier shadows paint over later ones, so what survives is green 0-4px and
+   white 4-7px: a 3px rule floating 4px inside the edge. Both follow the
    padding box's border-radius for free, which is the whole reason it is done
    this way — the engine ANIMATES that radius during a burst, and a real
    `border` would be separate geometry that disagrees with it frame by frame.
@@ -155,12 +155,20 @@ const PANEL = "#00693e";
    Restated in full here because of a WAAPI hazard: a keyframe that sets
    `box-shadow` replaces the WHOLE stack, so every static layer has to appear
    in every frame of the burst or the sign loses its border at exactly the
-   moment it is being looked at hardest. Keep in sync with `.gw-badge`. */
+   moment it is being looked at hardest. Keep in sync with `.gw-badge`.
+
+   IT WAS 3px/5px HERE AND 4px/3px THERE UNTIL 2026-08-19, which is the
+   failure the paragraph above predicted, arriving by a route it did not: the
+   stylesheet made the keyline RESPONSIVE (heavier above tablet) when the sign
+   grew, and a JS constant cannot answer a media query, so it could not
+   follow. Every burst thinned the rule. `.gw-badge` no longer steps — one
+   stack, both breakpoints — so these four values can be kept level by hand
+   again. */
 const RULE = "#ffffff";
 
 const REST_SHADOW = [
-  `inset 0 0 0 3px ${PANEL}`,
-  `inset 0 0 0 5px ${RULE}`,
+  `inset 0 0 0 4px ${PANEL}`,
+  `inset 0 0 0 7px ${RULE}`,
   "0 1px 2px rgba(0,32,18,0.26)",
   "0 6px 14px -6px rgba(0,32,18,0.32)",
 ].join(", ");
@@ -334,8 +342,8 @@ function badgeFrames(o: GlitchOptions, radius: number): Keyframe[] {
       // border and travel with the panel — offsetting them would peel the
       // border off the sign instead of leaving its shadow behind.
       boxShadow: [
-        `inset 0 0 0 3px ${PANEL}`,
-        `inset 0 0 0 5px ${RULE}`,
+        `inset 0 0 0 4px ${PANEL}`,
+        `inset 0 0 0 7px ${RULE}`,
         `${lag}px 1px 2px rgba(0,32,18,0.26)`,
         `${lag}px 6px 14px -6px rgba(0,32,18,0.32)`,
       ].join(", "),

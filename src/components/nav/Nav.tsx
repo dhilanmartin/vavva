@@ -203,7 +203,26 @@ export function Nav() {
           than on the <Link>, because the link carries `home-rise`, whose
           keyframes animate `transform` — one element cannot hold both a
           static centring translate and an animated one. */}
-      <div className="relative mx-auto flex h-16 max-w-[1710px] items-center justify-between px-6">
+      {/* 43px, NOT 64 (2026-08-19). The row moved onto the announcement bar
+          and D's instruction was to keep that bar the size it already is —
+          "keep the announcement bar how it is (same size) ... and just fit
+          the buttons onto the announcement bar." So the bar's 43px is now
+          this row's height, and the bar's own padding is gone; see
+          `.vv-announce` in globals.css.
+
+          43px was the bar's measured height (12px padding + a 19.44px line +
+          12px padding), read off shadowlion.com's served CSS. It is now the
+          one place the number lives. The 24px gutter below is the same 24px
+          the bar used to hold as horizontal padding, so nothing moved
+          sideways.
+
+          What fits: the 31px mark clears 6px above and below, and a 20px
+          link row clears 11.5px. The two 44px AAA targets — `.vv-mark-link`
+          and the hamburger — overhang this row by half a pixel each side,
+          which is invisible (neither paints a background) and is the right
+          trade: the target size is a promise to a user, the bar height is a
+          promise to D. */}
+      <div className="relative mx-auto flex h-[43px] max-w-[1710px] items-center justify-between px-6">
         <div
           className="home-rise flex items-center justify-start"
           style={{ ["--i" as string]: 0 }}
@@ -214,17 +233,58 @@ export function Nav() {
             aria-controls="nav-panel"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
-            className="nav-toggle -ml-2 flex h-11 w-11 items-center justify-center tablet:hidden"
+            /* `-ml-3`, NOT `-ml-2` (2026-08-19). The negative margin exists
+               to hang the 44px target off the gutter so the ICON lines up
+               with everything else, and at -8px it did not: the button
+               started at 16px, the 20px glyph centres 12px into a 44px box,
+               and the icon's left edge landed at 28px against a 24px gutter.
+               Four pixels is invisible on its own and obvious next to the
+               centred mark. -12px puts the glyph edge at exactly 24px, which
+               is where the link row starts at tablet and up. */
+            className="nav-toggle -ml-3 flex h-11 w-11 items-center justify-center tablet:hidden"
           >
+            {/* THREE LINES, per D's Balenciaga reference (2026-08-19): "use
+                the attached image as a reference for mobile design. reference
+                the hamburger icon / header of the balenciaga site."
+
+                Theirs is a three-rule stack in roughly a 17x12.5 box — thin
+                rules, tight gaps, no rounding. This is 20x14 with the same
+                1.5px rules, which lands on the same 4-5px gap proportionally
+                and keeps the glyph on Vavva's own scale rather than cloning
+                a number off a screenshot.
+
+                Two lines is the other convention and it is not wrong; it is
+                just a different sign. Three reads as a menu of items, which
+                is what this opens, and it is what D pointed at.
+
+                The X is built from the outer two. Each line's centre sits
+                6.25px from the box's own (0.75px and 13.25px in a 14px box),
+                so that is the exact convergence — the previous pair used 6.5
+                and left a quarter-pixel of daylight at the crossing. The
+                middle rule wipes out from the centre rather than fading in
+                place: a line that shrinks into the crossing looks like it
+                was USED to build the X, where one that dissolves looks like
+                it was deleted.
+
+                `transition-[translate,rotate,opacity,scale]` names the
+                properties rather than leaning on `transition-transform`,
+                because Tailwind v4 writes these as the individual
+                `translate` / `rotate` / `scale` properties, not as a
+                composed `transform`. */}
             <span aria-hidden className="relative block h-3.5 w-5">
               <span
-                className={`absolute left-0 top-0 h-[1.5px] w-full bg-[var(--ink)] transition-transform duration-300 ease-[var(--ease-out)] ${
-                  open ? "translate-y-[6.5px] rotate-45" : ""
+                className={`absolute left-0 top-0 h-[1.5px] w-full bg-[var(--ink)] transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
+                  open ? "translate-y-[6.25px] rotate-45" : ""
                 }`}
               />
               <span
-                className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-[var(--ink)] transition-transform duration-300 ease-[var(--ease-out)] ${
-                  open ? "-translate-y-[6.5px] -rotate-45" : ""
+                className={`absolute left-0 top-1/2 h-[1.5px] w-full -translate-y-1/2 bg-[var(--ink)] transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
+                  open ? "scale-x-0 opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-[var(--ink)] transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
+                  open ? "-translate-y-[6.25px] -rotate-45" : ""
                 }`}
               />
             </span>
@@ -300,7 +360,17 @@ export function Nav() {
               So: the header is the same size as mimis' (the ask), and the
               mark is the size this repo has now decided on twice. See not-found.tsx for the one other file
               that has to know the bar height. */}
-            <VavvaMark className="vv-mark-ink h-[31px] w-auto" />
+            {/* RED AGAIN (2026-08-19). D: "Make the Vavva logo back to
+                red as well." `vv-mark-ink` — the `brightness(0)
+                invert(6.7%)` filter that made the PNG's brush stroke #111 —
+                is off, so the artwork shows its own #B32622.
+
+                It is not a contrast regression coming back in: the ink cut
+                was reached the same week because the mark was sitting ON THE
+                ARTWORK, where red measured 1.29:1 against the sky. On the
+                white bar it measures 6.5:1. The rule is still in globals.css
+                with that reasoning, carried by nothing. */}
+            <VavvaMark className="h-[31px] w-auto" />
           </Link>
         </div>
 

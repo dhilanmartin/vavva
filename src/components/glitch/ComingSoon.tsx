@@ -277,26 +277,40 @@ export function ComingSoon() {
      reproduced is its BEHAVIOUR rather than its shapes: Title Case, a medium
      weight rather than a bold, and near-zero tracking. 15px because a sign
      that has to be squinted at is not a sign. */
-  /* 15px -> 22/30px (2026-08-19, restored at D's request).
+  /* 15px -> 22/30px -> 18/24px. Three sizes in two days, and the last one is
+     D's: "make the coming soon sign smaller" (2026-08-19).
 
-     At 15px this was a badge, not a sign: a green pill about the size of a
-     browser chip, floating in an open sky. It read as UI sitting on top of
-     the picture rather than as an object inside it. A street sign is legible
-     from across a street, which is the entire reference.
+     15px was too small and the reason is worth keeping: it was a badge, not a
+     sign — a green pill about the size of a browser chip, floating in an open
+     sky, reading as UI sitting on top of the picture rather than as an object
+     inside it. A street sign is legible from across a street, which is the
+     entire reference. 22/30 fixed that and overshot: on a 375px phone the
+     plate was 204px wide, 54% of the viewport, which is a sign held up to
+     your face rather than seen across a street.
 
-     The badge insets below scale with it, and so does the white keyline in
-     .gw-badge — a plate that doubles in size with a fixed 3px keyline stops
-     looking like enamel and starts looking like a border. */
+     18/24 is a flat 0.8 of the pass before it, which takes the phone plate to
+     about 44% of the viewport and still reads as signage rather than as a
+     chip. Everything below scales with it by the same 0.8 so the proportions
+     the sign is built on do not shift — see the panel note. */
   const TEXT =
-    "font-sans text-[22px] font-semibold leading-none tracking-[0.005em] whitespace-pre text-white tablet:text-[30px]";
+    "font-sans text-[18px] font-semibold leading-none tracking-[0.005em] whitespace-pre text-white tablet:text-[24px]";
 
   /* The panel. The insets are the sign's padding, and they have to clear the
-     white rule, which now scales with the plate (see .gw-badge): 4px in and
-     3px thick on mobile, 5px in and 4px thick from tablet up. So 32px/16px
-     leaves 25px of green beside the legend and 9px above it; 44px/22px
-     leaves 35px and 13px. */
+     white keyline, which is 4px in and 3px thick at both sizes now (see
+     .gw-badge — it stopped stepping when the sign shrank).
+
+     HELD AS RATIOS OF THE LEGEND, not scaled blindly. What a sign shop is
+     actually setting is the clear green between the legend and the rule, in
+     multiples of letter height: this keeps it at ~0.4x above and below and
+     ~1.2x either side, which is what the 22/30 pass worked out to.
+
+       mobile   27px in  ->  20px clear beside the legend, 7px above it
+       tablet   36px in  ->  29px clear beside the legend, 10px above it
+
+     The radius holds its own ratio too — ~0.19 of the plate's height, which
+     is what keeps the corner reading as a stamped plate at either size. */
   const PANEL =
-    "gw-badge absolute -inset-x-8 -top-[16px] -bottom-[16px] rounded-[10px] tablet:-inset-x-11 tablet:-top-[22px] tablet:-bottom-[22px] tablet:rounded-[14px]";
+    "gw-badge absolute -inset-x-[27px] -top-[14px] -bottom-[14px] rounded-[8px] tablet:-inset-x-9 tablet:-top-[17px] tablet:-bottom-[17px] tablet:rounded-[11px]";
 
 
   return (

@@ -298,6 +298,30 @@ Three things this drags along, all recorded so the next change knows:
   `usePathname()` branch would paint the paper bar for one frame and flip it
   on hydration — the same white-flash failure the red-landing pass hit.
 
+**Amendment, the header came off the artwork (2026-08-19).** D: *"Place the
+current header components on the announcement bar and remove the current
+announcement bar copy ... Make the Vavva logo back to red as well, and turn
+the other header buttons black."* The header no longer floats over the image;
+it sits inside the 43px announcement bar above it, which is opaque white.
+
+So the FIRST bullet above is now history rather than instruction — the scrim
+is gone, along with the white nav links and the white-inverted mark it was
+holding up. Its measurements stand and are worth keeping: they describe the
+artwork, and the artwork has not changed. **Put anything over this image
+again and re-measure before you do.** On the white bar the question does not
+arise — black type is 21:1 and the red mark 6.5:1, which is what makes the
+mark red again rather than a contrast regression re-entering by the back
+door.
+
+The other two bullets are untouched. The footer is still hidden on `/` only,
+still by `:has()`.
+
+The artwork did not move: it already began at the bottom edge of the bar,
+because the header was floating over it rather than displacing it. What
+changed is that the site's chrome went from 43px of copy above a 64px bar of
+links to one 43px bar carrying both jobs, and that nothing is on top of the
+picture any more.
+
 **Amendment, the footer mark (2026-08-18).** The second-VAVVA ban above is
 lifted for the footer, and only for the footer. It was written when this site
 was a one-page landing whose whole composition was a single centred wordmark,

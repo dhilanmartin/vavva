@@ -1,129 +1,51 @@
-"use client";
-
-/* The announcement bar, above everything.
+/* The top bar — and as of 2026-08-19 it is the HEADER'S GROUND rather than a
+   message of its own.
    ===========================================================================
 
-   shadowlion.com's, matched to their own served CSS (their site blocks
-   automated rendering, so it was read from the stylesheet rather than
-   measured live): background #fff, colour #000, padding .75rem 1.5rem,
-   centred, font-size .9rem, box-shadow 0 2px 8px rgba(0,0,0,.1); the clause
-   at weight 500 and the link at 700; hover to opacity .7 over .3s.
+   D: "Place the current header components on the announcement bar and remove
+   the current announcement bar copy ... keep the announcement bar how it is
+   (same size) ... and just fit the buttons onto the announcement bar."
 
-   VAVVA ADDS TWO THINGS THEIRS DOES NOT HAVE, both at D's request: it
-   animates in, and it can be dismissed.
+   So this file announces nothing. What it keeps is the CHROME the bar was
+   carrying — shadowlion.com's white field and `0 2px 8px rgba(0,0,0,.1)`
+   drop shadow, read out of their served CSS — and the nav now stands on it.
+   One 43px bar at the top of every route instead of a 43px strip of copy
+   above a 64px bar of links. The bar's own height did not change; see
+   `.vv-announce` in globals.css for where the 43px now comes from.
 
-   ---- why this is a client component now ---------------------------------
+   ---- what went with the copy, and why it could not stay ------------------
 
-   Dismissal has to persist, or the bar is a nag: closed on the landing,
-   back on the next navigation. So it reads localStorage — which makes this
-   the only client component in the chrome. It ships ~1KB of JS.
+   THE DISMISS BUTTON, and this one is a consequence rather than a request.
+   The close control wrote `vv-announce:v1` to localStorage and the inline
+   script in layout.tsx stamped `announce-off` on <html> before first paint,
+   which set `display: none` on this bar. With the nav living inside it, that
+   is a button that permanently deletes the site's navigation — on every
+   route, for that visitor, with no way back short of clearing storage. A
+   dismissible header is not a header. The `announce-off` read is gone from
+   layout.tsx's script too, so someone who dismissed the old bar on a
+   previous visit does not load into a site with no nav.
 
-   THE FLASH IS THE HARD PART, and it is handled BEFORE React, not in it.
-   A dismissed bar rendered on the server and removed on hydration is 43px
-   of white that appears and vanishes on every page load — worse than not
-   having a dismiss button. The inline script in layout.tsx reads the same
-   key and stamps `announce-off` on <html> before first paint, so a
-   dismissed bar is never painted at all. This component's state only
-   handles the dismissal that happens in front of you.
+   THE EXIT (`.vv-announce-shell`'s grid-rows collapse) went with the button
+   that triggered it, since nothing dismisses the bar any more.
 
-   THE KEY IS VERSIONED (`vv-announce:v1`). Dismissal means "I have read
-   this announcement", not "never show me a bar again". Change the copy,
-   bump the version, and it returns for everyone who dismissed the old one.
+   THE ENTRANCE (`announceIn`). The bar used to fade and drop 8px into place
+   at 0.02s, leading the header's `.home-rise` cascade. Nested, that is two
+   entrances playing the same 420ms — the three header zones fading in inside
+   a parent that is itself fading in. The bar is static now and those zones
+   keep their own stagger, which is the motion that was always doing the work.
 
-   `aria-live` is deliberately ABSENT. The bar is present on load rather
-   than arriving later, so announcing it would interrupt a screen reader
-   mid-sentence for something already in the document order. */
+   DROPPING DISMISSAL IS WHAT MAKES THIS A SERVER COMPONENT AGAIN: no state,
+   no effect, no localStorage, no client bundle. It was the only client
+   component in the chrome.
 
-import { useEffect, useState } from "react";
-import { INSTAGRAM_HREF } from "@/lib/site";
+   All of it is one `git revert` away if the announcement returns — and it
+   would return BESIDE the nav rather than above it, which is a layout
+   question this component would have to answer then, not now. */
 
-export const ANNOUNCE_KEY = "vv-announce:v1";
-
-/* Long enough to outlast the 220ms collapse in globals.css with room for a
-   slow frame. The bar is already at opacity 0 well before this fires, so the
-   only thing it delays is the unmount. */
-const EXIT_MS = 400;
-
-export function AnnouncementBar() {
-  const [leaving, setLeaving] = useState(false);
-  const [gone, setGone] = useState(false);
-
-  /* IT ANIMATES OUT, and it has to (2026-08-19). This used to be a bare
-     `if (dismissed) return null`, so a bar that took 420ms to arrive left in
-     a single frame — yanking 43px out of normal flow and shoving the whole
-     page up under the cursor that had just clicked. An entrance without an
-     exit is the jarring change that entrance was there to prevent.
-
-     `announce-off` is deliberately NOT set until the exit finishes: it
-     carries `display: none`, which would delete the bar mid-collapse. Its
-     real job is the next page load, where the inline script in layout.tsx
-     sets it from localStorage before first paint. Storage is written
-     immediately, though, so a navigation mid-animation still counts as
-     dismissed. */
-  useEffect(() => {
-    if (!leaving) return;
-    const t = setTimeout(() => {
-      document.documentElement.classList.add("announce-off");
-      setGone(true);
-    }, EXIT_MS);
-    return () => clearTimeout(t);
-  }, [leaving]);
-
-  if (gone) return null;
-
-  const dismiss = () => {
-    if (leaving) return; // second click during the exit
-    try {
-      window.localStorage.setItem(ANNOUNCE_KEY, "1");
-    } catch {
-      /* private mode / storage disabled — dismiss for this view only */
-    }
-    // Reduced motion gets the old instant removal. A collapsing bar is
-    // movement, and this one carries no meaning that a fade preserves.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      document.documentElement.classList.add("announce-off");
-      setGone(true);
-      return;
-    }
-    setLeaving(true);
-  };
-
-  return (
-    <div className={`vv-announce-shell${leaving ? " is-leaving" : ""}`}>
-    <div className="vv-announce-clip">
-    <div className="vv-announce">
-      <div className="vv-announce-content">
-        <span>
-          We have news to share •{" "}
-          <a
-            href={INSTAGRAM_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="vv-announce-link"
-          >
-            Follow Us ↗
-          </a>
-        </span>
-      </div>
-
-      <button
-        type="button"
-        aria-label="Dismiss announcement"
-        className="vv-announce-close"
-        onClick={dismiss}
-      >
-        <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true">
-          <path
-            d="M1 1l10 10M11 1L1 11"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            fill="none"
-          />
-        </svg>
-      </button>
-      </div>
-      </div>
-    </div>
-  );
+export function AnnouncementBar({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <div className="vv-announce">{children}</div>;
 }

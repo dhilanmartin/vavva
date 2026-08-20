@@ -213,7 +213,7 @@ export default function RootLayout({
             one should not be holding content back for the other either. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;if(localStorage.getItem('vv-announce:v1'))d.classList.add('announce-off');d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
+            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
           }}
         />
         <script
@@ -250,20 +250,38 @@ export default function RootLayout({
             remaining route is reachable from the nav.
 
             This note existed twice, near-verbatim, until 2026-08-14. */}
-        {/* Above the header, in flow, on every route. The landing's header
-            is absolutely positioned over the artwork and offsets itself by
-            `--announce-h` to clear this — see globals.css. */}
-        <AnnouncementBar />
+        {/* THE HEADER STANDS ON THE BAR (2026-08-19). D: "Place the current
+            header components on the announcement bar and remove the current
+            announcement bar copy ... keep the announcement bar how it is
+            (same size) ... and just fit the buttons onto the announcement
+            bar."
 
-        {/* THE POSITIONING CONTEXT FOR THE LANDING'S OVERLAID HEADER. On `/`
-            the header is absolute so the artwork can run under it, and it
-            used to be offset by a hardcoded `--announce-h`. This wrapper
-            starts immediately below the bar, so `top: 0` inside it is
-            already the right place and there is no number to keep in step —
-            the same lesson as the 64/104px chrome arithmetic that was wrong
-            three times before `flex-1` retired it. */}
-        <div className="relative flex flex-1 flex-col">
+            One element of chrome at the top of every route, 43px tall — the
+            bar's own height, unchanged — carrying the links, the mark and
+            Contact. The bar no longer says anything; it is the white field
+            and drop shadow the nav sits on. See AnnouncementBar.tsx for what
+            had to go with the copy (the dismiss button, chiefly: it used to
+            `display: none` this element, which would now delete the site's
+            navigation).
+
+            THE LANDING'S OVERLAID HEADER IS GONE WITH IT, and that is the
+            visible half of the change rather than a side effect. `/` used to
+            run the header absolutely over the artwork — transparent, over a
+            dark scrim, with white links and a white-inverted mark, because
+            no ink colour cleared 4.5:1 against foliage, sky and blossom at
+            once. On an opaque white bar none of that applies, which is what
+            makes the rest of D's ask safe: the mark is red again (6.5:1) and
+            the links are black (21:1). The artwork itself does not move — it
+            already began at the bottom edge of this bar, and it still does.
+            globals.css keeps the contrast measurements at the deleted scrim.
+
+            THE POSITIONING CONTEXT WENT WITH THE OVERLAY. The wrapper that
+            used to hold the header and the page together existed so an
+            absolute `top: 0` would land below the bar with no number to keep
+            in step. Nothing is absolute here any more. */}
+        <AnnouncementBar>
           <Nav />
+        </AnnouncementBar>
 
         {/* ---- the header lamp strip is gone (2026-08-18) ----------------
 
@@ -300,8 +318,7 @@ export default function RootLayout({
             chrome height and was wrong three times: 64, then 104 when the
             lamp strip arrived, then 64 again when it went, then 144 the
             moment a footer was mounted under it. It now just grows. */}
-          <div className="flex flex-1 flex-col">{children}</div>
-        </div>
+        <div className="flex flex-1 flex-col">{children}</div>
 
         {/* Remounted 2026-08-18 ("emulate their footer"), for the first time
             since 2026-08-07 when D removed it. Rebuilt against mimis.nyc's
