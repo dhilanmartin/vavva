@@ -98,16 +98,10 @@ const PRIMARY_LINKS = [
 // is gone with it: .nav-link now owns its own transition (colour + the
 // press transform together), and two transition declarations on one element
 // are resolved by stylesheet order rather than by concatenation order.
-/* Nav is the ledger role now (2026-08-19) — 11px mono, 0.08em, uppercase,
-   the same type as the address, the prices and the footer. It was 16px
-   Satoshi semibold, which was mimis.nyc's nav size measured off their live
-   styles.
-
-   `active` no longer changes the colour, only the underline: --mute is
-   reserved for hover and --red for what does not exist yet, so a third
-   colour meaning would break the rule that makes red legible. See
-   .vv-nav-link in globals.css for the 44px hit area. */
-const navLinkClass = () => "vv-ledger vv-nav-link";
+const navLinkClass = (active: boolean) =>
+  `nav-link inline-block text-[16px] font-semibold uppercase ${
+    active ? "text-[#111] underline" : "text-black no-underline"
+  }`;
 
 /* One nav item, rendered as a real link or as an inert label.
    D, 2026-08-07: "ensure the buttons are still visible on the header even
@@ -141,7 +135,7 @@ function NavItem({
     return (
       <span
         aria-disabled="true"
-        className={`${className} ${navLinkClass()} nav-link-inert`}
+        className={`${className} ${navLinkClass(false)} nav-link-inert`}
       >
         {label}
       </span>
@@ -169,7 +163,7 @@ function NavItem({
       href={target}
       aria-current={isCurrent ? "page" : undefined}
       onClick={onNavigate}
-      className={`${className} ${navLinkClass()}`}
+      className={`${className} ${navLinkClass(isCurrent)}`}
     >
       {label}
     </Link>
@@ -185,7 +179,7 @@ export function Nav() {
   }));
 
   return (
-    <header className="relative z-20">
+    <header className="relative z-20 bg-[var(--paper)]">
       {/* THE MARK IS ABSOLUTELY CENTRED, and the side zones size to their own
           content. This replaced three `flex-1` zones, which looked like the
           right way to centre a mark and failed at a specific band of widths.
@@ -239,7 +233,7 @@ export function Nav() {
           <ul className="hidden items-center gap-5 tablet:flex">
             {links.map((link) => (
               <li key={link.href}>
-                <NavItem {...link} className="" />
+                <NavItem {...link} className="leading-5" />
               </li>
             ))}
           </ul>
@@ -249,7 +243,7 @@ export function Nav() {
           <Link
             href="/"
             aria-label="Vavva — home"
-            className="vv-mark-link home-rise pointer-events-auto"
+            className="home-rise pointer-events-auto flex items-center"
             style={{ ["--i" as string]: 1 }}
           >
           {/* Sized by HEIGHT, not width: a nav bar sizes marks by height,
@@ -306,7 +300,7 @@ export function Nav() {
               So: the header is the same size as mimis' (the ask), and the
               mark is the size this repo has now decided on twice. See not-found.tsx for the one other file
               that has to know the bar height. */}
-            <VavvaMark className="vv-mark-ink h-[31px] w-auto" />
+            <VavvaMark className="h-[31px] w-auto" />
           </Link>
         </div>
 
@@ -341,7 +335,7 @@ export function Nav() {
               href={CONTACT_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className={navLinkClass()}
+              className={`leading-5 ${navLinkClass(false)}`}
             >
               Contact
             </a>
@@ -367,7 +361,7 @@ export function Nav() {
               <li key={link.href} style={{ ["--i" as string]: i }}>
                 <NavItem
                   {...link}
-                  className="block"
+                  className="block leading-[32px]"
                   onNavigate={() => setOpen(false)}
                 />
               </li>
@@ -378,7 +372,7 @@ export function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
-                className={`block ${navLinkClass()}`}
+                className={`block leading-[32px] ${navLinkClass(false)}`}
               >
                 Contact
               </a>

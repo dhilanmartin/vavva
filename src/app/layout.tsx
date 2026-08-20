@@ -1,16 +1,33 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import { AnnouncementBar } from "@/components/announce/AnnouncementBar";
 import { Nav } from "@/components/nav/Nav";
 import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
-/* Two faces, both self-hosted in globals.css: Satoshi (display, statement,
-   body) and Geist Mono (the ledger role). No next/font loader here any more.
+/* INTER, and it is the only face on the site (2026-08-19).
 
-   Newsreader is gone as of 2026-08-19. It existed only as the fallback under
-   GT Alpina, GT Alpina is gone with the DESIGN.md rewrite — trial files, and
-   a face borrowed from mimis.nyc rather than chosen for this house — and a
-   font loaded to stand in for a font nothing loads is a third family in all
-   but name. Display type is Satoshi 700 cut tight. See globals.css. */
+   D: "id rather have u use the same font for the page/footer as im using in
+   my other project (prismarineco)". This is that project's exact loader —
+   next/font/google, latin subset, the optical-size axis requested explicitly,
+   exposed as a CSS variable and self-hosted at build time so no request
+   leaves the origin at runtime.
+
+   `opsz` is the reason this is worth doing properly rather than naming Inter
+   in a font stack: Inter ships real optical cuts, so the 48px page titles get
+   a different master than the 14px nav rather than one compromise outline
+   scaled up and down.
+
+   It replaces two faces at once — Satoshi (the sans) and GT Alpina (the
+   serif display, whose files were trial cuts). Hierarchy that used to come
+   from switching family now comes from the weight axis, which is what
+   Prismarine does too. */
+const inter = Inter({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 /* ---- Literata, and why it is no longer loaded ----------------------------
 
@@ -114,7 +131,7 @@ export const viewport: Viewport = {
   // read a CSS custom property; it went white with the palette on
   // 2026-08-07. Left stale it would tint mobile browser chrome grey against
   // a white page.
-  themeColor: "#FAF8F4",
+  themeColor: "#FFFFFF",
   colorScheme: "light",
 };
 
@@ -126,7 +143,11 @@ export default function RootLayout({
   return (
     // The intro script stamps `intro-js` / `intro-go` on <html> before hydration,
     // so the server markup can't match — that mismatch is the point, not a bug.
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={inter.variable}
+      suppressHydrationWarning
+    >
       <head>
         {/* THE HEADER-DISAPPEARS BUG (found and fixed 2026-08-14).
             D: "there seems to be a bug with how the vavva header is loading."
@@ -192,7 +213,7 @@ export default function RootLayout({
             one should not be holding content back for the other either. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
+            __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;if(localStorage.getItem('vv-announce:v1'))d.classList.add('announce-off');d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
           }}
         />
         <script
@@ -202,7 +223,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="vv-paper flex min-h-svh flex-col">
+      <body className="flex min-h-svh flex-col">
         {/* Nav stays — persistent, route-agnostic chrome on every page.
 
             NO FOOTER, and it is settled rather than pending. Removed
@@ -232,6 +253,7 @@ export default function RootLayout({
         {/* Above the header, in flow, on every route. The landing's header
             is absolutely positioned over the artwork and offsets itself by
             `--announce-h` to clear this — see globals.css. */}
+        <AnnouncementBar />
 
         {/* THE POSITIONING CONTEXT FOR THE LANDING'S OVERLAID HEADER. On `/`
             the header is absolute so the artwork can run under it, and it

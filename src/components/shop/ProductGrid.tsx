@@ -1,4 +1,4 @@
-import { ProductTile } from "./ProductTile";
+import { ComingSoonTile, ProductTile } from "./ProductTile";
 import trio from "../../assets/house-pbj-trio.png";
 import teeScript from "../../assets/products/tee-script.jpg";
 import teeFairies from "../../assets/products/tee-fairies.jpg";
@@ -76,7 +76,6 @@ const PRODUCTS = [
     image: trio,
     alt: "Three foil-wrapped House PB&J sandwich bars stacked — gold, red and purple.",
     price: "$15",
-    when: "Fall 2026",
     variants: ["PB", "PB&J", "Jam"],
   },
   {
@@ -84,7 +83,6 @@ const PRODUCTS = [
     image: teeScript,
     alt: "White cotton tee with the Vavva brush wordmark printed in red across the chest.",
     price: "$65",
-    when: "Fall 2026",
     variants: ["S", "M", "L", "XL"],
   },
   {
@@ -92,7 +90,6 @@ const PRODUCTS = [
     image: teeFairies,
     alt: "White cotton tee with two blue fairies printed at centre chest.",
     price: "$65",
-    when: "Fall 2026",
     variants: ["S", "M", "L", "XL"],
   },
   {
@@ -100,7 +97,6 @@ const PRODUCTS = [
     image: teeDobermans,
     alt: "White cotton tee with three black dobermans printed at centre chest.",
     price: "$65",
-    when: "Fall 2026",
     variants: ["S", "M", "L", "XL"],
   },
   {
@@ -108,7 +104,6 @@ const PRODUCTS = [
     image: teeGrid,
     alt: "White cotton tee printed with a dense grid of small multicoloured figures.",
     price: "$65",
-    when: "Fall 2026",
     variants: ["S", "M", "L", "XL"],
   },
   {
@@ -116,7 +111,6 @@ const PRODUCTS = [
     image: teeBlankBlack,
     alt: "Black cotton tee with no print.",
     price: "$65",
-    when: "Fall 2026",
     variants: ["S", "M", "L", "XL"],
   },
 ];
@@ -176,23 +170,12 @@ const PRODUCTS = [
    eager-loading a below-fold image. */
 const EAGER_TILES = 6;
 
-/* THE SECOND ROW OF SIX EMPTY "COMING SOON" TILES IS GONE (2026-08-19).
-
-   It was added at D's request and it doubled the page, but what it doubled
-   was nothing: six identical grey rectangles labelled with the same two
-   words. DESIGN.md anti-pattern #6 — never pad a page or a grid with blanks
-   to reach a target height or column count — was written from looking at
-   exactly this. A catalogue padded with blanks advertises how little is in
-   it; six finished objects, larger, do the opposite.
-
-   The grid also went from six columns at 5px gutters to three at 24px. Six
-   was Stussy's density, and Stussy is filling it with a few hundred tees. */
-
 // One desktop row of empty slots under the catalogue.
+const COMING_SOON_SLOTS = 6;
 
 export function ProductGrid() {
   return (
-    <div className="grid grid-cols-2 gap-x-6 gap-y-14 tablet:grid-cols-3">
+    <div className="grid grid-cols-2 gap-x-[5px] gap-y-10 tablet:grid-cols-3 desktop:grid-cols-6 desktop:gap-y-[30px]">
       {PRODUCTS.map((product, i) => (
         <ProductTile
           key={product.name}
@@ -200,6 +183,9 @@ export function ProductGrid() {
           eager={i < EAGER_TILES}
           index={i}
         />
+      ))}
+      {Array.from({ length: COMING_SOON_SLOTS }).map((_, i) => (
+        <ComingSoonTile key={`soon-${i}`} index={PRODUCTS.length + i} />
       ))}
     </div>
   );

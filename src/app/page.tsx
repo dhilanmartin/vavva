@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { ComingSoon } from "@/components/glitch/ComingSoon";
 import { Petals } from "@/components/hero/Petals";
-import { LedgerLine } from "@/components/chrome/LedgerLine";
 import skyline from "../assets/nyc-skyline-lander.png";
 
 /* Landing.
@@ -133,14 +132,6 @@ export default function HomePage() {
           draggable={false}
           placeholder="blur"
         />
-      </div>
-
-      {/* The chrome's second half. The wordmark is in the shared header
-          above; this is the line that runs under it, and the same line opens
-          every interior page. It is what makes the plate and the paper one
-          site — see components/chrome/LedgerLine.tsx. */}
-      <div className="vv-hero-ledger home-rise" style={{ ["--i" as string]: 2 }}>
-        <LedgerLine />
       </div>
 
       <Petals />
