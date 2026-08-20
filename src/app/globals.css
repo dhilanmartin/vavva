@@ -43,18 +43,6 @@
      case instead of managing it, and it buys the accent a meaning. */
   --red: #b32622;
   --red-rgb: 179 38 34;
-  /* The same accent on a dark ground, NOT a second hue — anti-pattern #5 is
-     about introducing another colour meaning, and this carries the identical
-     one (what does not exist yet) on the only surface in the site that is
-     dark: the artwork plate.
-
-     #B32622 is a 0.111-luminance red built to sit on 0.95 paper. On the
-     scrimmed sky it lands near the background's own value and stops reading
-     as an accent at all. This is that red lifted in value and desaturated
-     just enough to hold at 11px, the way a dark-mode variant of a brand
-     colour works. If red ever appears on a third kind of ground, it gets a
-     third value of THIS token — never a new colour. */
-  --red-on-dark: #ff6b66;
   /* Two ease-out curves, and they are NOT interchangeable — the split is the
      point, which is why both are tokens now instead of one token and five
      hand-typed copies of the other (they were literals at six call sites
@@ -2688,14 +2676,22 @@ html:has(.home-stage) .vv-hero-ledger {
   text-align: center;
 }
 
-/* The date keeps its red over the artwork. #B32622 on the darkened sky is a
-   weaker separation than the white beside it, which is acceptable here and
-   only here: it is a four-word annotation sitting inside a line whose other
-   three quarters are white, so the line stays readable even if that word is
-   the quietest part of it. The alternative — dropping red on the plate — is
-   worse, because the rule "red means not yet" is easier to read as a system
-   when it holds on every page. */
+/* NO RED ON THE PLATE. The date renders white with the rest of the line.
+
+   This started as brand red, then as a lightened dark-ground tint
+   (--red-on-dark, #FF6B66) so it would survive the sky. Measured against the
+   actual artwork pixels behind the line — rgb(10,76,150) after the scrim —
+   that tint lands at 3.02:1, and the floor for 12px type is 4.5:1. Clearing
+   it needs roughly #FFA89E, which is a pale pink at that size, not a red.
+
+   So the rule is stated more precisely instead of being bent: RED MARKS THE
+   NOT-YET IN TYPE, and the plate has no red type. The landing already says
+   "not yet" louder than any colour could — the sign in the middle of it
+   reads Coming Soon on a green plate at 30px. The white line measures
+   8.42:1 on the same sky.
+
+   That also retires --red-on-dark entirely, which keeps the palette at one
+   red and honours anti-pattern #5. */
 .vv-hero-ledger .vv-ledger-red {
-  color: var(--red-on-dark);
-  text-shadow: 0 1px 3px rgba(4, 12, 20, 0.8);
+  color: inherit;
 }
