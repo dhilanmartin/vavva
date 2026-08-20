@@ -54,20 +54,31 @@ and it passes the arbitration test: it states a place and a time.
 
 ## Type
 
-Two faces. Four roles. No exceptions.
+**One face. Four roles. No exceptions.**
 
-| Role | Face | Spec | Used for |
-|---|---|---|---|
-| **Display** | Satoshi 700 | 56px / 1.0 / `-0.035em` — 36px / 1.05 mobile | One per page. The page's name. |
-| **Statement** | Satoshi 400 | 22px / 1.4 / `-0.01em`, 34em measure | The single sentence that carries the page. |
-| **Body** | Satoshi 400 | 16px / 1.55 / `0em`, 34em measure | Prose. |
-| **Ledger** | Mono 500 | 11px / 1.2 / `0.08em`, uppercase | Address, date, price, status, nav, labels, footer. |
+| Role | Spec | Used for |
+|---|---|---|
+| **Display** | Satoshi 700 · 56px / 1.0 / `-0.035em` — 36px / 1.05 mobile | One per page. The page's name. |
+| **Statement** | Satoshi 400 · 22px / 1.4 / `-0.01em`, 34em measure | The single sentence that carries the page. |
+| **Body** | Satoshi 400 · 16px / 1.55 / `0em`, 34em measure | Prose. |
+| **Ledger** | Satoshi 500 · 12px / 1.2 / `0.08em`, uppercase | Address, date, price, status, nav, labels, footer. |
 
 **The ledger is the spine of the system.** One size, one weight, one tracking,
 everywhere. Address, price, nav item, product label, status, copyright — all the
-same. A mono ledger reads as *record* rather than *marketing*, which is the correct
-register for a place that has nothing to sell yet. Dimes runs its entire navigation
-this way; ALD runs its place-and-time line this way.
+same. It reads as *record* rather than *marketing*, which is the correct register
+for a place that has nothing to sell yet. Dimes runs its entire navigation in this
+role; ALD runs its place-and-time line in it.
+
+The ledger shipped as a mono for about an hour and was pulled. The reasoning for a
+mono was sound on paper — a monospaced face reads as a ledger by default — but on
+the landing that one line is the *only* text on the page, so the mono became the
+entire voice of the site and read as a terminal rather than as a plaque. **The
+register comes from the size, the caps and the tracking far more than from the
+face.** Stussy and mimis both set exactly these labels in a sans.
+
+That leaves the site on one face, which is a better outcome than the two-face plan
+it replaced and costs nothing: every role above is a size, a weight and a tracking
+of Satoshi.
 
 Measure is set in `em`, never `ch` — Satoshi's zero glyph is wide, and a `ch`-based
 measure resolves far longer than intended (`62ch` measured 88 characters here).
@@ -75,14 +86,17 @@ measure resolves far longer than intended (`62ch` measured 88 characters here).
 
 ### Font loading
 
-Both faces are self-hosted `woff2`, served from `/public/fonts`, with no request to
-an external host. **GT Alpina is removed** — it was a Grilli Type *trial* file
-(embedded name `GT Alpina Trial`), trial licences cover evaluation only, and the
-face came from mimis.nyc rather than from Vavva. Display type is Satoshi 700, tight.
+Satoshi is self-hosted `woff2` from `/public/fonts`, with no request to an external
+host. It is the only face loaded.
 
-The mono must be self-hosted `woff2` on the same terms. Verify the loading approach
-against `node_modules/next/dist/docs/` before wiring it — this Next version's font
-conventions differ from older ones.
+**GT Alpina is removed** — the shipped files were Grilli Type *trial* cuts (embedded
+name `GT Alpina Trial`), trial licences cover evaluation only, and the face came
+from mimis.nyc rather than from Vavva. Display type is Satoshi 700, cut tight.
+
+If a second face is ever added, it must be self-hosted `woff2` on the same terms,
+and it has to earn its place against the four roles above rather than beside them.
+Verify the loading approach against `node_modules/next/dist/docs/` — this Next
+version's font conventions differ from older ones.
 
 ---
 
@@ -234,6 +248,7 @@ apologised for.
 |---|---|
 | Announcement bar | Copied from shadowlion.com; announced news that does not exist. |
 | GT Alpina | Trial licence; came from mimis.nyc, not from Vavva. |
+| A mono ledger | Became the site's whole voice on the landing. Register comes from size and tracking, not the face. |
 | 6-column / 5px product grid | Stussy's outlet density applied to a six-item lookbook. Now 3-up desktop, 2-up mobile, 24px gutters. |
 | Six empty COMING SOON tiles | Advertised thinness. |
 | Equal-thirds footer | Copied from mimis.nyc. Now one ledger line above a hairline. |
