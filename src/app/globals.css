@@ -1940,14 +1940,27 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
    tears the sign, the exposed copy is at a different point in the drift than
    the one it tore out of, so the surface disagrees with itself along the
    seam. */
+/* The keyline scales with the type (2026-08-19). Two inset shadows carve it
+   rather than a border, because a real border sits outside the radius and
+   reads as a stroke instead of as the enamel edge of a plate. */
 .gw-badge {
   background-color: #00693e;
   box-shadow:
-    inset 0 0 0 3px #00693e,
-    inset 0 0 0 5px #ffffff,
+    inset 0 0 0 4px #00693e,
+    inset 0 0 0 7px #ffffff,
     0 1px 2px rgba(0, 32, 18, 0.26),
     0 6px 14px -6px rgba(0, 32, 18, 0.32);
   animation: gwDrift 14s linear infinite;
+}
+
+@media (min-width: 810px) {
+  .gw-badge {
+    box-shadow:
+      inset 0 0 0 5px #00693e,
+      inset 0 0 0 9px #ffffff,
+      0 2px 4px rgba(0, 32, 18, 0.26),
+      0 10px 22px -8px rgba(0, 32, 18, 0.32);
+  }
 }
 
 @keyframes gwDrift {
@@ -2184,8 +2197,19 @@ html:has(.home-stage) .nav-toggle span span {
    The honest fix remains the artwork. A dusk sky would put warm amber under
    the red instead of cerulean, which fixes this without touching the mark —
    see the prompt already handed over. */
+/* Over the artwork the mark inverts to paper instead of ink, with the nav
+   links beside it — this is the case the header scrim above was already
+   built for. `brightness(0) invert(1)` rather than shipping a second white
+   PNG: one asset to keep in step.
+
+   The dark drop-shadow stays. It is what separates white strokes from bright
+   sky, and it is depth rather than the white sticker-halo D rejected earlier.
+
+   This overrides .vv-mark-ink, which is the interior treatment; both set
+   `filter` and this selector is the more specific one. */
 html:has(.home-stage) header a[aria-label="Vavva — home"] img {
-  filter: drop-shadow(0 1px 2px rgba(4, 12, 20, 0.55))
+  filter: brightness(0) invert(1)
+    drop-shadow(0 1px 2px rgba(4, 12, 20, 0.55))
     drop-shadow(0 0 10px rgba(4, 12, 20, 0.45));
 }
 
@@ -2220,12 +2244,38 @@ html:has(.home-stage) footer {
   text-align: center;
   /* .9rem — theirs exactly. */
   font-size: 0.9rem;
-  /* EXPLICIT, so the bar is exactly 45px: 12px padding + 21px line + 12px
-     padding. Left to `normal` it inherited Satoshi's own ~1.5 and the bar
-     came out 45.6px, which D read as a couple of pixels too tall against the
-     reference. A declared line-height also means the height stops depending
-     on which face is loaded — the fallback would have shifted it again. */
-  line-height: 21px;
+  /* EXPLICIT, and now their number rather than a guess at it: the bar is
+     43px — 12px padding + a 19.44px line + 12px padding.
+
+     Their rule declares NO line-height, so theirs is whatever `normal`
+     resolves to in the face they serve, and that is why ours kept missing.
+     It was 21px here (45px total) because our Satoshi cut resolves `normal`
+     to ~1.5em, and 45px was picked to sit just under the 45.6px that
+     produced. D read the result as still 2-3px too tall, twice.
+
+     Measured, not estimated (2026-08-19). Their served bundle is
+     _next/static/css/c88a16862734c6ca.css, `AnnouncementBar_bar`: padding
+     .75rem 1.5rem, font-size .9rem, no line-height. The face under it is
+     their own Satoshi OTF (_next/static/media/6c3b16f6d0ef383f-s.p.otf,
+     weight 500), whose hhea metrics are ascent 1010, descent -240, lineGap
+     100 on a 1000 upm — 1.35em, so 19.44px at 14.4px, and a 43.44px bar.
+
+     Confirmed by rendering rather than by arithmetic, since their live site
+     still refuses to paint headless: their rules and their OTF reproduced in
+     a local page report getBoundingClientRect().height === 43 (Chrome snaps
+     the 19.44px line box to 19) and paint 43 full white rows. This bar now
+     paints the same 43.
+
+     The fraction is kept rather than rounded to 19px because engines that
+     lay out in fractions resolve THEIR `normal` to the same 19.44, and a
+     declared 19 would sit 0.44px under them there.
+
+     DECLARED IN PX, NOT INHERITED, and the font swap that landed the same
+     day is the proof of why: the site is Inter now, whose `normal` is
+     ~1.21em — 17.4px here, a 41px bar, 2px UNDER theirs in the other
+     direction. Their bar's height is a fact about their face; ours has to
+     be stated, or it tracks whichever face this site happens to load. */
+  line-height: 19.44px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -2257,7 +2307,7 @@ html.announce-off .vv-announce {
 
    Opacity and an 8px drop, NOT a slide from -100%. The bar sits in normal
    flow at the top of the document, so translating it its own full height
-   would expose 45px of whatever is behind it — the artwork on the landing —
+   would expose 43px of whatever is behind it — the artwork on the landing —
    and read as a gap opening rather than a bar arriving. A short drop into
    its own box has no such hole.
 
@@ -2289,7 +2339,7 @@ html.intro-go .vv-announce {
    line — theirs has no dismiss, so the text is centred on the bar, not on
    the space left over beside a button.
 
-   36px square: over the 24px WCAG 2.5.8 floor without crowding a 45px bar.
+   36px square: over the 24px WCAG 2.5.8 floor without crowding a 43px bar.
    The glyph inside is 11px; the target is the padding around it. */
 .vv-announce-close {
   position: absolute;
@@ -2598,4 +2648,26 @@ html.intro-go .vv-announce {
 
 .doc-text:last-child {
   margin-bottom: 0;
+}
+
+/* ---- the wordmark, in ink -----------------------------------------------
+   Restored 2026-08-19 at D's request, after a revert took it back to red.
+
+   The mark is a PNG of a red brush stroke, so "make it ink" is a filter
+   rather than a colour swap — there is no ink cut of the artwork.
+
+   `brightness(0)` maps every channel to zero while leaving alpha alone,
+   which gives a true silhouette of the stroke rather than a darkened red.
+   `invert(6.7%)` then lifts pure black to exactly #111111 (0.067 x 255 = 17),
+   so the mark lands on the same ink as every other piece of type on the site
+   instead of being the one #000 thing on the page.
+
+   WHY NOT RED: #B32622 and the artwork's sky sit at almost the same
+   luminance (0.111 against roughly 0.15 after the scrim), and contrast is a
+   measure of value, not hue. That is why the mark read at 1.29:1 there and
+   why none of the three previous attempts to rescue it — a white glow, then
+   a dark shadow, then more size — moved the number. Inverting the mark
+   moves it to 6.65:1 because it changes the value rather than the surround. */
+.vv-mark-ink {
+  filter: brightness(0) invert(6.7%);
 }
