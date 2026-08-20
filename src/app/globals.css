@@ -10,37 +10,17 @@
      whole ramp re-derived against white on its own — no other value in this
      file changed. --ink lands on #1A1A1A, which is exactly the reference's
      own body colour. That is why the palette was built as relationships. */
-  /* Warm paper, not pure white (2026-08-19, DESIGN.md "Colour"). #fff is a
-     screen default rather than a chosen ground; every reference that reads
-     as a made object — Dimes, Kinfolk, ALD — sits on a warmed off-white.
-     This is the ground of every INTERIOR page. The landing is a plate and
-     has no paper at all. */
-  --paper: #faf8f4;
-  /* One flat ink, not an alpha ramp. The ramp existed so tokens could
-     re-derive against a changing background; the background is settled now,
-     and a ramp is how "which black is this" becomes a question. 15.9:1 on
-     --paper. */
-  --ink: #111111;
-  /* Hairlines and tile edges — the ONLY structural line in the system. */
-  --rule: #e2ded6;
+  --paper: #fff;
+  --ink: rgba(0, 0, 0, 0.9);
   /* 0.55 is the floor: at 0.45 this rendered 3.24:1 on the paper, under the
      4.5:1 AA minimum for 15px body — and the resting CTA uses this token. */
-  /* Ledger secondary ONLY — never prose. 5.3:1 on --paper. */
-  --mute: #6b6b6b;
+  --mute: rgba(0, 0, 0, 0.55);
   /* Body copy sits one step below headings, the same relationship mimis.nyc
      sets with #000 headings over #222 body — kept as a relationship against
      this house's paper rather than importing their two hexes. 0.80 on
      --paper is 11.5:1, comfortably past AA at the 14px the scale uses. */
   --ink-body: rgba(0, 0, 0, 0.8);
-  /* RESERVED: red marks only what does not exist yet — FALL 2026, OPEN SOON,
-     COMING SOON, a price with no way to be paid. Nothing else is ever red,
-     including the wordmark (DESIGN.md "Red means not yet").
-
-     The wordmark was red until 2026-08-19. Over the daylight artwork it
-     measured 1.39:1, and every structural fix for that — deeper scrim, drop
-     shadow, a chrome band behind it — was a way of fighting the artwork
-     rather than a way of being legible. Taking the mark to ink deletes the
-     case instead of managing it, and it buys the accent a meaning. */
+  /* Sampled from the brush wordmark — the one accent the house prints in. */
   --red: #b32622;
   --red-rgb: 179 38 34;
   /* Two ease-out curves, and they are NOT interchangeable — the split is the
@@ -129,11 +109,14 @@
      — ComingSoon.tsx uses that class, and it would otherwise fall back to
      Tailwind's default stack and quietly set a different face than the rest
      of the site. */
-  --font-sans: "Satoshi", ui-sans-serif, system-ui, -apple-system,
+  /* ONE FAMILY. --font-serif is kept as a name because call sites across the
+     site still say `font-serif` for their display type, but it resolves to
+     Inter too — the hierarchy comes from weight and size, not from a second
+     face. Deleting the token would silently drop those headings to Tailwind's
+     default serif stack, which is worse than an honest alias. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
-  /* No --font-serif and no --font-mono. The system is ONE face: every role
-     is a size, a weight and a tracking of Satoshi. A token naming a family
-     nothing loads is how a second one creeps back. */
+  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ---- GT Alpina, installed 2026-08-18 -------------------------------------
@@ -186,32 +169,25 @@
 
    To revert: delete this block, put the next/font Inter loader back in
    layout.tsx, and drop --font-sans below. */
-@font-face {
-  font-family: "Satoshi";
-  src: url("/fonts/Satoshi-Variable.woff2") format("woff2-variations");
-  font-weight: 300 900;
-  font-style: normal;
-  font-display: swap;
-}
+/* NO @font-face HERE ANY MORE (2026-08-19).
 
-/* ---- GT Alpina was here, and why it is gone --------------------------
+   The site is set in INTER, loaded through `next/font/google` in layout.tsx
+   and self-hosted at build time, so there is no runtime font request and
+   nothing to declare here. This is the same setup the Prismarine site uses,
+   at D's instruction: "use the same font for the page/footer as im using in
+   my other project (prismarineco)".
 
-   Removed the same day. Two reasons, either sufficient:
+   What this replaced, so the history is not lost:
 
-   The files were TRIAL cuts. `strings` on both .otf files returns the
-   embedded names `GT Alpina Trial Regular` / `GTAlpinaTrial-Bold` — Grilli
-   Type trial licences cover evaluation and mockups, never a public domain,
-   and these were deployed. D holds a purchased licence; the licensed webfont
-   package is a separate download and was never the thing in this folder.
+     Satoshi-Variable.woff2   the sans, self-hosted from Fontshare
+     GT-Alpina-*.otf          the serif display face, and TRIAL cuts —
+                              `strings` returns the embedded name
+                              "GT Alpina Trial", which is evaluation-only
+                              licensing and was deployed
 
-   And it was mimis.nyc's face, identified by reading their live @font-face
-   table and adopted because it was theirs. That is the borrowing habit
-   DESIGN.md now names as anti-pattern #1. Display type is Satoshi 700 cut
-   tight — a face this site already owns, doing a job it can do.
-
-   To restore a serif display: add the @font-face here, add the family to
-   --font-serif in @theme, and point .vv-display at it. Nothing else. */
-
+   Both files are deleted from public/fonts/. Inter covers both roles: it is a
+   variable master, so display weight comes from the weight axis rather than
+   from a second family. */
 
 * {
   box-sizing: border-box;
@@ -913,13 +889,42 @@ html.intro-js .scroll-reveal.reveal-stagger {
    The face is installed. This is that line, changed. If the fonts ever come
    back out (see the trial-licence warning at the top of this file), 440 is
    the number to restore along with them. */
+/* WEIGHT 520, NOT 400, NOW THAT THIS IS INTER (2026-08-19).
+
+   400 was correct while these roles were set in a serif: GT Alpina's regular
+   carries real stroke contrast, so at 48px it has presence at its own regular
+   weight. Inter is a grotesque with even strokes and no contrast, and the
+   same 400 at the same size reads thin and unfinished — the letterforms have
+   nothing to hold the eye with.
+
+   520 is Prismarine's display weight, and it is deliberately non-round: Inter
+   is a variable master, so 520 is a real interpolated instance rather than a
+   rounding of 500, and the extra 20 is what closes the gap without tipping
+   into semibold. Same reasoning that file records for its own scale.
+
+   Tracking goes with it. Inter is drawn loose for UI at small sizes, so it
+   needs a tighter negative at display sizes than a serif does; -0.022em is
+   Prismarine's --letter-spacing-xl and it is the value that stops 48px Inter
+   reading as spaced-out. The per-role tracking further down this file is
+   overridden for the two heading roles below. */
 .mimi-display,
 .mimi-title,
 .mimi-lead {
   font-family: var(--font-serif);
-  font-weight: 400;
+  font-weight: 520;
   color: var(--ink);
   text-align: center;
+}
+
+.mimi-display,
+.mimi-title {
+  letter-spacing: -0.022em;
+}
+
+/* The lead is 26px — inside the band where Inter still wants a negative, but
+   a smaller one. */
+.mimi-lead {
+  letter-spacing: -0.014em;
 }
 
 /* `balance` on the two heading roles only — NOT on .mimi-lead, which sits
@@ -1935,32 +1940,14 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
    tears the sign, the exposed copy is at a different point in the drift than
    the one it tore out of, so the surface disagrees with itself along the
    seam. */
-/* MUTCD green is the ONE licensed object colour (DESIGN.md "The one
-   licensed object"). It is not a system token and it appears nowhere else —
-   not as a background, not as a link, not as an accent. Green outside this
-   badge is a bug.
-
-   The two inset shadows are what carve the white keyline: a real border
-   would sit outside the radius and read as a stroke rather than as the
-   enamel edge of a plate. They scale with the type below. */
 .gw-badge {
   background-color: #00693e;
   box-shadow:
-    inset 0 0 0 4px #00693e,
-    inset 0 0 0 7px #ffffff,
+    inset 0 0 0 3px #00693e,
+    inset 0 0 0 5px #ffffff,
     0 1px 2px rgba(0, 32, 18, 0.26),
     0 6px 14px -6px rgba(0, 32, 18, 0.32);
   animation: gwDrift 14s linear infinite;
-}
-
-@media (min-width: 810px) {
-  .gw-badge {
-    box-shadow:
-      inset 0 0 0 5px #00693e,
-      inset 0 0 0 9px #ffffff,
-      0 2px 4px rgba(0, 32, 18, 0.26),
-      0 10px 22px -8px rgba(0, 32, 18, 0.32);
-  }
 }
 
 @keyframes gwDrift {
@@ -2152,12 +2139,12 @@ html:has(.home-stage) header {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html:has(.home-stage) .vv-nav-link {
+html:has(.home-stage) .nav-link {
   color: #fff;
 }
 
-html:has(.home-stage) .nav-panel .vv-nav-link {
-  color: var(--ink);
+html:has(.home-stage) .nav-panel .nav-link {
+  color: #000;
 }
 
 html:has(.home-stage) .nav-toggle span span {
@@ -2197,25 +2184,8 @@ html:has(.home-stage) .nav-toggle span span {
    The honest fix remains the artwork. A dusk sky would put warm amber under
    the red instead of cerulean, which fixes this without touching the mark —
    see the prompt already handed over. */
-/* ---- 2026-08-19: the mark is no longer red anywhere -------------------
-
-   The two passes above are the full history of trying to make a red mark
-   legible on a bright sky — a white glow, then a dark shadow, then more
-   size. Both were real improvements to a case that should not have existed.
-   D's call on the new colour system retires it: red is reserved for what
-   does not exist yet, and the studio's own name is not that.
-
-   Over the artwork the mark inverts to paper with the nav links, which is
-   the case the scrim above was already built for. `brightness(0) invert(1)`
-   rather than a second white PNG: one asset. The dark drop-shadow stays —
-   it is what separates white strokes from bright sky, and it is depth
-   rather than the sticker-halo D rejected.
-
-   This overrides .vv-mark-ink, which is the interior treatment. Both are
-   `filter`, and this selector is the more specific one. */
 html:has(.home-stage) header a[aria-label="Vavva — home"] img {
-  filter: brightness(0) invert(1)
-    drop-shadow(0 1px 2px rgba(4, 12, 20, 0.55))
+  filter: drop-shadow(0 1px 2px rgba(4, 12, 20, 0.55))
     drop-shadow(0 0 10px rgba(4, 12, 20, 0.45));
 }
 
@@ -2227,17 +2197,180 @@ html:has(.home-stage) footer {
   display: none;
 }
 
-/* The announcement bar was here, and is gone (2026-08-19).
+/* ---- the announcement bar (components/announce/AnnouncementBar.tsx) ------
 
-   It was shadowlion.com's, reproduced from their served CSS down to the
-   45px height and the 0.9rem/500 of the label, and it said "We have news to
-   share". There was no news. Under the new arbitration test — does this
-   state a fact about the place, the goods, or the date? — it states nothing,
-   and it cost the landing a hard white slab across the top of the artwork.
+   Every value below is shadowlion.com's own, read out of their served CSS
+   bundle rather than estimated from a screenshot — their site blocks
+   automated rendering, so measuring it live was not available. See
+   AnnouncementBar.tsx for the source rules and the one deliberate departure.
 
-   What replaced it is the ledger line: MERCER ST · SOHO · NEW YORK ·
-   FALL 2026, over the artwork rather than above it, in the same chrome that
-   opens every interior page. See components/chrome/LedgerLine.tsx. */
+   The bar carries NO height variable any more. The landing's overlaid header
+   used to offset itself by an `--announce-h` that had to be kept in step with
+   whatever this bar's padding and type actually produced; layout.tsx now
+   wraps the header and the page in a positioning context that already starts
+   below the bar, so `top: 0` is correct by construction. */
+.vv-announce {
+  position: relative;
+  z-index: 40;
+  width: 100%;
+  /* .75rem 1.5rem */
+  padding: 12px 24px;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  /* .9rem — theirs exactly. */
+  font-size: 0.9rem;
+  /* EXPLICIT, so the bar is exactly 45px: 12px padding + 21px line + 12px
+     padding. Left to `normal` it inherited Satoshi's own ~1.5 and the bar
+     came out 45.6px, which D read as a couple of pixels too tall against the
+     reference. A declared line-height also means the height stops depending
+     on which face is loaded — the fallback would have shifted it again. */
+  line-height: 21px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- the bar is the LANDING's, not the site's (2026-08-18) ---------------
+
+   D: "remove the We have news to share ... on every other page but the home."
+
+   Hidden with the same `:has(.home-stage)` test the landing's transparent
+   header and hidden footer already use, rather than a `usePathname()` branch
+   in layout.tsx — that would make the root layout a client component and
+   paint the bar for one frame on every route before hydration removed it.
+
+   The markup still ships on every page and is display:none off the landing.
+   That is the cost of doing it in CSS: one hidden anchor in the DOM
+   site-wide. If that ever matters, the fix is a route group with its own
+   layout, not a JS route check. */
+html:not(:has(.home-stage)) .vv-announce {
+  display: none;
+}
+
+/* Dismissed. Stamped on <html> by the inline script in layout.tsx BEFORE
+   first paint, so a bar that was closed on a previous visit is never painted
+   and then removed — see AnnouncementBar.tsx. */
+html.announce-off .vv-announce {
+  display: none;
+}
+
+/* ---- the bar arrives ------------------------------------------------------
+
+   Opacity and an 8px drop, NOT a slide from -100%. The bar sits in normal
+   flow at the top of the document, so translating it its own full height
+   would expose 45px of whatever is behind it — the artwork on the landing —
+   and read as a gap opening rather than a bar arriving. A short drop into
+   its own box has no such hole.
+
+   Gated on `intro-js`/`intro-go` like every other entrance here, which also
+   means a page loaded into a background tab (where the script backs out)
+   renders the bar plainly rather than leaving it at opacity 0. It leads the
+   header's cascade at 0.02s — the bar is above the nav, so it should arrive
+   first. */
+@keyframes announceIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+html.intro-js:not(.intro-go) .vv-announce {
+  opacity: 0;
+}
+
+html.intro-go .vv-announce {
+  animation: announceIn 0.42s var(--ease-rise) 0.02s backwards;
+}
+
+/* The close control. Absolutely positioned so it cannot shift the centred
+   line — theirs has no dismiss, so the text is centred on the bar, not on
+   the space left over beside a button.
+
+   36px square: over the 24px WCAG 2.5.8 floor without crowding a 45px bar.
+   The glyph inside is 11px; the target is the padding around it. */
+.vv-announce-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mute);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-close:hover {
+    color: #000;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.intro-go .vv-announce {
+    animation-name: homeFade;
+  }
+
+  .vv-announce-close {
+    transition: none;
+  }
+}
+
+/* `font-weight: 500` on the span and 700 on the link, which is their served
+   CSS verbatim.
+
+   IT WENT TO 400/14px FOR ONE PASS AND THAT WAS A MISREAD — worth recording,
+   because the evidence looked convincing at the time. D compared the two
+   bars and called ours too bold, so this dropped a step. What he was
+   actually looking at was a DUPLICATE `.vv-announce` block still sitting at
+   the end of this file from an earlier pass, winning on source order and
+   rendering neither the size nor the colour intended. Deleting the duplicate
+   and then lightening the weight applied the same correction twice.
+
+   Settled by measuring the shared prefix "We have news to share •" in a
+   side-by-side screenshot — identical string, so directly comparable:
+   theirs is ~4.7% wider than ours was at 400/14px. Going 14 -> 14.4px is
+   +2.9% and 400 -> 500 adds roughly another 2% in this face. The two
+   together land on their number, which is the confirmation their stylesheet
+   was right all along. */
+.vv-announce-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  font-weight: 500;
+}
+
+.vv-announce-link {
+  color: #000;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.3s;
+  /* Layout-neutral hit area: the padding grows the target, the negative
+     margin gives back the space so the line does not move. */
+  display: inline-block;
+  padding: 6px 2px;
+  margin: -6px 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-link:hover {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-announce-link {
+    transition: none;
+  }
+}
 
 /* ---- falling blossom (components/hero/Petals.tsx) ------------------------
 
@@ -2377,357 +2510,92 @@ html:has(.home-stage) footer {
   text-align: left;
 }
 
-/* ===========================================================================
-   THE SYSTEM — added 2026-08-19 with the DESIGN.md rewrite.
-   ===========================================================================
+/* ---- the document reader (Story) ----------------------------------------
+   Ported from the Prismarine site's `/about` at D's instruction: "the same
+   formatting fo rthe about page as well". Same metrics, same restraint.
 
-   Four type roles, two faces, one accent with a meaning. Everything above
-   this block that starts `.mimi-` is the previous system: metrics measured
-   off mimis.nyc's computed styles and reproduced exactly. Those are being
-   retired call site by call site; when the last one goes, delete them.
+   The idea it encodes is worth stating, because it looks like an accident
+   otherwise: THE TITLE IS THE SAME SIZE AS THE BODY. A 580px column of 16px
+   text with a 16px heading over it has no size hierarchy at all, so weight
+   carries the whole job — 576 against 440. That is why the weights are
+   non-round: Inter is a variable master and both are real instances.
 
-   Read DESIGN.md first. The short version: the thesis is "an address, before
-   it opens", and it exists to reject things. Type that states nothing does
-   not ship.
-
-   These are unlayered, so they beat Tailwind utilities on specificity ties —
-   which is deliberate for roles (a role should not be half-overridden by a
-   stray `text-sm`) and is why spacing lives on wrappers instead of here. */
-
-/* ---- Display ------------------------------------------------------------
-   One per page. The page's name, and nothing else earns this size.
-   Satoshi 700 cut tight: at 56px the default tracking reads loose and
-   web-default, and -0.035em is where the counters close up into a wordmark-
-   like block without the letters touching. */
-.vv-display {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-  color: var(--ink);
+   It reads as a document rather than as a marketing page, which is what an
+   "our story" page actually is. The 48px centred display type the rest of
+   this site uses would fight the prose here rather than introduce it. */
+.doc-reader {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 100px;
 }
 
-@media (min-width: 810px) {
-  .vv-display {
-    font-size: 56px;
-    line-height: 1;
-  }
+.doc-head,
+.doc-body {
+  width: 100%;
+  max-width: 580px;
+  padding-inline: 8px;
 }
 
-/* ---- Statement ----------------------------------------------------------
-   The single sentence that carries a page. One per page at most — a second
-   one means neither is the statement. */
-.vv-statement {
-  margin: 0;
-  max-width: 34em;
-  font-family: var(--font-sans);
-  font-size: 22px;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-  color: var(--ink);
+.doc-head {
+  padding-top: 50px;
 }
 
-/* ---- Body ---------------------------------------------------------------
-   Measure in `em`, never `ch`. Satoshi's zero is wide, so a ch-based measure
-   resolves far longer than it reads: `62ch` here came out at 716px and 88
-   characters per line. 34em lands at ~66, which is the number that was
-   wanted both times. */
-.vv-body {
-  margin: 0;
-  max-width: 34em;
+/* 16px, and the weight is the only thing separating it from the paragraph
+   below. #2c2c2c rather than pure black: at this size and weight, black is
+   heavier than the page wants. */
+.doc-title {
+  margin: 0 0 16px;
   font-family: var(--font-sans);
   font-size: 16px;
-  font-weight: 400;
-  line-height: 1.55;
-  letter-spacing: 0;
-  color: var(--ink);
+  font-weight: 576;
+  line-height: 160%;
+  letter-spacing: normal;
+  text-align: left;
+  color: #2c2c2c;
 }
 
-.vv-body + .vv-body {
-  margin-top: 1.55em;
-}
-
-/* ---- Ledger -------------------------------------------------------------
-   THE SPINE. One size, one weight, one tracking, everywhere: address, date,
-   price, status, nav, product label, footer, copyright.
-
-   SATOSHI, NOT A MONO (2026-08-19). This role shipped as Geist Mono for
-   about an hour. The reasoning was sound on paper — a mono reads as record
-   rather than marketing, which is the right register for a place with
-   nothing to sell — and D rejected it on sight on the landing, where the
-   ledger line is the only text on the page and the mono was therefore the
-   entire voice of the site. He is right: it read as a terminal, not as a
-   plaque.
-
-   Satoshi at 12/500/0.08em does the same job. The register comes from the
-   size, the caps and the tracking far more than from the face — this is the
-   treatment Stussy and mimis both use for exactly these labels, in a sans.
-
-   12px rather than 11: a mono's uppercase forms carry more width per glyph,
-   so dropping to a sans at the same size made the line visibly smaller than
-   it had been. 0.08em is the band that works — below ~0.06em the caps crowd,
-   above ~0.1em the line stops reading as a unit and becomes separate words.
-
-   The site is now ONE FACE. That is a better outcome than the two-face plan
-   it replaced, and it costs nothing: every role below is a size, a weight
-   and a tracking of Satoshi. */
-.vv-ledger {
-  margin: 0;
+.doc-subtitle {
+  margin: 0 0 48px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink);
+  font-size: 16px;
+  font-weight: 440;
+  line-height: 160%;
+  letter-spacing: normal;
+  text-align: left;
+  color: #2c2c2c;
+  text-wrap: pretty;
 }
 
-/* Secondary ledger. Never prose — 5.3:1 is fine for an 11px annotation and
-   is not a body-copy colour. */
-.vv-ledger-mute {
-  color: var(--mute);
+.doc-section {
+  margin-bottom: 40px;
 }
 
-/* The not-yet. This is the ONLY class in the system that paints red, which
-   is what keeps the rule enforceable: grep for it and you have every red
-   thing on the site. */
-.vv-ledger-red {
-  color: var(--red);
+.doc-heading {
+  margin: 0 0 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 576;
+  line-height: 160%;
+  letter-spacing: normal;
+  text-align: left;
+  color: #2c2c2c;
+  text-wrap: balance;
 }
 
-/* ---- The rule -----------------------------------------------------------
-   The only structural line. A box-shadow rather than a border because a real
-   border adds a pixel of layout height, which is how the footer bar ended up
-   81px against a spec of 80. */
-.vv-rule {
-  box-shadow: inset 0 1px 0 0 var(--rule);
+.doc-text {
+  margin: 0 0 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 440;
+  line-height: 160%;
+  letter-spacing: normal;
+  text-align: left;
+  color: #2c2c2c;
+  text-wrap: pretty;
 }
 
-/* ---- Page frame ---------------------------------------------------------
-   12 columns is the mental model; the container and the gutter are what the
-   code actually needs. 1280 is authored — the old 1710 was mimis.nyc's
-   viewport width read off their container, not a measure anyone chose. */
-.vv-page {
-  width: 100%;
-  max-width: 1280px;
-  margin-inline: auto;
-  padding-inline: 24px;
-}
-
-/* ---- The opening gesture ------------------------------------------------
-   Every interior route opens with these four numbers, in this order. This is
-   the unification mechanism: the pages are one site because they begin the
-   same way, not because they share a colour.
-
-     chrome
-       80  ↓
-     display title      flush left
-       16  ↓
-     ledger line
-       40  ↓
-     ───────────────    full-width hairline
-       48  ↓
-     content
-
-   Do not tune these per page. A page that needs different spacing needs a
-   different role, not a different number. */
-.vv-open {
-  padding-top: 80px;
-}
-
-.vv-open__ledger {
-  margin-top: 16px;
-}
-
-.vv-open__rule {
-  margin-top: 40px;
-  height: 1px;
-  background: var(--rule);
-}
-
-.vv-open__content {
-  margin-top: 48px;
-}
-
-@media (max-width: 809px) {
-  .vv-open {
-    padding-top: 48px;
-  }
-  .vv-open__rule {
-    margin-top: 28px;
-  }
-  .vv-open__content {
-    margin-top: 32px;
-  }
-}
-
-/* ---- Landing chrome -----------------------------------------------------
-   The same wordmark + ledger line that opens every interior page, sitting on
-   the plate instead of on paper. White here because it is over artwork; that
-   is the ONLY colour difference between the two, and it is a legibility
-   fact rather than a second style.
-
-   The shadow is a legibility floor, not a look: the artwork is a rendered
-   sky whose luminance varies across the line, and 11px type has no mass to
-   survive that on its own. */
-html:has(.home-stage) .vv-hero-ledger .vv-ledger,
-html:has(.home-stage) .vv-hero-ledger {
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
-}
-
-/* ---- Interior ground ----------------------------------------------------
-   Paper is the interior ground only. The landing is a plate and sets its own
-   background from the artwork. */
-.vv-paper {
-  background: var(--paper);
-}
-
-/* ---- The wordmark, in ink ------------------------------------------------
-   The mark is a PNG of a red brush stroke, so "make it ink" is a filter
-   rather than a colour swap — there is no ink cut of the artwork.
-
-   `brightness(0)` maps every channel to zero while leaving alpha alone,
-   which gives a true silhouette of the stroke rather than a darkened red.
-   `invert(6.7%)` then lifts pure black to exactly #111111 (0.067 x 255 =
-   17), so the mark lands on --ink like every other piece of type on the
-   site instead of being the one #000 thing on the page.
-
-   Red is reserved for what does not exist yet, and a studio's own name is
-   not that. See DESIGN.md "Red means not yet" for the contrast history —
-   the mark measured 1.39:1 over the artwork while it was red. */
-.vv-mark-ink {
-  filter: brightness(0) invert(6.7%);
-}
-
-/* Over the artwork the mark inverts to paper instead, for the same reason
-   the ledger line does: it is sitting on a rendered sky. */
-/* (the landing's mark treatment lives with the rest of the landing chrome,
-   further up this file — search `home-stage) header a`) */
-
-/* ---- Nav, in the ledger role --------------------------------------------
-   Nav is ledger type like every other label on the site — same 11px, same
-   0.08em, same uppercase. It is small, and ALD and Dimes both run their
-   navigation this small; a nav that shouts is a nav competing with the one
-   thing each page is meant to say.
-
-   The vertical padding is what keeps the hit area honest: 11px type in a
-   44px target, per WCAG 2.5.8, so the label can be small without the button
-   being small. */
-.vv-nav-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding-block: 6px;
-  color: var(--ink);
-  text-decoration: none;
-  transition: color 200ms var(--ease-out);
-}
-
-/* Hover changes COLOUR ONLY — no transform, no underline animation. See
-   DESIGN.md "Motion". */
-@media (hover: hover) and (pointer: fine) {
-  .vv-nav-link:hover {
-    color: var(--mute);
-  }
-}
-
-
-
-@media (hover: hover) and (pointer: fine) {
-  html:has(.home-stage) .vv-nav-link:hover {
-    color: rgba(255, 255, 255, 0.72);
-  }
-}
-
-/* The current page. An underline rather than a colour change, because the
-   colour slot is spoken for: --mute is hover and --red means not-yet. */
-.vv-nav-link[aria-current="page"] {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-
-/* ---- the ledger line on the plate ---------------------------------------
-   Sits directly under the centred wordmark, over the artwork, the way ALD
-   prints its city and timestamp. Absolutely positioned rather than placed in
-   the header, because the header is a three-zone row shared with every
-   interior route and this line belongs to the landing only.
-
-   72px clears the 64px header with 8px of air. */
-.vv-hero-ledger {
-  position: absolute;
-  top: 72px;
-  left: 0;
-  right: 0;
-  z-index: 30;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-  padding-inline: 24px;
-}
-
-.vv-hero-ledger .vv-ledger {
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(4, 12, 20, 0.75);
-  text-align: center;
-}
-
-/* NO RED ON THE PLATE. The date renders white with the rest of the line.
-
-   This started as brand red, then as a lightened dark-ground tint
-   (--red-on-dark, #FF6B66) so it would survive the sky. Measured against the
-   actual artwork pixels behind the line — rgb(10,76,150) after the scrim —
-   that tint lands at 3.02:1, and the floor for 12px type is 4.5:1. Clearing
-   it needs roughly #FFA89E, which is a pale pink at that size, not a red.
-
-   So the rule is stated more precisely instead of being bent: RED MARKS THE
-   NOT-YET IN TYPE, and the plate has no red type. The landing already says
-   "not yet" louder than any colour could — the sign in the middle of it
-   reads Coming Soon on a green plate at 30px. The white line measures
-   8.42:1 on the same sky.
-
-   That also retires --red-on-dark entirely, which keeps the palette at one
-   red and honours anti-pattern #5. */
-.vv-hero-ledger .vv-ledger-red {
-  color: inherit;
-}
-
-/* ---- Touch targets ------------------------------------------------------
-   Two controls measured under the 44px floor (WCAG 2.5.8) in the design
-   review on 2026-08-19: the header wordmark link at 66x31, and the footer
-   Instagram chip at 34x34.
-
-   Both keep their VISUAL size and gain hit area — the chip is a 34px
-   rounded square by design and the mark is 31px tall because D set it
-   there. `min-height` plus symmetric inline padding grows the target
-   around the artwork rather than scaling it, so nothing moves on screen.
-
-   The mark sits inside an absolutely centred, translate(-50%) wrapper, so
-   symmetric padding leaves the centring intact. */
-.vv-mark-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding-inline: 10px;
-}
-
-.vv-ig {
-  position: relative;
-}
-
-/* A pseudo-element target rather than padding on the chip itself: the chip's
-   own box IS the visible 34px square with its own fill and radius, so
-   padding it would grow the fill. This grows only the pointer surface. */
-.vv-ig::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 44px;
-  height: 44px;
-  transform: translate(-50%, -50%);
+.doc-text:last-child {
+  margin-bottom: 0;
 }
