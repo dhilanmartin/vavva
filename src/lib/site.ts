@@ -41,35 +41,48 @@ export const CONTACT_HREF = INSTAGRAM_HREF;
    D, 2026-08-18: "disable the header buttons. (make them clickable and
    hoverable) but just link to the same home page coming soon."
 
-   NOT `SECONDARY_PAGES_LIVE = false`, which is the other lever in this file
-   and would look like the obvious one. That flag makes Nav render inert
-   <span>s — no href, no hover, aria-disabled — and it 404s the routes. D
-   asked for the opposite of the first half: the links stay real links, they
-   still hover and still press, they just all arrive at the coming-soon
-   landing. A visitor gets a working header that happens to have one
-   destination, not a row of dead labels.
+   NOT `SECONDARY_PAGES_LIVE` ON ITS OWN, which is the other lever in this
+   file and would look like the obvious one. That flag 404s the routes, and
+   with nothing else set it renders Nav as inert <span>s — no href, no hover,
+   aria-disabled. D asked for the opposite of that second half: the links
+   stay real links, they still hover and still press, they just all arrive at
+   the coming-soon landing. A visitor gets a working header that happens to
+   have one destination, not a row of dead labels.
 
-   The routes themselves stay LIVE and reachable by URL. That is deliberate
-   and worth knowing: /products and /locations still render, and both are
-   still in sitemap.xml, so a search result can still land on them even
-   though nothing in the UI points there. If they should go dark too, flip
-   SECONDARY_PAGES_LIVE — that is exactly what it is for.
+   THIS FLAG SAYS NOTHING ABOUT WHETHER THE ROUTES EXIST, which is the whole
+   reason there are two of them. Parked + live is a header that skips past
+   pages still reachable by URL and still in sitemap.xml (the state through
+   2026-08-18). Parked + dark is the pre-launch front door, and is what is
+   set now. Unparked + dark is the row of dead labels. The two flags compose;
+   neither is a stronger version of the other.
 
-   Contact is untouched. It is not parked because it is not a placeholder:
-   it goes to Instagram, which is a real destination (see CONTACT_HREF). */
-export const NAV_DESTINATIONS_PARKED = false;
+   Contact is untouched by either. It is not a placeholder: it goes to
+   Instagram, which is a real destination (see CONTACT_HREF). */
+export const NAV_DESTINATIONS_PARKED = true;
 
-/* ^ FALSE as of 2026-08-18, at D's instruction — "enable a dev server with
-   all the pages working." Parking the header was the right call for a
-   pre-launch front door and is one word away from returning; it is off now
-   because the secondary pages are being worked on and a header that always
-   goes home makes them unreachable by clicking.
+/* ^ TRUE again as of 2026-08-19. It went false the day before ("enable a dev
+   server with all the pages working"), because a header that always goes
+   home makes pages under construction unreachable by clicking. That work is
+   parked now — D: "disable the locations/products/our story pages for now" —
+   so the pre-launch front door is back and so is this.
 
-   THIS IS A PRODUCTION-FACING FLAG, not a dev-only one. Flip it back to true
-   before the next push if the public header should still be parked. */
+   IT IS SET ALONGSIDE `SECONDARY_PAGES_LIVE = false`, AND THE PAIR IS THE
+   POINT. Dark routes on their own would render the header as three inert
+   labels, which is the thing D ruled out in as many words the last time this
+   came up. Parked destinations on their own would leave three public pages
+   nothing points at. Together they are the state he has actually asked for
+   twice: a header that looks and feels alive, every button arriving at the
+   coming-soon landing, and nothing behind them to find.
 
-// The whole site is the landing page as of 2026-08-07, at D's instruction:
-// "disable every page but the home page."
+   Nav.tsx checks THIS flag first for that reason — a parked link's href is
+   `/`, never the dark route, so it cannot hand anyone a 404. See NavItem.
+
+   THIS IS A PRODUCTION-FACING FLAG, not a dev-only one. */
+
+// The whole site is the landing page again as of 2026-08-19. D: "disable the
+// locations/products/our story pages for now." Same instruction as
+// 2026-08-07 ("disable every page but the home page"), same flag; it was
+// true for one day while those pages were being worked on.
 //
 // One boolean, consulted everywhere it matters — the routes themselves
 // (notFound()), the nav, the footer and the sitemap — so there is exactly
@@ -78,9 +91,16 @@ export const NAV_DESTINATIONS_PARKED = false;
 // the setup that lets a broken page sit unnoticed for a week. This behaves
 // the same everywhere.
 //
-// Flip to true and Locations / Shop / Our Story return, links and sitemap
-// entries included. Nothing else needs touching.
-export const SECONDARY_PAGES_LIVE = true;
+// /story's notFound() gate was ADDED on the way to flipping this, not
+// assumed — it had been reopened separately on 2026-08-19 and never got the
+// gate its two siblings carry, so this flag would have de-listed it while
+// leaving it answering 200. All three are gated now.
+//
+// Flip to true and Locations / Products / Our Story return, links and
+// sitemap entries included. Nothing else needs touching — though consider
+// NAV_DESTINATIONS_PARKED above at the same time, since a live page the
+// header parks past is reachable only by URL.
+export const SECONDARY_PAGES_LIVE = false;
 
 // GATED_ROUTES_LIVE removed 2026-08-07.
 //

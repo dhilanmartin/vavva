@@ -103,15 +103,31 @@ const navLinkClass = (active: boolean) =>
     active ? "text-[#111] underline" : "text-black no-underline"
   }`;
 
-/* One nav item, rendered as a real link or as an inert label.
+/* One nav item, rendered as a real link or as an inert label. Two flags in
+   src/lib/site.ts decide which, and they are checked in the order below for
+   a reason.
+
+   PARKED WINS, and that ordering is the 2026-08-19 fix. Both flags were set
+   together that day — the three secondary pages went dark ("disable the
+   locations/products/our story pages for now") on a header D had already
+   said should stay "clickable and hoverable" — and with the dark-routes test
+   first, the parked branch was unreachable: the header rendered three dead
+   labels, which is the outcome he had ruled out in as many words.
+
+   The two compose correctly once they are read in this order, because a
+   parked link's href is `/` and never the dark route. It cannot hand anyone
+   a Not Found page, which is the only thing the inert branch was protecting
+   against. */
+
+/* THE INERT BRANCH, for pages that are dark with nowhere to send anyone.
    D, 2026-08-07: "ensure the buttons are still visible on the header even
    tho they are disabled. just have them click to nothing."
 
-   When SECONDARY_PAGES_LIVE is false this renders a <span>, not an <a>. It
-   is NOT an anchor with a dead href: that would still be focusable, still
-   announce as a link, still show a target in the status bar, and — with the
-   routes 404ing — would hand anyone who clicked it a Not Found page, which
-   is exactly the "click to nothing" D is ruling out.
+   This renders a <span>, not an <a>. It is NOT an anchor with a dead href:
+   that would still be focusable, still announce as a link, still show a
+   target in the status bar, and — with the routes 404ing — would hand
+   anyone who clicked it a Not Found page, which is exactly the "click to
+   nothing" D is ruling out.
 
    The span is visually identical to a live link (same class, same colour,
    same weight — it should not read as greyed out), but carries
@@ -131,7 +147,19 @@ function NavItem({
   className: string;
   onNavigate?: () => void;
 }) {
-  if (!SECONDARY_PAGES_LIVE) {
+  /* PARKED: a real link that goes home (see NAV_DESTINATIONS_PARKED in
+     src/lib/site.ts). D asked for the header to stay "clickable and
+     hoverable" while every button lands on the coming-soon page.
+
+     `active` is forced FALSE rather than recomputed. Every parked item
+     resolves to `/`, so on the landing all three would satisfy
+     `pathname === href` at once and the header would show three current
+     pages — `aria-current="page"` on three links, three underlines. A
+     header where everything is current tells a visitor nothing, and tells a
+     screen reader something false. */
+  const parked = NAV_DESTINATIONS_PARKED;
+
+  if (!parked && !SECONDARY_PAGES_LIVE) {
     return (
       <span
         aria-disabled="true"
@@ -142,19 +170,6 @@ function NavItem({
     );
   }
 
-  /* PARKED: a real link that goes home (see NAV_DESTINATIONS_PARKED in
-     src/lib/site.ts). D asked for the header to stay "clickable and
-     hoverable" while every button lands on the coming-soon page, which is a
-     different thing from the `SECONDARY_PAGES_LIVE` branch above — that one
-     renders inert <span>s with no href and no hover.
-
-     `active` is forced FALSE rather than recomputed. Every parked item
-     resolves to `/`, so on the landing all three would satisfy
-     `pathname === href` at once and the header would show three current
-     pages — `aria-current="page"` on three links, three underlines. A
-     header where everything is current tells a visitor nothing, and tells a
-     screen reader something false. */
-  const parked = NAV_DESTINATIONS_PARKED;
   const target = parked ? "/" : href;
   const isCurrent = parked ? false : active;
 

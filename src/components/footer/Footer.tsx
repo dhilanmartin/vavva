@@ -67,11 +67,17 @@ import {
 /* Four links, their count and the header's set — a footer listing different
    destinations than the nav is a second, quieter IA to keep in sync.
 
-   Filtered by SECONDARY_PAGES_LIVE for the same reason Nav is: this file can
-   be remounted at any time and must not be what resurrects links to disabled
-   routes. Contact is not a route, so the list can never go empty. */
+   THE TEST IS THE SAME ONE NavItem MAKES, and it has to be or the two lists
+   drift (2026-08-19). The rule this file must never break is that it cannot
+   be what resurrects a link to a dark route — but a PARKED link's href is
+   `/`, never the route, so parking satisfies that rule as completely as
+   dropping the link does, and it keeps the footer showing what the header
+   shows. Dropped only when the pages are dark AND nothing is parking them,
+   which is the case where there is genuinely nowhere to send anyone.
+
+   Contact is not a route, so the list can never go empty either way. */
 const LINKS = [
-  ...(SECONDARY_PAGES_LIVE
+  ...(NAV_DESTINATIONS_PARKED || SECONDARY_PAGES_LIVE
     ? [
         { href: "/locations", label: "Locations" },
         { href: "/products", label: "Products" },
