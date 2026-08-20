@@ -905,8 +905,15 @@ html.intro-js .scroll-reveal.reveal-stagger {
    Tracking goes with it. Inter is drawn loose for UI at small sizes, so it
    needs a tighter negative at display sizes than a serif does; -0.022em is
    Prismarine's --letter-spacing-xl and it is the value that stops 48px Inter
-   reading as spaced-out. The per-role tracking further down this file is
-   overridden for the two heading roles below. */
+   reading as spaced-out.
+
+   THE TRACKING LIVES IN THE PER-ROLE BLOCKS FURTHER DOWN, not here. It was
+   written here first, as a shared override above them, and that silently did
+   nothing: those blocks carry their own letter-spacing at the same
+   specificity and later in the file, so they won every time. The lead was
+   the one that mattered — it kept -1.04px, the value tuned for the serif,
+   which is 2.9x tighter than Inter wants at 26px. Each role now declares its
+   own, once. */
 .mimi-display,
 .mimi-title,
 .mimi-lead {
@@ -914,17 +921,6 @@ html.intro-js .scroll-reveal.reveal-stagger {
   font-weight: 520;
   color: var(--ink);
   text-align: center;
-}
-
-.mimi-display,
-.mimi-title {
-  letter-spacing: -0.022em;
-}
-
-/* The lead is 26px — inside the band where Inter still wants a negative, but
-   a smaller one. */
-.mimi-lead {
-  letter-spacing: -0.014em;
 }
 
 /* `balance` on the two heading roles only — NOT on .mimi-lead, which sits
@@ -982,20 +978,24 @@ html.intro-js .scroll-reveal.reveal-stagger {
 .mimi-display {
   font-size: 48px;
   line-height: 56px;
-  letter-spacing: -0.02em;
+  /* -0.022em, not the reference's -0.02em: theirs is a serif's number. */
+  letter-spacing: -0.022em;
   color: #000;
 }
 
 .mimi-title {
   font-size: 43px;
   line-height: 56px;
-  letter-spacing: -0.86px;
+  /* was -0.86px, which is -0.02em at this size — same swap as above. */
+  letter-spacing: -0.022em;
 }
 
+/* The lead is 26px — inside the band where Inter still wants a negative, but
+   a smaller one than the headings take. */
 .mimi-lead {
   font-size: 26px;
   line-height: 36.4px;
-  letter-spacing: -1.04px;
+  letter-spacing: -0.014em;
 }
 
 /* The Story lead's shape: one bold sentence running straight into regular
