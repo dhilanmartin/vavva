@@ -188,14 +188,24 @@ export function ComingSoon() {
      reproduced is its BEHAVIOUR rather than its shapes: Title Case, a medium
      weight rather than a bold, and near-zero tracking. 15px because a sign
      that has to be squinted at is not a sign. */
+  /* 15px -> 22/30px (2026-08-19, restored at D's request).
+
+     At 15px this was a badge, not a sign: a green pill about the size of a
+     browser chip, floating in an open sky. It read as UI sitting on top of
+     the picture rather than as an object inside it. A street sign is legible
+     from across a street, which is the entire reference.
+
+     The badge insets below scale with it, and so does the white keyline in
+     .gw-badge — a plate that doubles in size with a fixed 3px keyline stops
+     looking like enamel and starts looking like a border. */
   const TEXT =
-    "font-sans text-[15px] font-semibold leading-none tracking-[0.005em] whitespace-pre text-white";
+    "font-sans text-[22px] font-semibold leading-none tracking-[0.005em] whitespace-pre text-white tablet:text-[30px]";
 
   /* The panel. The insets are the sign's padding, and they have to clear the
      white rule: it sits 3px in and is 2px thick, so 20px/11px leaves 15px of
      green beside the legend and 6px above it. */
   const PANEL =
-    "gw-badge absolute -inset-x-5 -top-[11px] -bottom-[11px] rounded-[7px]";
+    "gw-badge absolute -inset-x-8 -top-[16px] -bottom-[16px] rounded-[10px] tablet:-inset-x-11 tablet:-top-[22px] tablet:-bottom-[22px] tablet:rounded-[14px]";
 
 
   return (

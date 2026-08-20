@@ -300,7 +300,7 @@ export function Nav() {
               So: the header is the same size as mimis' (the ask), and the
               mark is the size this repo has now decided on twice. See not-found.tsx for the one other file
               that has to know the bar height. */}
-            <VavvaMark className="h-[31px] w-auto" />
+            <VavvaMark className="vv-mark-ink h-[31px] w-auto" />
           </Link>
         </div>
 
