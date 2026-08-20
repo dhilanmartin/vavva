@@ -115,35 +115,117 @@ export function ComingSoon() {
        them on the same element would mean whichever wrote last won. Nesting
        composes for free. */
     const magnet = host.querySelector<HTMLElement>("[data-glitch-magnet]");
+
+    /* PULL STAYS 0.18 THROUGH THE 2026-08-19 SIZE CHANGE, and here are the
+       numbers so it does not get re-litigated. `reach` is derived from the
+       host rect, so taking the legend 15px -> 22/30px moved reach 64px ->
+       108.2px and the maximum throw 1.71px -> 2.88px (both measured in the
+       browser, not estimated; the maximum of d*PULL*(1-d/reach)^2 sits at
+       d = reach/3 and equals PULL*(4/27)*reach).
+
+       That is 1.69x in absolute pixels and IDENTICAL in proportion: 2.88px
+       against the 275px plate is the same 1% of its width that 1.71px was
+       against 163px. A magnet's field scaling with the object it belongs to
+       is the physically correct behaviour, so there is nothing to re-tune.
+       Revisit only if the sign stops being the whole landing. */
     const PULL = 0.18;
+
+    /* THE RECT IS CACHED, invalidated rather than re-read. It used to be
+       measured inside every animation frame of every pointermove, which is a
+       forced layout read per frame for a box that only changes on resize or
+       scroll. */
+    let rect: DOMRect | null = null;
+    const invalidate = () => {
+      rect = null;
+    };
+
+    /* A SPRING, NOT A DIRECT WRITE. The transform used to be assigned
+       straight from the pointer offset with `transition: none`, which gives
+       the unit no momentum: it is welded to the cursor, and welded motion
+       reads as artificial rather than as attraction.
+
+       Integrating instead means the sign lags slightly, carries velocity,
+       and — because velocity survives a change of target — reverses smoothly
+       when the pointer crosses back over it. It also gives the release its
+       elasticity honestly. The old release was a 620ms CSS transition on
+       `--ease-out`, commented as having "a little overshoot"; that curve is
+       cubic-bezier(0.23, 1, 0.32, 1), whose control points both sit at y=1,
+       so it mathematically cannot overshoot. This does, because it is a real
+       spring: damping under 1 lets it pass the target and come back.
+
+       STIFF/DAMP are tuned for a light, quick settle — roughly 300ms to rest
+       from a full-throw release, with one small overshoot. */
+    const STIFF = 0.16;
+    const DAMP = 0.74;
+    const REST = 0.05;
+
+    let tx = 0;
+    let ty = 0; // where the pointer wants it
+    let cx = 0;
+    let cy = 0; // where it is
+    let vx = 0;
+    let vy = 0; // how fast it is going
     let raf = 0;
+
+    const tick = () => {
+      raf = 0;
+      if (!magnet) return;
+
+      vx = (vx + (tx - cx) * STIFF) * DAMP;
+      vy = (vy + (ty - cy) * STIFF) * DAMP;
+      cx += vx;
+      cy += vy;
+
+      const settled =
+        Math.abs(tx - cx) < REST &&
+        Math.abs(ty - cy) < REST &&
+        Math.abs(vx) < REST &&
+        Math.abs(vy) < REST;
+
+      if (settled) {
+        cx = tx;
+        cy = ty;
+        vx = 0;
+        vy = 0;
+      }
+
+      magnet.style.transform = `translate3d(${cx.toFixed(2)}px,${cy.toFixed(2)}px,0)`;
+
+      if (settled) {
+        /* Released the compositing layer. `will-change` used to be a static
+           class on the element, which pinned a layer for the life of the
+           page — including on touch, where this whole interaction is gated
+           off and the layer bought nothing. globals.css makes the same
+           argument about the intro cascade. */
+        if (cx === 0 && cy === 0) magnet.style.willChange = "";
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
 
     const onMove = (e: PointerEvent) => {
       if (!magnet) return;
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const r = host.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dy = e.clientY - (r.top + r.height / 2);
-        const reach = Math.hypot(r.width, r.height) / 2;
-        const falloff = Math.max(0, 1 - Math.hypot(dx, dy) / reach);
-        const k = PULL * falloff * falloff;
-        magnet.style.transition = "none";
-        magnet.style.transform = `translate3d(${(dx * k).toFixed(2)}px,${(dy * k).toFixed(2)}px,0)`;
-      });
+      if (!rect) rect = host.getBoundingClientRect();
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
+      const reach = Math.hypot(rect.width, rect.height) / 2;
+      const falloff = Math.max(0, 1 - Math.hypot(dx, dy) / reach);
+      const k = PULL * falloff * falloff;
+      tx = dx * k;
+      ty = dy * k;
+      magnet.style.willChange = "transform";
+      kick();
     };
 
-    // Eased release with a little overshoot — a magnet that snaps back
-    // linearly reads as a bug rather than as elasticity.
     const onLeaveMagnet = () => {
       if (!magnet) return;
-      if (raf) {
-        cancelAnimationFrame(raf);
-        raf = 0;
-      }
-      magnet.style.transition = "transform 620ms var(--ease-out)";
-      magnet.style.transform = "translate3d(0,0,0)";
+      tx = 0;
+      ty = 0;
+      kick();
     };
 
     const fine = window.matchMedia("(pointer: fine)").matches;
@@ -162,6 +244,10 @@ export function ComingSoon() {
       host.addEventListener("pointerleave", onLeave);
       host.addEventListener("pointermove", onMove);
       host.addEventListener("pointerleave", onLeaveMagnet);
+      // Lazy invalidation: the next pointermove re-measures. Cheaper than
+      // measuring here, since most resizes and scrolls never reach the sign.
+      window.addEventListener("resize", invalidate, { passive: true });
+      window.addEventListener("scroll", invalidate, { passive: true });
     }
 
     return () => {
@@ -172,8 +258,11 @@ export function ComingSoon() {
         host.removeEventListener("pointerleave", onLeave);
         host.removeEventListener("pointermove", onMove);
         host.removeEventListener("pointerleave", onLeaveMagnet);
+        window.removeEventListener("resize", invalidate);
+        window.removeEventListener("scroll", invalidate);
       }
       if (raf) cancelAnimationFrame(raf);
+      if (magnet) magnet.style.willChange = "";
       engine.destroy();
     };
   }, []);
@@ -202,8 +291,10 @@ export function ComingSoon() {
     "font-sans text-[22px] font-semibold leading-none tracking-[0.005em] whitespace-pre text-white tablet:text-[30px]";
 
   /* The panel. The insets are the sign's padding, and they have to clear the
-     white rule: it sits 3px in and is 2px thick, so 20px/11px leaves 15px of
-     green beside the legend and 6px above it. */
+     white rule, which now scales with the plate (see .gw-badge): 4px in and
+     3px thick on mobile, 5px in and 4px thick from tablet up. So 32px/16px
+     leaves 25px of green beside the legend and 9px above it; 44px/22px
+     leaves 35px and 13px. */
   const PANEL =
     "gw-badge absolute -inset-x-8 -top-[16px] -bottom-[16px] rounded-[10px] tablet:-inset-x-11 tablet:-top-[22px] tablet:-bottom-[22px] tablet:rounded-[14px]";
 
@@ -218,7 +309,7 @@ export function ComingSoon() {
       aria-label="Coming soon"
       className="relative inline-flex select-none items-center justify-center px-3 py-2"
     >
-      <span data-glitch-magnet className="relative inline-block will-change-transform">
+      <span data-glitch-magnet className="relative inline-block">
         <span className="relative grid place-items-center">
           {/* THE ANCHOR. Inter is proportional, so every substituted letter is
               a different width — without an invisible copy of the RESTING
