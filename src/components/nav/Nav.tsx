@@ -243,7 +243,7 @@ export function Nav() {
           <Link
             href="/"
             aria-label="Vavva — home"
-            className="home-rise pointer-events-auto flex items-center"
+            className="vv-mark-link home-rise pointer-events-auto"
             style={{ ["--i" as string]: 1 }}
           >
           {/* Sized by HEIGHT, not width: a nav bar sizes marks by height,
