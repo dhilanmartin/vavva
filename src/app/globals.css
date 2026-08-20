@@ -2303,6 +2303,59 @@ html.announce-off .vv-announce {
   display: none;
 }
 
+/* ---- the bar leaves ------------------------------------------------------
+
+   The grid-rows collapse, same technique and same reasoning as `.nav-panel`:
+   the bar is IN NORMAL FLOW at the top of the document, so its removal has
+   to give its 43px back to the page over time rather than in one frame. A
+   transform cannot do that — translating the bar away leaves the hole. `0fr`
+   collapses to a true zero, where a max-height guess would either clip early
+   or leave a ceiling.
+
+   Yes, this animates a layout property, which the rest of this file avoids.
+   It is the same justified exception `.nav-panel` documents: there is no
+   GPU-only way to hand space back to in-flow content. It is bounded — one
+   element, 220ms, once per visitor — and the opacity runs shorter so the bar
+   is invisible for most of the collapse and only the space is still moving.
+
+   220ms against the 420ms entrance is deliberate, not sloppy symmetry: the
+   arrival is a page-load flourish and the dismissal is a system response to
+   a deliberate click, and system responses snap. */
+.vv-announce-shell {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 220ms var(--ease-rise),
+    opacity 140ms ease-out;
+}
+
+/* THE CLIP IS ITS OWN ELEMENT, and it has to be. `.vv-announce` carries
+   `padding: 12px 24px`, and padding is not part of what a grid row sizes —
+   with the bar itself as the grid item, a 0fr row still left 24px of its
+   padding standing, so the bar collapsed 43px -> 24px and then snapped the
+   last 24px away on unmount. An unpadded item in between takes the row's
+   height honestly and clips the padded bar inside it. */
+.vv-announce-shell > .vv-announce-clip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.vv-announce-shell.is-leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  /* The bar is on its way out; nothing in it should still be clickable. */
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion unmounts immediately (AnnouncementBar.tsx), so this
+     transition would never run — declared off anyway so a future code path
+     cannot reintroduce the movement by accident. */
+  .vv-announce-shell {
+    transition: none;
+  }
+}
+
 /* ---- the bar arrives ------------------------------------------------------
 
    Opacity and an 8px drop, NOT a slide from -100%. The bar sits in normal
