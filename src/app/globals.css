@@ -44,6 +44,7 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-rise: cubic-bezier(0.19, 1, 0.22, 1);
 
+
   /* Apple HIG systemGray4/systemGray — flat AssetPlaceholder fills, not a
      brand color choice. Kept as tokens alongside the rest so a palette
      edit can't miss them. */
@@ -540,12 +541,42 @@ p {
        rest    color #000            text-decoration none
        hover   color #ffd303         text-decoration underline
        current color #111            text-decoration underline
-     Same three-state model, same decoration on each — the one substitution
-     is D's: the accent is Vavva's brush red (--red #b32622) in place of
-     their yellow, which is also the only hue this house prints in. */
+     Same three-state model, same decoration on each. The accent used to be
+     D's substitution of Vavva's brush red for their yellow.
+
+     ---- 2026-08-20: THE ACCENT MOVED TO THE UNDERLINE -------------------
+
+     D turned the header --red, which took the hover accent's colour away by
+     making it the ground: red type on a red bar is 1:1, invisible. And it
+     cannot simply become the next hue along, because a hover state is TYPE
+     and type on this field has to clear 4.5:1 — the amber --hl measures
+     3.33:1 on --red, and nothing warm enough to read as an accent does
+     better. Any hue that passes here is close enough to white to not look
+     like a hue.
+
+     So the three states keep their three-way distinction by splitting which
+     property carries it, instead of pushing both through colour:
+
+       rest     #fff, no underline
+       hover    #fff, AMBER underline   (--hl, 3.33:1 — a non-text indicator
+                                        under 1.4.11's 3:1 floor, which is
+                                        the correct standard for a rule)
+       current  #fff, WHITE underline   (see navLinkClass in Nav.tsx)
+
+     The type never leaves 6.53:1, and the accent is still --hl, which is
+     the token that already means "you are touching this" everywhere else on
+     the site (::selection, the focus ring) and was deliberately kept from
+     meaning "Vavva" — see the token's own note. Red said Vavva and amber
+     said touch; on a red bar, amber is the only one of the two still free
+     to say anything.
+
+     `text-decoration-color` is named explicitly at BOTH ends, because a
+     decoration set on hover and not on rest has nothing to transition from
+     and no state to return to — the underline would flick amber and stay
+     amber under an already-underlined current page. */
   .nav-link:hover {
-    color: var(--red);
     text-decoration-line: underline;
+    text-decoration-color: var(--hl);
   }
 }
 
@@ -599,8 +630,18 @@ p {
   /* transform on --ease-out, colour on ease — see .social-link. */
   transition:
     color 180ms ease,
+    text-decoration-color 180ms ease,
     transform 120ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* The rest end of the hover's amber underline (2026-08-20). `currentColor` is
+   already the initial value, so this changes nothing about how a link paints
+   — it states the value so the transition above has two endpoints and so a
+   current-page underline is explicitly WHITE rather than inheriting whatever
+   the last hover left resolved. See `.nav-link:hover`. */
+.nav-link {
+  text-decoration-color: currentColor;
 }
 
 /* HIT AREA, header row only.
@@ -663,7 +704,9 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .nav-link,
   .nav-toggle {
-    transition: color 180ms ease;
+    transition:
+      color 180ms ease,
+      text-decoration-color 180ms ease;
   }
 
   .nav-link:active,
@@ -2112,11 +2155,11 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
    view. Both went: the header floated over the image, and the footer is not
    rendered on the landing at all.
 
-   THE HEADER'S HALF IS GONE NOW, by request rather than by regression. D,
+   THE HEADER'S HALF IS GONE, by request rather than by regression. D,
    2026-08-19: "Place the current header components on the announcement bar
    ... Make the Vavva logo back to red as well, and turn the other header
-   buttons black." The header no longer sits on the artwork — it sits on the
-   opaque white bar above it — so every rule that existed to make type
+   buttons black." The header stopped sitting on the artwork and started
+   sitting on an opaque bar above it, so every rule that existed to make type
    legible over a photograph went with it:
 
      header { position: absolute; background: transparent }
@@ -2136,8 +2179,12 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
 
    White fared no better across the whole band — 4.08:1 on the sky, ~2.2:1 on
    the blossom — which is why the answer was a scrim and not a colour. Put
-   anything over this image again and that problem comes back with it. On the
-   white bar it does not arise: black on #fff is 21:1, and the red mark 6.5:1.
+   anything over this image again and that problem comes back with it. On an
+   opaque bar it does not arise, in either of the two the header has stood on:
+   black on #fff was 21:1 with the red mark at 6.5:1, and white on --red
+   (2026-08-20) is 6.53:1 for both the type and the mark. The measurements
+   below are the artwork's, not the header's, which is why they outlived two
+   recolours of it.
 
    THE ARTWORK DID NOT MOVE. It began at the bottom edge of the bar while the
    header floated over it, and it begins there still. What changed is that
@@ -2154,71 +2201,382 @@ html:has(.home-stage) footer {
   display: none;
 }
 
-/* ---- the top bar, which is the header now (2026-08-19) -------------------
+/* ---- the announcement bar, back above the header (2026-08-20) ------------
 
-   D: "Place the current header components on the announcement bar and remove
-   the current announcement bar copy ... keep the announcement bar how it is
-   (same size) ... and just fit the buttons onto the announcement bar."
+   D: "add back the announcement bar. (make our current header from white to
+   VAVVA red and flip the current header components to white)."
 
-   So this is not an announcement any more. It is the white field and drop
-   shadow the site's navigation stands on, on every route: one bar at the top
-   of the page in place of a 43px strip of copy above a 64px bar of links.
+   For one day (2026-08-19) this element was not an announcement at all: the
+   copy came out, the nav moved in, and it was the white field the links stood
+   on. That is undone. It says something again, it can be closed again, and
+   the navigation is a separate bar below it — see AnnouncementBar.tsx for why
+   ABOVE rather than the "beside" that pass left as an open question.
 
-   The field is still shadowlion.com's own, read out of their served CSS
+   Every value below is shadowlion.com's own, read out of their served CSS
    bundle rather than estimated from a screenshot — their site blocks
    automated rendering, so measuring it live was never available.
 
-   ITS HEIGHT IS UNCHANGED, WHICH WAS THE ASK. The bar was 43px — 12px
-   padding, a 19.44px line of copy, 12px padding — and it is 43px still. The
-   padding and the line-height are gone from this rule because there is no
-   line of copy left for them to set: the height is the nav row's own now
-   (`h-[43px]` in Nav.tsx), which is where a nav bar's height belongs, and
-   the 24px gutter is the nav's own `px-6` rather than this element's
-   padding. Nothing else about the box changed.
+   THE DROP SHADOW IS BACK ON THIS ELEMENT, where it started. It spent half a
+   day on `.vv-header`, and the rule it moved by is worth keeping in mind
+   rather than the position: the shadow belongs at the BOTTOM edge of the
+   chrome, because that is the only edge with page under it. While a red
+   header stood below this bar, casting 8px of rgba(0,0,0,.1) into a saturated
+   red field produced a dark band across the top of the header — a gradient
+   nobody drew — so it moved down one element. The header is unmounted, this
+   bar is the bottom edge again, and the shadow comes back with the job.
 
-   Vertical padding here would in fact have been wrong rather than merely
-   redundant: the mobile nav panel is IN FLOW inside the header, so it opens
-   inside this element, and padding on the bar would have been stranded below
-   the open panel.
-
-   ---- what was removed, and why it could not stay -------------------------
-
-   THE COPY. "We have news to share • Follow Us ↗" and its Instagram link, at
-   D's instruction. That was this element's entire reason to exist on its own.
-
-   THE DISMISS BUTTON (`.vv-announce-close`) and the collapse built for it
-   (`.vv-announce-shell` / `-clip` / `.is-leaving`) — a consequence rather
-   than a request. The close control wrote `vv-announce:v1` to localStorage
-   and the inline script in layout.tsx stamped `announce-off` on <html>
-   before first paint, which set `display: none` on this bar. With the nav
-   living inside it, that is a button that permanently deletes the site's
-   navigation — on every route, for that visitor, with no way back short of
-   clearing storage. A dismissible header is not a header.
-   `html.announce-off .vv-announce` went with it, so someone who dismissed
-   the old bar on a previous visit does not load into a site with no nav.
-
-   `html:not(:has(.home-stage)) .vv-announce { display: none }`, the rule
-   that made the bar the LANDING's rather than the site's (D, 2026-08-18:
-   "remove the We have news to share ... on every other page but the home").
-   Same reasoning: it would now hide the navigation on every page but `/`.
-
-   THE ENTRANCE (`@keyframes announceIn`, opacity and an 8px drop at 0.02s,
-   leading the header's cascade). Nested, that is two entrances playing the
-   same 420ms — three header zones fading in inside a parent that is itself
-   fading in. The bar is static and `.home-rise` keeps its stagger, which is
-   the motion that was always doing the work.
-
-   All of it — the copy, the dismissal, the exit, the entrance, and the type
-   rules that dressed them (`.vv-announce-content` at weight 500,
-   `.vv-announce-link` at 700 hovering to opacity .7) — is one `git revert`
-   away if the announcement returns, and it would return BESIDE the nav
-   rather than above it. */
+   The bar carries NO height variable. Nothing on this site offsets itself by
+   the bar's height any more: both bars are in normal flow, so the artwork
+   starts below them by construction rather than by an `--announce-h` that had
+   to be kept in step with whatever the padding and type actually produced. */
 .vv-announce {
   position: relative;
   z-index: 40;
   width: 100%;
-  background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* .75rem 1.5rem */
+  padding: 12px 24px;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  /* .9rem — theirs exactly. */
+  font-size: 0.9rem;
+  /* EXPLICIT, and their number rather than a guess at it: the bar is 43px —
+     12px padding + a 19.44px line + 12px padding.
+
+     Their rule declares NO line-height, so theirs is whatever `normal`
+     resolves to in the face they serve, and that is why ours kept missing.
+     It was 21px here (45px total) because our Satoshi cut resolved `normal`
+     to ~1.5em, and 45px was picked to sit just under the 45.6px that
+     produced. D read the result as still 2-3px too tall, twice.
+
+     Measured, not estimated (2026-08-19). Their served bundle is
+     _next/static/css/c88a16862734c6ca.css, `AnnouncementBar_bar`: padding
+     .75rem 1.5rem, font-size .9rem, no line-height. The face under it is
+     their own Satoshi OTF (_next/static/media/6c3b16f6d0ef383f-s.p.otf,
+     weight 500), whose hhea metrics are ascent 1010, descent -240, lineGap
+     100 on a 1000 upm — 1.35em, so 19.44px at 14.4px, and a 43.44px bar.
+
+     Confirmed by rendering rather than by arithmetic, since their live site
+     still refuses to paint headless: their rules and their OTF reproduced in
+     a local page report getBoundingClientRect().height === 43 (Chrome snaps
+     the 19.44px line box to 19) and paint 43 full white rows. This bar paints
+     the same 43.
+
+     The fraction is kept rather than rounded to 19px because engines that
+     lay out in fractions resolve THEIR `normal` to the same 19.44, and a
+     declared 19 would sit 0.44px under them there.
+
+     DECLARED IN PX, NOT INHERITED, and the font swap of 2026-08-19 is the
+     proof of why: the site is Inter now, whose `normal` is ~1.21em — 17.4px
+     here, a 41px bar, 2px UNDER theirs in the other direction. Their bar's
+     height is a fact about their face; ours has to be stated, or it tracks
+     whichever face this site happens to load.
+
+     IT IS THIS BAR'S HEIGHT AND NOTHING ELSE'S, as of 2026-08-20. The nav
+     row borrowed this 43px while it lived inside this bar and gave it back a
+     day later; the header is 64px again — mimis.nyc's own — so the stack is
+     43 over 64 rather than two identical bands. Nav.tsx carries the argument
+     for why they should not match. */
+  line-height: 19.44px;
+}
+
+/* ---- the bar is the SITE'S again (2026-08-20) ----------------------------
+
+   `html:not(:has(.home-stage)) .vv-announce { display: none }` used to live
+   here. D, 2026-08-18: "remove the We have news to share ... on every other
+   page but the home." That instruction was written when a 64px nav bar stood
+   under this one on every route, so hiding the copy off the landing left the
+   site's chrome intact.
+
+   There is no nav any more. D: "keep just the announcement bar", and "dont
+   make the announcement bar disappear automatically." With the rule in place
+   those two do not both hold — every route but `/` would have no chrome at
+   all, and clicking off the landing would look exactly like the bar removing
+   itself.
+
+   So it renders everywhere. In practice that is `/` and the 404, since every
+   secondary route is dark, but "everywhere" is the honest description and it
+   stops the bar's presence from depending on which page you happen to be on.
+
+   TO PUT IT BACK, if a nav ever returns and the copy should be the landing's
+   again, it is one rule — and use `:has(.home-stage)` rather than a
+   `usePathname()` branch in layout.tsx, which would make the root layout a
+   client component and paint the bar for one frame on every route before
+   hydration removed it. */
+
+/* ---- `html.announce-off` is gone, and so is what it hid ------------------
+
+   D: "also dont make the announcement bar disappear automatically."
+
+   This is where `html.announce-off .vv-announce { display: none }` lived. It
+   was set before first paint from a `vv-announce:v*` key in localStorage, so
+   a bar closed on any earlier visit was never painted again.
+
+   That is the only thing on this site that ever made the bar vanish without a
+   click, and it vanished in the worst possible way to debug: no error, no
+   empty box, no element with a suspicious height — the markup shipped and
+   simply was not painted. It cost a round trip on 2026-08-20, when a key
+   dismissed two days earlier was hiding a bar that had just been restored,
+   and it would have cost another every time the copy changed without a
+   version bump.
+
+   Dismissal is now scoped to the view it happens in: the component unmounts
+   itself and the next load brings the bar back. Nothing is written, nothing
+   is read, and there is no state that can outlive the page. See
+   AnnouncementBar.tsx. */
+
+/* ---- the bar leaves ------------------------------------------------------
+
+   The grid-rows collapse, same technique and same reasoning as `.nav-panel`:
+   the bar is IN NORMAL FLOW at the top of the document, so its removal has
+   to give its 43px back to the page over time rather than in one frame. A
+   transform cannot do that — translating the bar away leaves the hole. `0fr`
+   collapses to a true zero, where a max-height guess would either clip early
+   or leave a ceiling.
+
+   Yes, this animates a layout property, which the rest of this file avoids.
+   It is the same justified exception `.nav-panel` documents: there is no
+   GPU-only way to hand space back to in-flow content. It is bounded — one
+   element, 220ms, once per visitor — and the opacity runs shorter so the bar
+   is invisible for most of the collapse and only the space is still moving.
+
+   220ms against the 420ms entrance is deliberate, not sloppy symmetry: the
+   arrival is a page-load flourish and the dismissal is a system response to
+   a deliberate click, and system responses snap. */
+.vv-announce-shell {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 220ms var(--ease-rise),
+    opacity 140ms ease-out;
+}
+
+/* THE CLIP IS ITS OWN ELEMENT, and it has to be. `.vv-announce` carries
+   `padding: 12px 24px`, and padding is not part of what a grid row sizes —
+   with the bar itself as the grid item, a 0fr row still left 24px of its
+   padding standing, so the bar collapsed 43px -> 24px and then snapped the
+   last 24px away on unmount. An unpadded item in between takes the row's
+   height honestly and clips the padded bar inside it. */
+.vv-announce-shell > .vv-announce-clip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.vv-announce-shell.is-leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  /* The bar is on its way out; nothing in it should still be clickable. */
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion unmounts immediately (AnnouncementBar.tsx), so this
+     transition would never run — declared off anyway so a future code path
+     cannot reintroduce the movement by accident. */
+  .vv-announce-shell {
+    transition: none;
+  }
+}
+
+/* ---- the bar arrives with the page (2026-08-20) --------------------------
+
+   D: "remove the delay for the bar to load in."
+
+   It waited 1.6s for one revision, and waiting was the whole reason that
+   entrance animated HEIGHT: a bar arriving after the page has settled has to
+   make its own room, so it opened `grid-template-rows` from 0fr and pushed
+   the page down. Deliberate, documented, and only defensible because of WHEN
+   it happened — nobody has reached for anything 1.6 seconds in.
+
+   REMOVE THE DELAY AND THAT ARGUMENT INVERTS. The same push at 0s is 43px of
+   reflow during first paint, which is precisely the window Cumulative Layout
+   Shift measures and precisely when a visitor is deciding whether the page is
+   working. It would not read as an entrance; it would read as the stylesheet
+   arriving late.
+
+   So the height goes back to being static — the bar holds its 43px from the
+   first frame, nothing below it ever moves — and only the INK animates. This
+   is the entrance the bar had before the delay was ever asked for, restored
+   for the reason it was written: opacity and an 8px drop INTO ITS OWN BOX.
+
+   NOT a slide from -100%. The bar sits in normal flow at the top of the
+   document, so translating it its own full height would expose 43px of
+   whatever is behind it — the artwork — and read as a gap opening rather than
+   a bar arriving. A short drop inside a box that already exists has no hole.
+
+   `@keyframes` rather than a transition, which is the finding from the delayed
+   build and is worth keeping even though the delay is gone: a transition
+   advances per rendered frame, so on a landing spending its first second
+   decoding a 1.4MB artwork its progress is a race — measured open on four of
+   six identical captures. An animation owns its own timeline. Every other
+   entrance in this file is one for the same reason.
+
+   `backwards` holds the `from` frame until the animation starts, so there is
+   no flash of an opaque bar before it fades. `html.intro-js:not(.intro-go)`
+   covers the two frames before that, and a page that never enters the intro
+   system at all — background tab, script threw, JS off — matches neither rule
+   and gets a plain, opaque, static bar. The bar being visible must never
+   depend on an animation running.
+
+   THE SHELL IS NOT INVOLVED any more. It is `display: grid` purely so the
+   dismissal can collapse it; nothing touches `grid-template-rows` on the way
+   in. Entrance animates the bar, exit animates the shell, and the two cannot
+   interfere. */
+@keyframes announceIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+html.intro-js:not(.intro-go) .vv-announce {
+  opacity: 0;
+}
+
+html.intro-go .vv-announce {
+  animation: announceIn 0.42s var(--ease-rise) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The drop is movement; the fade is not. `homeFade` is the same substitution
+     every other entrance in this file makes — the bar still arrives rather
+     than appearing, it just does not travel. No delay to strip, now that
+     there is no delay. */
+  html.intro-go .vv-announce {
+    animation-name: homeFade;
+  }
+
+  .vv-announce-close {
+    transition: none;
+  }
+}
+
+/* `font-weight: 500` on the span and 700 on the link, which is their served
+   CSS verbatim.
+
+   IT WENT TO 400/14px FOR ONE PASS AND THAT WAS A MISREAD — worth recording,
+   because the evidence looked convincing at the time. D compared the two
+   bars and called ours too bold, so this dropped a step. What he was
+   actually looking at was a DUPLICATE `.vv-announce` block still sitting at
+   the end of this file from an earlier pass, winning on source order and
+   rendering neither the size nor the colour intended. Deleting the duplicate
+   and then lightening the weight applied the same correction twice.
+
+   Settled by measuring the shared prefix "We have news to share •" in a
+   side-by-side screenshot — identical string, so directly comparable:
+   theirs is ~4.7% wider than ours was at 400/14px. Going 14 -> 14.4px is
+   +2.9% and 400 -> 500 adds roughly another 2% in this face. The two
+   together land on their number, which is the confirmation their stylesheet
+   was right all along. */
+.vv-announce-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  font-weight: 500;
+}
+
+.vv-announce-link {
+  color: #000;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.3s;
+  /* Layout-neutral hit area: the padding grows the target, the negative
+     margin gives back the space so the line does not move. */
+  display: inline-block;
+  padding: 6px 2px;
+  margin: -6px 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-link:hover {
+    opacity: 0.7;
+  }
+}
+
+/* The close control. Absolutely positioned so it cannot shift the centred
+   line — theirs has no dismiss, so the text is centred on the bar, not on
+   the space left over beside a button.
+
+   36px square: over the 24px WCAG 2.5.8 floor without crowding a 43px bar.
+   The glyph inside is 11px; the target is the padding around it. */
+.vv-announce-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mute);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-close:hover {
+    color: #000;
+  }
+}
+
+/* ---- the header's field — CARRIED BY NOTHING AS OF 2026-08-20 ------------
+
+   D: "for now remove the red header and keep just the announcement bar."
+
+   `.vv-header` was the red bar's shadow, and the red bar is unmounted (see
+   layout.tsx). The rule is kept, empty of its shadow, because the class is
+   still on the <header> in Nav.tsx and the file it belongs to is parked
+   rather than deleted — the day the nav remounts, this is where its field
+   rules go.
+
+   THE SHADOW IS NOT DUPLICATED HERE. It went back to `.vv-announce`, which is
+   the bottom edge of the chrome again. Two elements declaring the same
+   `0 2px 8px rgba(0,0,0,.1)` is how you end up stacking two of them the day
+   the header returns; the rule is that the shadow belongs to whichever bar is
+   last, and only that one.
+
+   What the header looked like, for whoever remounts it: `bg-[var(--red)]`
+   with white type, a white-filtered wordmark (`.vv-mark-paper`) and a white
+   hamburger, on a 64px row. White on #B32622 is 6.53:1 — past the 4.5:1 body
+   floor and the 3:1 that 1.4.11 asks of the mark. Do not put anything below
+   full white on that field: 85% composites to 5.09:1 and 72% to 3.61:1, and
+   the second already failed once. */
+
+/* ---- the wordmark, in paper — CARRIED BY NOTHING AS OF 2026-08-20 --------
+
+   Nav.tsx is unmounted and it was the only element that ever wore this class,
+   so this filter paints nothing today. D: "i dont think the vavva logo is
+   necessary for now since the domain is vavva.xyz itself." Kept for the same
+   reason `.vv-mark-ink` above is kept — the argument below is the whole
+   reasoning for a white cut of the mark, and it is one class attribute away
+   from applying again.
+
+   The same filter the landing's overlaid header used before 2026-08-19, for
+   the same reason and against a different surface: the mark is a PNG of a red
+   brush stroke, there is no white cut of the artwork, so "make it white" is a
+   filter rather than a colour swap. `brightness(0)` maps every channel to
+   zero while leaving alpha alone — a true silhouette rather than a lightened
+   red — and `invert(1)` takes that silhouette to #fff.
+
+   White on --red is 6.53:1, well past the 3:1 that WCAG 1.4.11 asks of a
+   graphic. It is not a preference here in any case: the mark's own #B32622
+   against a #B32622 bar is 1:1, and the wordmark would simply be gone.
+
+   NO DROP SHADOWS, which is the one difference from the artwork version. That
+   rule carried two — `drop-shadow(0 1px 2px)` and `drop-shadow(0 0 10px)` —
+   because white strokes on a bright, busy sky need something to sit against.
+   A flat field needs nothing, and a shadow on it would be the sticker-halo D
+   rejected on the landing, just in reverse. */
+.vv-mark-paper {
+  filter: brightness(0) invert(1);
 }
 
 /* ---- falling blossom (components/hero/Petals.tsx) ------------------------
@@ -2451,11 +2809,13 @@ html:has(.home-stage) footer {
 
 /* ---- the wordmark, in ink — CARRIED BY NOTHING AS OF 2026-08-19 ----------
 
-   D: "Make the Vavva logo back to red as well." Nav.tsx no longer puts this
-   class on the mark, so the PNG shows its own red on every route. The rule
-   stays on disk rather than being deleted, because the reasoning below is
-   the whole argument for the ink cut and it is one class attribute away from
-   applying again.
+   D: "Make the Vavva logo back to red as well." Nav.tsx stopped putting this
+   class on the mark that day, and has not put it back: the mark showed its
+   own red for as long as the bar was white, and wears `.vv-mark-paper`
+   (further down this file) now that the bar is --red. The rule stays on disk
+   rather than being deleted, because the reasoning below is the whole
+   argument for the ink cut and it is one class attribute away from applying
+   again — the day this house puts a light bar back under the wordmark.
 
    WHY IT EXISTED, and why the argument no longer holds. The mark is a PNG of
    a red brush stroke, so "make it ink" is a filter rather than a colour swap
@@ -2473,9 +2833,13 @@ html:has(.home-stage) footer {
    rescue it — a white glow, then a dark shadow, then more size — moved the
    number, where inverting it moved it to 6.65:1.
 
-   The mark is on an opaque white bar now, where red measures 6.5:1. The
-   condition that forced the ink is gone, which is what makes D's request
-   safe rather than a contrast regression re-entering by the back door. */
+   The mark went onto an opaque white bar, where red measures 6.5:1. The
+   condition that forced the ink was gone, which is what made D's request
+   safe rather than a contrast regression re-entering by the back door.
+
+   IT IS ON A RED BAR NOW (2026-08-20) AND RED ON RED IS 1:1, so the artwork
+   is filtered again — white this time, not ink. Same mechanism, opposite
+   end: `brightness(0) invert(1)`. See `.vv-mark-paper`. */
 .vv-mark-ink {
   filter: brightness(0) invert(6.7%);
 }

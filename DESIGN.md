@@ -314,13 +314,124 @@ mark red again rather than a contrast regression re-entering by the back
 door.
 
 The other two bullets are untouched. The footer is still hidden on `/` only,
-still by `:has()`.
+still by `:has()`, and the bar-vs-artwork question was settled again the next
+day — see the 08-20 amendment below.
 
 The artwork did not move: it already began at the bottom edge of the bar,
 because the header was floating over it rather than displacing it. What
 changed is that the site's chrome went from 43px of copy above a 64px bar of
 links to one 43px bar carrying both jobs, and that nothing is on top of the
 picture any more.
+
+**Amendment, two bars and a red header (2026-08-20).** D: *"add back the
+announcement bar. (make our current header from white to VAVVA red and flip
+the current header components to white)."*
+
+The 08-19 pass folded the announcement into the header. This unfolds it: the
+copy and the dismiss control come back, the nav moves out into a bar of its
+own, and that bar is `--red`. Chrome is 43px of white copy over 43px of red on
+`/`, and 43px of red alone everywhere else — the bar is landing-only again,
+which is safe now for the same reason the dismiss button is safe now: both
+hide a line of copy rather than the site's navigation.
+
+- **The header keeps its 43px.** It took that height from the announcement
+  bar on 08-19 and does not give it back to the old 64px. D asked for the bar
+  and a recolour; the row was not in question.
+- **Contrast on the red bar was already measured** — see the red-landing
+  entry above, same `#B32622` at luminance 0.1109. White type and the
+  white-inverted mark are **6.53:1**, past the 4.5:1 body floor and past the
+  3:1 that 1.4.11 asks of the mark and the hamburger. Nothing on this bar
+  sits below full white, which is the one rule to keep: 85% white composites
+  to 5.09:1 and 72% to 3.61:1, and that second number already failed once on
+  the red landing.
+- **The hover accent moved from colour to the underline.** It was `--red`,
+  which is now the ground and therefore 1:1. It could not become another hue
+  either — the amber `--hl` is 3.33:1 on red, fine for a rule and short of
+  the 4.5:1 that type needs. So the type stays white at every state and the
+  three-way distinction is carried by decoration: rest none, hover an amber
+  underline, current a white one. `--hl` is the right token for it — it
+  already means "you are touching this" on `::selection` and the focus ring,
+  and was deliberately kept from meaning "Vavva".
+- **The wordmark is filtered again**, `brightness(0) invert(1)`, the same
+  reversal the artwork header used and for a harder reason: the mark is a
+  `#B32622` PNG and the bar is `#B32622`. Unfiltered it does not read as low
+  contrast, it is simply absent. `.vv-mark-ink` stays on disk, unused, for
+  the day a light bar comes back.
+- **shadowlion's drop shadow moved down one element**, off `.vv-announce` and
+  onto `.vv-header`. Same value. Left on the bar it would have cast 8px of
+  10% black into a saturated red field — a dark smear reading as a gradient
+  nobody drew, rather than separation. At the bottom of the chrome it does
+  what it was measured to do, and off the landing it is the only thing
+  keeping a red band from floating between two identical white fields.
+
+One thing this does NOT revisit: `viewport.themeColor` is still `#FFFFFF`. It
+tracks `--paper` and the landing's topmost bar is still white, so it is right
+where it is read most. On the interior routes the top of the page is now red
+and the browser chrome above it is not, and fixing that properly means a
+per-route viewport export rather than a new literal here.
+
+**Amendment, and the red header lasted half a day (2026-08-20).** D: *"for now
+remove the red header and keep just the announcement bar. i dont think the
+vavva logo is necessary for now since the domain is vavva.xyz itself. also dont
+make the announcement bar disappear automatically."*
+
+Everything in the amendment above is now history. There is no header. The
+landing is 43px of white announcement bar over the artwork, and that is the
+whole interface.
+
+- **Nav.tsx and VavvaMark.tsx are parked, not deleted**, same convention as
+  Footer, LoadingLamps, SlugList and MediaFrame. Nav keeps its 64px row, its
+  red field and its white type; `.vv-header` and `.vv-mark-paper` stay in
+  globals.css carrying nothing, with the 6.53:1 measurements intact for
+  whoever remounts it.
+- **Nothing reachable was lost.** Every primary link was already parked to `/`
+  and every secondary route is dark, so the header's only live destination was
+  Contact — which is `INSTAGRAM_HREF`, the same URL the bar's *Follow Us ↗*
+  points at. Check this before deleting a site's navigation; here it happened
+  to be free.
+- **The logo argument is D's and it is sound, conditionally.** The address bar
+  already reads vavva.xyz, so a wordmark beneath it introduces the site to
+  someone who just typed its name. That holds for a one-page coming-soon and
+  stops holding the moment there is a second route to get back from.
+- **The shadow moved back to `.vv-announce`.** The rule is not "the shadow
+  lives on the bar" but *the shadow lives on the bottom edge of the chrome* —
+  the only edge with page under it. Whichever bar is last owns it, and only
+  that one.
+- **The bar is site-wide again.** The landing-only rule from 08-18 was written
+  when a nav bar stood under it on every route; with no nav, it would have left
+  every route but `/` with no chrome at all, and navigating off the landing
+  would have looked exactly like the bar removing itself.
+- **Dismissal no longer persists, and that is the "disappear automatically"
+  fix.** The bar never had a timer, but it did vanish on its own in the way
+  that matters: the close button wrote `vv-announce:v*` to localStorage and a
+  pre-paint script re-applied `announce-off`, so one click meant every later
+  load opened with no bar, no error, and no element to inspect. That cost a
+  round trip on this very date. The X now closes the bar for the current view
+  only; a reload brings it back. The key, the class, the CSS rule and the
+  pre-paint read are all gone.
+- **`themeColor: "#FFFFFF"` is simply correct now** rather than a compromise —
+  the top of every route is the white bar again.
+
+**Amendment, the delay is gone (2026-08-20).** D: *"remove the delay for the bar
+to load in."* The bar arrives with the page again — `announceIn`, 420ms of
+opacity and an 8px drop, no `--announce-delay` token any more.
+
+The important part is what went with it. A delayed entrance had to animate
+HEIGHT: a bar arriving after the page has settled must make its own room, so it
+opened `grid-template-rows` from 0fr and pushed the page down, which was
+defensible only because of *when* it happened. At 0s that same push is 43px of
+reflow during first paint — the exact window CLS measures. So the height is
+static again, the bar holds its 43px from the first frame, and only the ink
+animates. **If a delay is ever reintroduced, the height animation has to come
+back with it; they are one decision, not two.**
+
+One finding survives both revisions and is worth keeping: the entrance must be
+a `@keyframes` animation, never a transition with `transition-delay`. A
+transition advances per rendered frame, so on a landing spending its first
+second decoding a 1.4MB artwork its progress is a race — measured at
+`grid-template-rows: 0px` out to 2.6s with the delay correctly applied, and open
+on only four of six identical captures. Animations own their own timeline, which
+is why every other entrance in this file is one.
 
 **Amendment, the footer mark (2026-08-18).** The second-VAVVA ban above is
 lifted for the footer, and only for the footer. It was written when this site

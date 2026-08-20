@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AnnouncementBar } from "@/components/announce/AnnouncementBar";
-import { Nav } from "@/components/nav/Nav";
 import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
@@ -210,7 +209,20 @@ export default function RootLayout({
             Backing out removes `intro-js`, which also disarms `.scroll-
             reveal` (same class gates it, see globals.css). That is correct
             and deliberate: both are entrances, and a page that cannot play
-            one should not be holding content back for the other either. */}
+            one should not be holding content back for the other either.
+            ---- IT NO LONGER READS A DISMISSAL (2026-08-20) --------------
+
+            This script briefly stamped `announce-off` on <html> from
+            localStorage, so an announcement bar closed on an earlier visit
+            was never painted and then removed. D: "also dont make the
+            announcement bar disappear automatically."
+
+            The dismissal does not persist any more, so there is nothing to
+            read before paint and no flash to prevent — see
+            AnnouncementBar.tsx. What that read actually produced in practice
+            was a bar that silently failed to appear, with no error and no
+            element to inspect, for anyone who had clicked the X once.
+        */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var d=document.documentElement;if(document.visibilityState==='hidden')return;d.classList.add('intro-js');requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add('intro-go')})});setTimeout(function(){if(d.classList.contains('intro-go'))return;if(document.visibilityState==='hidden'){d.classList.remove('intro-js')}else{d.classList.add('intro-go')}},400)}catch(e){try{document.documentElement.classList.remove('intro-js')}catch(_){}}})();`,
@@ -223,10 +235,34 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-svh flex-col">
-        {/* Nav stays — persistent, route-agnostic chrome on every page.
+      {/* suppressHydrationWarning, for the same reason <html> carries it and
+          a different cause (2026-08-20). D hit:
 
-            NO FOOTER, and it is settled rather than pending. Removed
+            A tree hydrated but some attributes of the server rendered HTML
+            didn't match ... - cz-shortcut-listen="true"
+
+          `cz-shortcut-listen` is ColorZilla's. The extension stamps it on
+          <body> as soon as the document exists, which is before React
+          hydrates, so React compares its own server markup against a <body>
+          a third party has already edited and reports the difference.
+
+          Nothing in this repo can stop that, and nothing should try: the page
+          is correct, the extension is doing what extensions do, and the
+          warning is React telling the truth about a mismatch that does not
+          matter. This is the escape hatch React documents for exactly this
+          case.
+
+          IT IS ONE LEVEL DEEP, which is what makes it safe to reach for.
+          `suppressHydrationWarning` silences mismatches on THIS element's own
+          attributes and text — it does not propagate to children, so a real
+          hydration bug anywhere inside the app still reports normally. It is
+          not a blanket mute.
+
+          Note this cannot be reproduced in CI or in a headless run: extension
+          attributes only exist in a real profile with the extension loaded.
+          If it disappears, that is the extension being disabled, not a fix. */}
+      <body className="flex min-h-svh flex-col" suppressHydrationWarning>
+        {/* NO FOOTER, and it is settled rather than pending. Removed
             2026-08-07 at D's instruction ("keep the vavva header, and remove
             its footer"), site-wide rather than landing-only, which is what
             "remove the footer" said twice. Briefly remounted 2026-08-10 and
@@ -250,38 +286,36 @@ export default function RootLayout({
             remaining route is reachable from the nav.
 
             This note existed twice, near-verbatim, until 2026-08-14. */}
-        {/* THE HEADER STANDS ON THE BAR (2026-08-19). D: "Place the current
-            header components on the announcement bar and remove the current
-            announcement bar copy ... keep the announcement bar how it is
-            (same size) ... and just fit the buttons onto the announcement
-            bar."
+        {/* ONE BAR, AND IT IS THE WHOLE OF THE CHROME (2026-08-20).
+            D: "for now remove the red header and keep just the announcement
+            bar. i dont think the vavva logo is necessary for now since the
+            domain is vavva.xyz itself."
 
-            One element of chrome at the top of every route, 43px tall — the
-            bar's own height, unchanged — carrying the links, the mark and
-            Contact. The bar no longer says anything; it is the white field
-            and drop shadow the nav sits on. See AnnouncementBar.tsx for what
-            had to go with the copy (the dismiss button, chiefly: it used to
-            `display: none` this element, which would now delete the site's
-            navigation).
+            The red header is unmounted. Nav.tsx keeps its 64px row, its white
+            type and its red field on disk, ready to remount — same
+            paused-not-gone treatment as Footer, LoadingLamps, SlugList,
+            MediaFrame and the rest. VavvaMark goes with it, since Nav was its
+            only call site.
 
-            THE LANDING'S OVERLAID HEADER IS GONE WITH IT, and that is the
-            visible half of the change rather than a side effect. `/` used to
-            run the header absolutely over the artwork — transparent, over a
-            dark scrim, with white links and a white-inverted mark, because
-            no ink colour cleared 4.5:1 against foliage, sky and blossom at
-            once. On an opaque white bar none of that applies, which is what
-            makes the rest of D's ask safe: the mark is red again (6.5:1) and
-            the links are black (21:1). The artwork itself does not move — it
-            already began at the bottom edge of this bar, and it still does.
-            globals.css keeps the contrast measurements at the deleted scrim.
+            NOTHING REACHABLE WAS LOST, which is the check worth doing before
+            deleting a site's navigation. Every primary link was already
+            parked to `/` (NAV_DESTINATIONS_PARKED) and every secondary route
+            is dark (SECONDARY_PAGES_LIVE) — the header's three links went
+            home and the pages behind them 404. The one live destination it
+            carried was Contact, which is INSTAGRAM_HREF, and the bar's
+            "Follow Us ↗" is the same URL. The page has the same outbound
+            reach with the header gone.
 
-            THE POSITIONING CONTEXT WENT WITH THE OVERLAY. The wrapper that
-            used to hold the header and the page together existed so an
-            absolute `top: 0` would land below the bar with no number to keep
-            in step. Nothing is absolute here any more. */}
-        <AnnouncementBar>
-          <Nav />
-        </AnnouncementBar>
+            THE LOGO'S REMOVAL IS AN ARGUMENT, NOT A DELETION: the address bar
+            already reads vavva.xyz, so the wordmark under it was the site
+            naming itself to someone who had just typed its name. That is true
+            of a one-page coming-soon and stops being true the moment there is
+            a second route — which is why the component is parked rather than
+            dropped.
+
+            So the landing is 43px of white copy over the artwork, and that is
+            the entire interface. */}
+        <AnnouncementBar />
 
         {/* ---- the header lamp strip is gone (2026-08-18) ----------------
 

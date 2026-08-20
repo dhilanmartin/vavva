@@ -98,9 +98,34 @@ const PRIMARY_LINKS = [
 // is gone with it: .nav-link now owns its own transition (colour + the
 // press transform together), and two transition declarations on one element
 // are resolved by stylesheet order rather than by concatenation order.
+//
+// ---- 2026-08-20: white on red -------------------------------------------
+//
+// D: "flip the current header components to white." The bar is --red now, so
+// the two literals below invert. What they invert TO is not a straight swap
+// of the reference's pair, because that pair is a value relationship and it
+// does not survive being reflected:
+//
+//   theirs   rest #000 (21:1 on white)   current #111 — a step LIGHTER, i.e.
+//            a step of contrast GIVEN UP to mark the page you are on.
+//   ours     rest #fff (6.53:1 on --red) — and white is the ceiling. There is
+//            nothing above it to step down from, and stepping DOWN from white
+//            spends contrast this bar does not have spare: --red is a dark
+//            field, 6.53:1 is already under AAA, and rgba(255,255,255,.88)
+//            lands at 5.36:1.
+//
+// So both states are #fff and the CURRENT page is marked by the underline
+// alone — which is the part of their model that was doing the real work
+// anyway (all three of their states differ in decoration, and only two of
+// them differ in colour). Hover then needs its own signal, and it gets one in
+// globals.css: white type with an AMBER underline. See `.nav-link:hover`.
+//
+// Nothing today renders the current state at all — NAV_DESTINATIONS_PARKED
+// forces `active` false on every item, see NavItem below — so this is the
+// definition the flag's removal will switch on, not something on screen now.
 const navLinkClass = (active: boolean) =>
   `nav-link inline-block text-[16px] font-semibold uppercase ${
-    active ? "text-[#111] underline" : "text-black no-underline"
+    active ? "text-white underline" : "text-white no-underline"
   }`;
 
 /* One nav item, rendered as a real link or as an inert label. Two flags in
@@ -194,7 +219,7 @@ export function Nav() {
   }));
 
   return (
-    <header className="relative z-20 bg-[var(--paper)]">
+    <header className="vv-header relative z-20 bg-[var(--red)]">
       {/* THE MARK IS ABSOLUTELY CENTRED, and the side zones size to their own
           content. This replaced three `flex-1` zones, which looked like the
           right way to centre a mark and failed at a specific band of widths.
@@ -218,26 +243,47 @@ export function Nav() {
           than on the <Link>, because the link carries `home-rise`, whose
           keyframes animate `transform` — one element cannot hold both a
           static centring translate and an animated one. */}
-      {/* 43px, NOT 64 (2026-08-19). The row moved onto the announcement bar
-          and D's instruction was to keep that bar the size it already is —
-          "keep the announcement bar how it is (same size) ... and just fit
-          the buttons onto the announcement bar." So the bar's 43px is now
-          this row's height, and the bar's own padding is gone; see
-          `.vv-announce` in globals.css.
+      {/* 64px AGAIN (2026-08-20), which is this row giving back a number that
+          was never its own. D: "idk if both headers should b the same size
+          lmk what works best."
 
-          43px was the bar's measured height (12px padding + a 19.44px line +
-          12px padding), read off shadowlion.com's served CSS. It is now the
-          one place the number lives. The 24px gutter below is the same 24px
-          the bar used to hold as horizontal padding, so nothing moved
-          sideways.
+          It ran 43px for one day. That was the ANNOUNCEMENT BAR's height —
+          12px padding + a 19.44px line + 12px padding, read off
+          shadowlion.com's served CSS and argued down twice by D when it
+          rendered 2-3px tall — and this row inherited it on 2026-08-19 for
+          one reason: the nav had moved INSIDE that bar, and the instruction
+          was "keep the announcement bar how it is (same size)". The bar is a
+          separate element again, so it keeps its 43px and this row stops
+          borrowing it.
 
-          What fits: the 31px mark clears 6px above and below, and a 20px
-          link row clears 11.5px. The two 44px AAA targets — `.vv-mark-link`
-          and the hamburger — overhang this row by half a pixel each side,
-          which is invisible (neither paints a background) and is the right
-          trade: the target size is a promise to a user, the bar height is a
-          promise to D. */}
-      <div className="relative mx-auto flex h-[43px] max-w-[1710px] items-center justify-between px-6">
+          64px is mimis.nyc's measured header, flat at every width, and the
+          number this repo held for two weeks before the merge.
+
+          ---- why they should not match --------------------------------
+
+          Two 43px bands stacked read as one 86px header split by a colour
+          change — or as a site that could not decide how tall its header is.
+          Nothing in the stack says which bar matters. And the claim is false:
+          the announcement is secondary, ephemeral and DISMISSIBLE, the nav is
+          permanent and primary, and equal height gives them equal weight.
+
+          43 over 64 is roughly 2:3. The ribbon reads as a ribbon, the header
+          reads as the header, and the order is legible without anyone
+          thinking about it.
+
+          THE ROOM IS ALSO REAL, not just proportion. At 43px the 31px mark
+          cleared 6px above and below and the two 44px AAA targets —
+          `.vv-mark-link` and the hamburger — overhung the row by half a pixel
+          each side. That was accepted as invisible (neither paints a
+          background), but it was a trade. At 64px the mark clears 16.5px, the
+          20px link row clears 22px, and both targets sit inside the row with
+          10px to spare. Nothing overhangs anything.
+
+          One number, one place: `.home-stage` and not-found.tsx both grow
+          with `flex-1` rather than subtracting a chrome height, so changing
+          this does not strand a constant anywhere. That is the lesson of the
+          64 -> 104 -> 64 -> 144 run recorded in layout.tsx. */}
+      <div className="relative mx-auto flex h-16 max-w-[1710px] items-center justify-between px-6">
         <div
           className="home-rise flex items-center justify-start"
           style={{ ["--i" as string]: 0 }}
@@ -288,17 +334,17 @@ export function Nav() {
                 composed `transform`. */}
             <span aria-hidden className="relative block h-3.5 w-5">
               <span
-                className={`absolute left-0 top-0 h-[1.5px] w-full bg-[var(--ink)] transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
+                className={`absolute left-0 top-0 h-[1.5px] w-full bg-white transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
                   open ? "translate-y-[6.25px] rotate-45" : ""
                 }`}
               />
               <span
-                className={`absolute left-0 top-1/2 h-[1.5px] w-full -translate-y-1/2 bg-[var(--ink)] transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
+                className={`absolute left-0 top-1/2 h-[1.5px] w-full -translate-y-1/2 bg-white transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
                   open ? "scale-x-0 opacity-0" : ""
                 }`}
               />
               <span
-                className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-[var(--ink)] transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
+                className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-white transition-[translate,rotate,opacity,scale] duration-300 ease-[var(--ease-out)] ${
                   open ? "-translate-y-[6.25px] -rotate-45" : ""
                 }`}
               />
@@ -375,17 +421,28 @@ export function Nav() {
               So: the header is the same size as mimis' (the ask), and the
               mark is the size this repo has now decided on twice. See not-found.tsx for the one other file
               that has to know the bar height. */}
-            {/* RED AGAIN (2026-08-19). D: "Make the Vavva logo back to
-                red as well." `vv-mark-ink` — the `brightness(0)
-                invert(6.7%)` filter that made the PNG's brush stroke #111 —
-                is off, so the artwork shows its own #B32622.
+            {/* WHITE, AND THIS ONE IS FORCED (2026-08-20). D: "flip the
+                current header components to white" — but even without the
+                instruction the mark could not stay as it was: it is a PNG of
+                a #B32622 brush stroke, and the bar under it is now #B32622.
+                Red on red is 1:1. The mark would have disappeared.
 
-                It is not a contrast regression coming back in: the ink cut
-                was reached the same week because the mark was sitting ON THE
-                ARTWORK, where red measured 1.29:1 against the sky. On the
-                white bar it measures 6.5:1. The rule is still in globals.css
-                with that reasoning, carried by nothing. */}
-            <VavvaMark className="h-[31px] w-auto" />
+                Third treatment in three days, and the pattern is worth
+                stating because it is the same rule every time: the mark is
+                one asset and the surface decides its filter.
+
+                  on the ARTWORK   `brightness(0) invert(1)` — white, because
+                                   red on that sky was 1.29:1
+                  on WHITE         no filter — its own red, 6.5:1
+                  on RED           `brightness(0) invert(1)` again — white,
+                                   6.53:1
+
+                `.vv-mark-paper` in globals.css, which is the artwork rule's
+                filter without the two drop-shadows it carried. Those existed
+                to separate white strokes from a bright, busy sky; a flat
+                field needs nothing. `vv-mark-ink` stays on disk, carried by
+                nothing, with the argument for the #111 cut intact. */}
+            <VavvaMark className="vv-mark-paper h-[31px] w-auto" />
           </Link>
         </div>
 
