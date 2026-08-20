@@ -2695,3 +2695,39 @@ html:has(.home-stage) .vv-hero-ledger {
 .vv-hero-ledger .vv-ledger-red {
   color: inherit;
 }
+
+/* ---- Touch targets ------------------------------------------------------
+   Two controls measured under the 44px floor (WCAG 2.5.8) in the design
+   review on 2026-08-19: the header wordmark link at 66x31, and the footer
+   Instagram chip at 34x34.
+
+   Both keep their VISUAL size and gain hit area — the chip is a 34px
+   rounded square by design and the mark is 31px tall because D set it
+   there. `min-height` plus symmetric inline padding grows the target
+   around the artwork rather than scaling it, so nothing moves on screen.
+
+   The mark sits inside an absolutely centred, translate(-50%) wrapper, so
+   symmetric padding leaves the centring intact. */
+.vv-mark-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 10px;
+}
+
+.vv-ig {
+  position: relative;
+}
+
+/* A pseudo-element target rather than padding on the chip itself: the chip's
+   own box IS the visible 34px square with its own fill and radius, so
+   padding it would grow the fill. This grows only the pointer surface. */
+.vv-ig::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
