@@ -2671,3 +2671,26 @@ html.intro-go .vv-announce {
 .vv-mark-ink {
   filter: brightness(0) invert(6.7%);
 }
+
+/* ---- the wordmark's hit area --------------------------------------------
+   Restored 2026-08-19. It first landed in f6227b3 and was swept up by the
+   revert that followed, which was scoped to the design system and never
+   meant to touch this.
+
+   THE STANDARD IS 2.5.5, NOT 2.5.8, and f6227b3's own message had that
+   wrong. 66x31 clears the 24px WCAG 2.5.8 (AA) floor already; 44px is 2.5.5
+   Target Size (Enhanced, AAA), which is what this buys. The footer's
+   Instagram chip is deliberately NOT given the same treatment — see the note
+   above .vv-ig for why 34px stands there.
+
+   The mark keeps its VISUAL size: 31px is the number this repo has settled
+   on twice. `min-height` plus symmetric inline padding grows the target
+   around the artwork rather than scaling it, so nothing moves on screen. The
+   link sits inside an absolutely centred translate(-50%) wrapper, and
+   symmetric padding leaves that centring intact. */
+.vv-mark-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 10px;
+}
