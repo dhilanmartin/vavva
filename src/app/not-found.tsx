@@ -39,7 +39,7 @@ import Link from "next/link";
    still on that stepped scale. */
 export default function NotFound() {
   return (
-    <main className="flex w-full flex-1 flex-col bg-[var(--paper)] antialiased">
+    <main className="flex w-full flex-1 flex-col bg-[var(--paper)]">
       {/* px-4 / md:px-5 to match the home column. This was px-1, which put the
           copy 4px off the bezel on a 320px phone while the home page held 16 —
           the two pages are the same site and should not gutter differently.
@@ -47,8 +47,10 @@ export default function NotFound() {
           so it just needs to stop the block drifting on a wide screen. */}
       <div className="mx-auto flex w-full max-w-[360px] flex-1 flex-col justify-center px-4 py-16 md:px-5">
         {/* An h1, not a p. The home page's heading is carried by the mark; this
-            page has no mark, so as a <p> it shipped with no heading at all. */}
-        <h1 className="m-0 text-[15px] font-medium leading-[1.4] tracking-[-0.015em] text-black">
+            page has no mark, so as a <p> it shipped with no heading at all.
+            18px / 600 sits above the 15px `.social-link` under it — equal 15px
+            on both made the heading a label. */}
+        <h1 className="m-0 text-lg font-semibold leading-[1.2] text-black">
           Not found
         </h1>
         <p className="mt-6">

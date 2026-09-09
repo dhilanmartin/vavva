@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
-import { SECONDARY_PAGES_LIVE } from "@/lib/site";
+import { isRouteLive } from "@/lib/site";
 
 // Renamed from /shop to /products 2026-08-12, at D's instruction — label
 // and route stay in agreement, same rule this repo already applied when
@@ -60,12 +60,12 @@ export const metadata: Metadata = { title: "Products — VAVVA" };
    living on the grid wrapper (`mt-11`) rather than on the deleted line, so
    the reference's rhythm did not depend on it. */
 export default function ProductsPage() {
-  // Disabled 2026-08-07 — see SECONDARY_PAGES_LIVE in src/lib/site.ts.
-  if (!SECONDARY_PAGES_LIVE) notFound();
+  // Gated per-route as of 2026-09-04 — see PRODUCTS_PAGE_LIVE in site.ts.
+  if (!isRouteLive("/products")) notFound();
 
   return (
-    <main className="w-full bg-[var(--paper)] px-6 pb-24 pt-10">
-      <div className="mx-auto max-w-[1710px]">
+    <main className="w-full bg-[var(--paper)] pb-24 pt-10 desktop:pt-16">
+      <div className="vv-shop px-6">
         {/* On-load entrance, 2026-08-18. D: "add animation to the Products
             and Locations on their respective pages on refresh/load-in (see
             mimis.nyc)" — their page headings fade + rise on load, the same
@@ -84,7 +84,7 @@ export default function ProductsPage() {
             landing's one paragraph does at index 3. The page reads as one
             cascade from the top of the window down, not as two competing
             ones. */}
-        <h1 className="mimi-display home-rise" style={{ ["--i" as string]: 3 }}>
+        <h1 className="vv-shop-title home-rise" style={{ ["--i" as string]: 3 }}>
           Products
         </h1>
         {/* `reveal-stagger` moves the entrance off this wrapper and onto the

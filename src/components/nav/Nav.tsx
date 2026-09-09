@@ -58,8 +58,9 @@ import { useState } from "react";
 import { VavvaMark } from "@/components/brand/VavvaMark";
 import {
   CONTACT_HREF,
+  destinationHref,
+  isRouteLive,
   NAV_DESTINATIONS_PARKED,
-  SECONDARY_PAGES_LIVE,
 } from "@/lib/site";
 
 // "Merch" reverted to "Shop" 2026-08-07, then "Shop" renamed to "Products"
@@ -118,7 +119,7 @@ const PRIMARY_LINKS = [
 // alone — which is the part of their model that was doing the real work
 // anyway (all three of their states differ in decoration, and only two of
 // them differ in colour). Hover then needs its own signal, and it gets one in
-// globals.css: white type with an AMBER underline. See `.nav-link:hover`.
+// globals.css: underline in black. See `.nav-link:hover`.
 //
 // Nothing today renders the current state at all — NAV_DESTINATIONS_PARKED
 // forces `active` false on every item, see NavItem below — so this is the
@@ -182,9 +183,9 @@ function NavItem({
      pages — `aria-current="page"` on three links, three underlines. A
      header where everything is current tells a visitor nothing, and tells a
      screen reader something false. */
-  const parked = NAV_DESTINATIONS_PARKED;
+  const live = isRouteLive(href);
 
-  if (!parked && !SECONDARY_PAGES_LIVE) {
+  if (!NAV_DESTINATIONS_PARKED && !live) {
     return (
       <span
         aria-disabled="true"
@@ -195,8 +196,8 @@ function NavItem({
     );
   }
 
-  const target = parked ? "/" : href;
-  const isCurrent = parked ? false : active;
+  const target = destinationHref(href);
+  const isCurrent = live ? active : false;
 
   return (
     <Link

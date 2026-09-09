@@ -1,10 +1,10 @@
-import { ComingSoonTile, ProductTile } from "./ProductTile";
-import trio from "../../assets/house-pbj-trio.png";
-import teeScript from "../../assets/products/tee-script.jpg";
-import teeFairies from "../../assets/products/tee-fairies.jpg";
-import teeDobermans from "../../assets/products/tee-dobermans.jpg";
-import teeGrid from "../../assets/products/tee-grid.jpg";
+import { ProductTile } from "./ProductTile";
 import teeBlankBlack from "../../assets/products/tee-blank-black.jpg";
+import nightLeopard from "../../assets/products/silk-mask.png";
+import nightLeopardWorn from "../../assets/products/silk-mask-worn.png";
+import cherryBlossom from "../../assets/products/cherry-blossom.png";
+import sweetDreams from "../../assets/products/sweet-dreams.png";
+import pajamaPant from "../../assets/products/pajama-pant.png";
 
 // Seven tees added 2026-08-14 (D supplied the packshots; src/assets/products/).
 //
@@ -72,39 +72,29 @@ import teeBlankBlack from "../../assets/products/tee-blank-black.jpg";
 // two products to square the grid would be the grid deciding the inventory.
 const PRODUCTS = [
   {
-    name: "House PB&J",
-    image: trio,
-    alt: "Three foil-wrapped House PB&J sandwich bars stacked — gold, red and purple.",
-    price: "$15",
-    variants: ["PB", "PB&J", "Jam"],
+    name: "Leopard",
+    image: nightLeopard,
+    hoverImage: nightLeopardWorn,
+    alt: "Leopard-print plush silk sleep mask.",
+    price: "$200",
+    variants: [],
+    href: "/products/leopard",
   },
   {
-    name: "Script Tee",
-    image: teeScript,
-    alt: "White cotton tee with the Vavva brush wordmark printed in red across the chest.",
-    price: "$65",
-    variants: ["S", "M", "L", "XL"],
+    name: "Sakura",
+    image: cherryBlossom,
+    alt: "Pastel cherry-blossom plush silk sleep mask.",
+    price: "$200",
+    variants: [],
+    href: "/products/sakura",
   },
   {
-    name: "Fairies Tee",
-    image: teeFairies,
-    alt: "White cotton tee with two blue fairies printed at centre chest.",
-    price: "$65",
-    variants: ["S", "M", "L", "XL"],
-  },
-  {
-    name: "Dobermans Tee",
-    image: teeDobermans,
-    alt: "White cotton tee with three black dobermans printed at centre chest.",
-    price: "$65",
-    variants: ["S", "M", "L", "XL"],
-  },
-  {
-    name: "Grid Tee",
-    image: teeGrid,
-    alt: "White cotton tee printed with a dense grid of small multicoloured figures.",
-    price: "$65",
-    variants: ["S", "M", "L", "XL"],
+    name: "Midnight",
+    image: sweetDreams,
+    alt: "Navy starfield plush silk sleep mask.",
+    price: "$200",
+    variants: [],
+    href: "/products/midnight",
   },
   {
     name: "Blank Tee, Black",
@@ -112,6 +102,14 @@ const PRODUCTS = [
     alt: "Black cotton tee with no print.",
     price: "$65",
     variants: ["S", "M", "L", "XL"],
+  },
+  {
+    name: "Pajama Pant",
+    image: pajamaPant,
+    alt: "Blue and white pinstripe pajama pants.",
+    price: "$85",
+    variants: ["S", "M", "L", "XL"],
+    href: "/products/pajama-pant",
   },
 ];
 
@@ -143,8 +141,9 @@ const PRODUCTS = [
      row gap        40px below desktop, 30px at desktop
      image          4:5 portrait, flat: no radius, no border, no shadow
      image -> text  10px
-     name           12px/16.8px below desktop, 10px/14px at desktop, weight
-                    500, uppercase, LEFT aligned
+     name           12px / 1.4, weight 500, uppercase, LEFT aligned.
+                    Stussy steps this to 10px in a 4-col row; this grid is
+                    two ~277px cells, so 12px holds at every width.
      hover reveal   a second line fades in under the name, 250ms
                     cubic-bezier(0.215, 0.61, 0.355, 1), its height reserved
                     at rest so the grid cannot reflow
@@ -168,14 +167,14 @@ const PRODUCTS = [
    screen. With six products it happens to be the whole catalogue; leave it
    at 6 rather than tracking the count, or a seventh product silently starts
    eager-loading a below-fold image. */
-const EAGER_TILES = 6;
-
-// One desktop row of empty slots under the catalogue.
-const COMING_SOON_SLOTS = 6;
+const EAGER_TILES = 5;
 
 export function ProductGrid() {
+  // 2-col on the phone, 3-col from tablet up. Four columns is Balenciaga's
+  // move and it wants a denser catalogue. Drop the 560 cap so desktop uses
+  // `--shop`.
   return (
-    <div className="grid grid-cols-2 gap-x-[5px] gap-y-10 tablet:grid-cols-3 desktop:grid-cols-6 desktop:gap-y-[30px]">
+    <div className="grid grid-cols-2 gap-x-[5px] gap-y-10 tablet:grid-cols-3 desktop:gap-y-[30px]">
       {PRODUCTS.map((product, i) => (
         <ProductTile
           key={product.name}
@@ -183,9 +182,6 @@ export function ProductGrid() {
           eager={i < EAGER_TILES}
           index={i}
         />
-      ))}
-      {Array.from({ length: COMING_SOON_SLOTS }).map((_, i) => (
-        <ComingSoonTile key={`soon-${i}`} index={PRODUCTS.length + i} />
       ))}
     </div>
   );

@@ -102,6 +102,39 @@ export const NAV_DESTINATIONS_PARKED = true;
 // header parks past is reachable only by URL.
 export const SECONDARY_PAGES_LIVE = false;
 
+// Products only, 2026-09-04. D: reopen /products, leave Locations and Our
+// Story dark. Not SECONDARY_PAGES_LIVE, which is still the three-together
+// lever — flipping that would 200 the other two as well.
+//
+// Nav and Footer read `destinationHref` so a live /products cannot sit
+// behind a parked link, and a dark sibling still goes home rather than 404.
+export const PRODUCTS_PAGE_LIVE = true;
+
+export function isRouteLive(path: string): boolean {
+  if (path === "/products") return PRODUCTS_PAGE_LIVE || SECONDARY_PAGES_LIVE;
+  return SECONDARY_PAGES_LIVE;
+}
+
+export function destinationHref(path: string): string {
+  if (isRouteLive(path)) return path;
+  return NAV_DESTINATIONS_PARKED ? "/" : path;
+}
+
+/* Interior chrome lists live routes only. A label for a dark page — even
+   one that parks to `/` — is a door painted on the wall. Locations and
+   Our Story return to this list the moment SECONDARY_PAGES_LIVE is true. */
+const INTERIOR_NAV_CANDIDATES = [
+  { href: "/locations", label: "Locations" },
+  { href: "/products", label: "Products" },
+  { href: "/story", label: "Our Story" },
+] as const;
+
+export function liveInteriorNav(): { href: string; label: string }[] {
+  return INTERIOR_NAV_CANDIDATES.filter((item) => isRouteLive(item.href)).map(
+    (item) => ({ href: item.href, label: item.label }),
+  );
+}
+
 // GATED_ROUTES_LIVE removed 2026-08-07.
 //
 // It existed for a specific situation: the landing was the finished public

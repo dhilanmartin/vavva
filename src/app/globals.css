@@ -11,6 +11,10 @@
      file changed. --ink lands on #1A1A1A, which is exactly the reference's
      own body colour. That is why the palette was built as relationships. */
   --paper: #fff;
+  /* Shop measure. 1710 was mimis' catalogue width — six cells. Two SKUs
+     and a PDP at that cap turn the photograph into a billboard. 1080 is
+     the column the eye can take in; side paper is the rest of the desk. */
+  --shop: 1080px;
   --ink: rgba(0, 0, 0, 0.9);
   /* 0.55 is the floor: at 0.45 this rendered 3.24:1 on the paper, under the
      4.5:1 AA minimum for 15px body — and the resting CTA uses this token. */
@@ -226,6 +230,8 @@ html {
      there is no gutter to reserve, and it is the standard fix where there
      is. */
   scrollbar-gutter: stable;
+  /* Drops the 300ms double-tap-zoom delay on tap. Pinch-zoom stays. */
+  touch-action: manipulation;
 }
 
 body {
@@ -293,18 +299,11 @@ html.intro-go .home-rise {
   }
 }
 
-/* Even line lengths, decided by the browser rather than by hand-tuning the
-   measure every time the copy changes. `pretty` only protects the last line
-   from becoming an orphan; `balance` equalises the whole set, which is what
-   kills the ragged notch — the etymology line goes from 297/305/126 (a 179px
-   spread ending in a stub) to 223/233/272 (48px).
-
-   Declared twice on purpose. A browser with `pretty` but no `balance` drops the
-   second declaration and keeps the orphan protection; one with neither falls
-   all the way back to normal wrapping. */
+/* Orphan control on paragraphs. `pretty` keeps the last line from collapsing
+   to a stub. `balance` belongs on short headings (`.vv-shop-title`,
+   `.vv-pdp-title`), not on body copy — it evened out whole blocks. */
 p {
   text-wrap: pretty;
-  text-wrap: balance;
 }
 
 /* The pronunciation, a parenthetical inside an already-parenthetical gloss.
@@ -528,55 +527,61 @@ p {
   outline: none;
 }
 
+/* First tab stop. Hidden until focused so it adds no chrome. White ring
+   because the chip is already black, and the site's amber+hairline would
+   vanish against it. */
+.vv-skip {
+  position: absolute;
+  left: 16px;
+  top: 8px;
+  z-index: 100;
+  display: inline-flex;
+  height: 44px;
+  align-items: center;
+  padding: 0 16px;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.vv-skip:not(:focus-visible) {
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+}
+
+.vv-skip:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
 /* Touch devices fire hover on tap, which left footer/nav links stuck in
    their hovered state after a mobile tap. Gated per improve-animations
    audit finding #1 — plans/001-motion-polish-tokens.md. */
 @media (hover: hover) and (pointer: fine) {
   .footer-link:hover {
-    color: var(--ink);
+    color: var(--red);
   }
 
-  /* Nav link states, read straight off mimis.nyc's own link preset
-     (.framer-styles-preset-1tp9t5i), which resolves to:
-       rest    color #000            text-decoration none
-       hover   color #ffd303         text-decoration underline
-       current color #111            text-decoration underline
-     Same three-state model, same decoration on each. The accent used to be
-     D's substitution of Vavva's brush red for their yellow.
-
-     ---- 2026-08-20: THE ACCENT MOVED TO THE UNDERLINE -------------------
-
-     D turned the header --red, which took the hover accent's colour away by
-     making it the ground: red type on a red bar is 1:1, invisible. And it
-     cannot simply become the next hue along, because a hover state is TYPE
-     and type on this field has to clear 4.5:1 — the amber --hl measures
-     3.33:1 on --red, and nothing warm enough to read as an accent does
-     better. Any hue that passes here is close enough to white to not look
-     like a hue.
-
-     So the three states keep their three-way distinction by splitting which
-     property carries it, instead of pushing both through colour:
-
-       rest     #fff, no underline
-       hover    #fff, AMBER underline   (--hl, 3.33:1 — a non-text indicator
-                                        under 1.4.11's 3:1 floor, which is
-                                        the correct standard for a rule)
-       current  #fff, WHITE underline   (see navLinkClass in Nav.tsx)
-
-     The type never leaves 6.53:1, and the accent is still --hl, which is
-     the token that already means "you are touching this" everywhere else on
-     the site (::selection, the focus ring) and was deliberately kept from
-     meaning "Vavva" — see the token's own note. Red said Vavva and amber
-     said touch; on a red bar, amber is the only one of the two still free
-     to say anything.
-
-     `text-decoration-color` is named explicitly at BOTH ends, because a
-     decoration set on hover and not on rest has nothing to transition from
-     and no state to return to — the underline would flick amber and stay
-     amber under an already-underlined current page. */
+  /* Nav link states. Rest black / none, hover Vavva red + underline
+     (type and rule). Named at both ends so a current-page underline
+     (Products, always on in PaperNav) turns red under the pointer and
+     returns to ink via currentColor when it leaves — not a stale hover
+     colour. --red is the brush/favicon accent, #b32622. */
   .nav-link:hover {
+    color: var(--red);
     text-decoration-line: underline;
-    text-decoration-color: var(--hl);
+    text-decoration-color: var(--red);
   }
 }
 
@@ -635,13 +640,13 @@ p {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* The rest end of the hover's amber underline (2026-08-20). `currentColor` is
-   already the initial value, so this changes nothing about how a link paints
-   — it states the value so the transition above has two endpoints and so a
-   current-page underline is explicitly WHITE rather than inheriting whatever
-   the last hover left resolved. See `.nav-link:hover`. */
+/* Rest end of the hover underline. `currentColor` is already the initial
+   value; stating it gives the transition two endpoints so a current-page
+   underline returns to ink instead of keeping the last hover colour. */
 .nav-link {
   text-decoration-color: currentColor;
+  text-underline-position: from-font;
+  text-decoration-thickness: from-font;
 }
 
 /* HIT AREA, header row only.
@@ -828,6 +833,12 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
 .nav-panel.is-open {
   grid-template-rows: 1fr;
+}
+
+@media (min-width: 810px) {
+  .vv-paper-nav .nav-panel {
+    display: none;
+  }
 }
 
 .nav-panel > div {
@@ -1705,7 +1716,7 @@ html.intro-js .scroll-reveal.reveal-stagger {
 }
 
 .vv-hero-sign {
-  z-index: 1;
+  z-index: 2;
   padding: 24px;
 }
 
@@ -1834,9 +1845,9 @@ html.intro-js .scroll-reveal.reveal-stagger {
   display: block;
   font-size: 12px;
   font-weight: 500;
-  line-height: 16.8px;
+  line-height: 1.4;
   text-transform: uppercase;
-  letter-spacing: normal;
+  letter-spacing: 0.04em;
   color: #000;
 }
 
@@ -1854,38 +1865,455 @@ html.intro-js .scroll-reveal.reveal-stagger {
   gap: 0 15px;
   margin: 10px 0 0;
   padding: 0;
-  height: 16.8px;
+  height: 1.05rem;
   overflow: hidden;
   white-space: nowrap;
   list-style: none;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 250ms cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .vv-product-variants {
+    opacity: 0;
+  }
+
   .vv-product:hover .vv-product-variants {
+    opacity: 1;
+  }
+
+  .vv-product:hover .vv-product-hover {
     opacity: 1;
   }
 }
 
-/* The type steps DOWN at desktop, which is the opposite of the usual
-   direction and is the reference's own: two big columns on a phone can carry
-   12px labels, four narrow ones read better at 10px. */
-@media (min-width: 1200px) {
-  .vv-product-name,
-  .vv-product-price,
-  .vv-product-variants {
-    font-size: 10px;
-    line-height: 14px;
-  }
-
-  .vv-product-variants {
-    height: 14px;
-  }
+.vv-product-hover {
+  opacity: 0;
+  transition: opacity 250ms cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vv-product-variants {
+  .vv-product-variants,
+  .vv-product-hover {
+    transition: none;
+  }
+}
+
+.vv-product-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-product-link:hover .vv-product-name {
+    text-decoration: underline;
+  }
+}
+
+.vv-product-static {
+  cursor: default;
+}
+
+.vv-shop {
+  width: 100%;
+  max-width: var(--shop);
+  margin-inline: auto;
+}
+
+.vv-shop-title {
+  font-family: var(--font-serif);
+  font-weight: 520;
+  font-size: 32px;
+  line-height: 36px;
+  letter-spacing: -0.022em;
+  color: #000;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ---- product page (Silk Mask, 2026-09-08) --------------------------------
+
+   Two layers. Chrome (PaperNav, footer) is full-width, 24px in from the
+   viewport — the house still owns the desk. The product is `--shop`: a
+   sized object in the middle. 1710 used to be both, and the mask filled
+   leftover paper. Stillz-shaped, not Stillz-copied: no centered logo,
+   thumbs stay with the photos, CTA stays black and column-width.
+
+   Gallery language is the catalogue's: #f2f2f2 frames, 5px gaps, no radius.
+   Two photographs only — a six-thumb rail of invented crops would be a
+   catalogue of pictures we do not have.
+
+   Thumbs stay beside the stage at every width. The 520px photo is a cap,
+   not a floor: below that the stage shrinks so the 72px rail still fits.
+   A 1fr photo column plus margin-inline: auto was centering a 520px stage
+   in leftover tablet paper and leaving the thumbs stranded on the leading
+   edge. The stack is one column `min(100%, 597px)` so gallery and buy share
+   a width; the photo track is `minmax(0, 520px)` so it shrinks on a phone
+   instead of overflowing.
+
+   Two columns when the pair actually fits (597 + 56 + 320), not at the
+   1200px type step. Stacked, the buy column is the gallery's width so the
+   CTA shares the photo's edges.
+
+   Buy column is the text stack from the headed render, set to the start
+   edge, Inter, black on white. The black CTA is not a second accent:
+   --red means Vavva, and a purchase control is a press, not a brand
+   object. */
+.vv-pdp {
+  display: grid;
+  grid-template-columns: min(100%, calc(72px + 5px + 520px));
+  justify-content: start;
+  gap: 40px;
+  width: 100%;
+}
+
+.vv-pdp:not(:has(.vv-pdp-thumbs)) {
+  grid-template-columns: min(100%, 520px);
+}
+
+@media (min-width: 1024px) {
+  .vv-pdp,
+  .vv-pdp:not(:has(.vv-pdp-thumbs)) {
+    grid-template-columns: max-content 320px;
+    justify-content: center;
+    justify-items: stretch;
+    gap: 56px;
+    align-items: start;
+  }
+}
+
+.vv-pdp-gallery {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 520px);
+  gap: 5px;
+  align-items: start;
+  width: 100%;
+}
+
+.vv-pdp-gallery:not(:has(.vv-pdp-thumbs)) {
+  grid-template-columns: minmax(0, 520px);
+}
+
+.vv-pdp-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.vv-pdp-stage {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 520px;
+  min-width: 0;
+  overflow: hidden;
+  background: #f2f2f2;
+}
+
+.vv-pdp-thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: #f2f2f2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vv-pdp-thumb.is-active {
+  outline: 1px solid #000;
+  outline-offset: 2px;
+}
+
+.vv-pdp-count {
+  position: absolute;
+  inset-inline-start: 12px;
+  inset-block-end: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: #000;
+}
+
+.vv-pdp-buy {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .vv-pdp-buy {
+    width: 320px;
+  }
+}
+
+.vv-pdp-brand,
+.vv-pdp-label,
+.vv-pdp-features,
+.vv-pdp-chip-name,
+.vv-pdp-cta,
+.vv-pdp-accordions summary {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.vv-pdp-brand {
+  margin: 0 0 12px;
+  color: var(--mute);
+}
+
+.vv-pdp-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+  text-align: start;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.vv-pdp-price {
+  margin: 8px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  color: #000;
+}
+
+.vv-pdp-lede {
+  margin: 24px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: var(--ink-body);
+  text-wrap: pretty;
+}
+
+.vv-pdp-features {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.vv-pdp-field {
+  margin: 28px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.vv-pdp-label {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.vv-pdp-label span {
+  color: var(--mute);
+}
+
+.vv-pdp-swatches {
+  display: flex;
+  gap: 20px;
+}
+
+.vv-pdp-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vv-pdp-size {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #000;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vv-pdp-size.is-active {
+  background: #000;
+  color: #fff;
+}
+
+.vv-pdp-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  /* 36px chip is the visible size; pad the label to 44 without moving layout. */
+  padding: 4px;
+  margin: -4px;
+}
+
+.vv-pdp-swatch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vv-pdp-chip {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.vv-pdp-swatch:has(input:focus-visible) .vv-pdp-chip {
+  outline: 2px solid var(--hl);
+  outline-offset: 3px;
+}
+
+.vv-pdp-swatch:has(input:checked) .vv-pdp-chip {
+  box-shadow: 0 0 0 1px #fff, 0 0 0 2px #000;
+}
+
+.vv-pdp-chip-black {
+  background: #000;
+}
+
+.vv-pdp-qty {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  height: 44px;
+  max-width: 160px;
+  border: 1px solid #000;
+}
+
+.vv-pdp-qty button,
+.vv-pdp-qty span {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+}
+
+.vv-pdp-qty span {
+  font-variant-numeric: tabular-nums;
+}
+
+.vv-pdp-qty button {
+  cursor: pointer;
+  transition: transform 120ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vv-pdp-qty button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.vv-pdp-qty button:disabled {
+  color: var(--mute);
+  cursor: default;
+}
+
+.vv-pdp-cta {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 48px;
+  margin: 28px 0 0;
+  padding-block: 14px;
+  padding-inline: 16px;
+  border: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 120ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 1023.98px) {
+  .vv-pdp-cta {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    box-shadow: 0 -16px 0 var(--paper);
+  }
+}
+
+.vv-pdp-cta:active {
+  transform: scale(0.96);
+}
+
+.vv-pdp-ship {
+  margin: 12px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--mute);
+}
+
+.vv-pdp-accordions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 32px 0 0;
+}
+
+.vv-pdp-accordions summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  cursor: pointer;
+  list-style: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vv-pdp-accordions summary::-webkit-details-marker {
+  display: none;
+}
+
+.vv-pdp-accordions details[open] summary span {
+  transform: rotate(45deg);
+}
+
+.vv-pdp-accordions summary span {
+  display: inline-block;
+  transition: transform 120ms var(--ease-out);
+}
+
+.vv-pdp-accordions details p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: var(--ink-body);
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-pdp-cta,
+  .vv-pdp-qty button,
+  .vv-pdp-accordions summary span {
     transition: none;
   }
 }
@@ -2056,6 +2484,27 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   animation: gwDrift 14s linear infinite;
 }
 
+/* The plate is the door into /products. It used to be a picture of a sign;
+   it is now a link that still looks like one. White ring on :focus-visible
+   because the panel is already the house's second green, and a black ring
+   would vanish against the skyline. Offset clears the inset keyline. */
+.gw-enter {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.gw-enter:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 12px;
+}
+
+.gw-enter:active {
+  transform: scale(0.98);
+}
+
 @keyframes gwDrift {
   0%,
   100% {
@@ -2082,6 +2531,10 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   .gw-badge {
     animation: none;
   }
+
+  .gw-enter:active {
+    transform: none;
+  }
 }
 
 /* ---- the Instagram chip (components/social/InstagramLink.tsx) ------------
@@ -2089,14 +2542,12 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
    Geometry and timing are dhilan.fyi's, read off its live styles; the two
    colours are inverted for white paper. That file carries the reasoning.
 
-   34px square is comfortably past this repo's 44px control floor? It is NOT
-   — and that is a deliberate exception rather than an oversight. The floor
-   exists for controls a visitor has to hit to use the site; this is one
-   social link in a footer that also lists the same destination as a text
-   link ("Contact"), so the small target is never the only way through. The
-   chip's own 34px plus the footer's 20px padding gives it a comfortable
-   surround on touch regardless. */
+   34px square is the visible chip. Contact used to duplicate this URL as a
+   text link, which made the small target an exception. Contact is gone, so
+   on interior routes this chip is the only Instagram handoff — the visible
+   size stays 34, the hit grows to 44 via ::after. */
 .vv-ig {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2122,6 +2573,12 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
 
 .vv-ig:active {
   transform: scale(0.94);
+}
+
+.vv-ig::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2234,8 +2691,12 @@ html:has(.home-stage) footer {
   z-index: 40;
   width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* .75rem 1.5rem */
-  padding: 12px 24px;
+  /* End padding clears the 36px dismiss + 12px inset + 24px between
+     targets. Start stays 24. Symmetric 48px still let "Follow Us" sit
+     9px from the X on a 375px bar. */
+  padding-block: 12px;
+  padding-inline-start: 24px;
+  padding-inline-end: 72px;
   background-color: #fff;
   color: #000;
   text-align: center;
@@ -2281,6 +2742,12 @@ html:has(.home-stage) footer {
   line-height: 19.44px;
 }
 
+@media (min-width: 810px) {
+  .vv-announce {
+    padding-inline: 72px;
+  }
+}
+
 /* ---- the bar is the SITE'S again (2026-08-20) ----------------------------
 
    `html:not(:has(.home-stage)) .vv-announce { display: none }` used to live
@@ -2295,15 +2762,15 @@ html:has(.home-stage) footer {
    all, and clicking off the landing would look exactly like the bar removing
    itself.
 
-   So it renders everywhere. In practice that is `/` and the 404, since every
-   secondary route is dark, but "everywhere" is the honest description and it
-   stops the bar's presence from depending on which page you happen to be on.
+   The shop header is back (Home/Back + Products). D, 2026-09-09: keep the
+   announcement on the home page. The 2026-08-18 rule returns, on the shell
+   so the clip collapses with the bar. Interior routes keep their own chrome.
+   `:has(.home-stage)` rather than a pathname branch, so the root layout
+   stays a server component. */
 
-   TO PUT IT BACK, if a nav ever returns and the copy should be the landing's
-   again, it is one rule — and use `:has(.home-stage)` rather than a
-   `usePathname()` branch in layout.tsx, which would make the root layout a
-   client component and paint the bar for one frame on every route before
-   hydration removed it. */
+html:not(:has(.home-stage)) .vv-announce-shell {
+  display: none;
+}
 
 /* ---- `html.announce-off` is gone, and so is what it hid ------------------
 
@@ -2502,11 +2969,12 @@ html.intro-go .vv-announce {
    the space left over beside a button.
 
    36px square: over the 24px WCAG 2.5.8 floor without crowding a 43px bar.
-   The glyph inside is 11px; the target is the padding around it. */
+   The glyph inside is 11px; the visible control stays 36, the hit grows to
+   44 via ::after. Home-only now, so it cannot collide with PaperNav. */
 .vv-announce-close {
   position: absolute;
   top: 50%;
-  right: 12px;
+  inset-inline-end: 12px;
   display: flex;
   width: 36px;
   height: 36px;
@@ -2519,6 +2987,12 @@ html.intro-go .vv-announce {
   cursor: pointer;
   transform: translateY(-50%);
   transition: color 160ms ease;
+}
+
+.vv-announce-close::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
 }
 
 @media (hover: hover) and (pointer: fine) {

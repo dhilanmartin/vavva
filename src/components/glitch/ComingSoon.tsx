@@ -15,11 +15,10 @@
    thing malfunctioning rather than as an effect applied to a shape.
 
    It went green (guide), then yellow (warning), then red (regulatory) inside
-   one day. Red is where it stops: it is the sign class that means you may not
-   proceed, it is the most accurate of the three for a door with nothing
-   behind it, and it is the only one that is also the house accent — so the
-   landing stops carrying a second colour by exception. globals.css has the
-   full argument and the contrast figures.
+   one day, and settled on green. The legend is Coming Soon. The plate is a
+   link to /products — a guide sign that names a destination, which is the
+   class green already was. The scramble, magnet and material are
+   unchanged. globals.css has the contrast figures.
 
    THERE IS NO ARROW ANY MORE. It pointed down at the studio's one sentence,
    then up at it when D flipped the order, and then the sentence itself was
@@ -30,6 +29,7 @@
    Under reduced motion it renders the plain legend and nothing runs — no
    engine, no timers, no clones animating. */
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { ACTIVE, GlitchWord, IDLE } from "./engine";
 
@@ -41,7 +41,7 @@ const WORD = "Coming Soon";
 const LAYERS = 10;
 
 export function ComingSoon() {
-  const hostRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -314,16 +314,15 @@ export function ComingSoon() {
 
 
   return (
-    <div
+    <Link
       ref={hostRef}
-      // role="img" over the whole unit: the base element's text is REWRITTEN
-      // by the scramble, so anything reading the DOM directly would announce
-      // "ccming sccn". The label is the word this is supposed to say.
-      role="img"
-      aria-label="Coming soon"
-      className="relative inline-flex select-none items-center justify-center px-3 py-2"
+      href="/products"
+      // The scramble rewrites the visible glyphs, so the accessible name
+      // cannot come from the DOM text. The label is the word the sign says.
+      aria-label="Coming Soon"
+      className="gw-enter relative inline-flex select-none items-center justify-center px-3 py-2"
     >
-      <span data-glitch-magnet className="relative inline-block">
+      <span aria-hidden data-glitch-magnet className="relative inline-block">
         <span className="relative grid place-items-center">
           {/* THE ANCHOR. Inter is proportional, so every substituted letter is
               a different width — without an invisible copy of the RESTING
@@ -376,6 +375,6 @@ export function ComingSoon() {
           ))}
         </span>
       </span>
-    </div>
+    </Link>
   );
 }

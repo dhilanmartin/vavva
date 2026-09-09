@@ -112,7 +112,7 @@ export default function HomePage() {
   return (
     <main className="home-stage">
       <h1 className="sr-only">
-        Casa Vavva — a creative studio in New York City. Coming soon.
+        Casa Vavva — a creative studio in New York City.
       </h1>
       {/* `priority`: this is the largest contentful paint on the front door
           and there is nothing above it to defer to. */}

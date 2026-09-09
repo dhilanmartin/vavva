@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AnnouncementBar } from "@/components/announce/AnnouncementBar";
 import { Footer } from "@/components/footer/Footer";
+import { PaperNav } from "@/components/nav/PaperNav";
 import "./globals.css";
 
 /* INTER, and it is the only face on the site (2026-08-19).
@@ -132,6 +133,9 @@ export const viewport: Viewport = {
   // a white page.
   themeColor: "#FFFFFF",
   colorScheme: "light",
+  // Lets `env(safe-area-inset-*)` resolve on notched phones. Without cover
+  // those insets stay 0 and the footer's extra pad is a no-op.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -262,6 +266,9 @@ export default function RootLayout({
           attributes only exist in a real profile with the extension loaded.
           If it disappears, that is the extension being disabled, not a fix. */}
       <body className="flex min-h-svh flex-col" suppressHydrationWarning>
+        <a href="#content" className="vv-skip">
+          Skip to content
+        </a>
         {/* NO FOOTER, and it is settled rather than pending. Removed
             2026-08-07 at D's instruction ("keep the vavva header, and remove
             its footer"), site-wide rather than landing-only, which is what
@@ -316,6 +323,7 @@ export default function RootLayout({
             So the landing is 43px of white copy over the artwork, and that is
             the entire interface. */}
         <AnnouncementBar />
+        <PaperNav />
 
         {/* ---- the header lamp strip is gone (2026-08-18) ----------------
 
@@ -352,7 +360,9 @@ export default function RootLayout({
             chrome height and was wrong three times: 64, then 104 when the
             lamp strip arrived, then 64 again when it went, then 144 the
             moment a footer was mounted under it. It now just grows. */}
-        <div className="flex flex-1 flex-col">{children}</div>
+        <div id="content" className="flex flex-1 flex-col">
+          {children}
+        </div>
 
         {/* Remounted 2026-08-18 ("emulate their footer"), for the first time
             since 2026-08-07 when D removed it. Rebuilt against mimis.nyc's

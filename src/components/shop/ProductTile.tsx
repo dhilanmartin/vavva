@@ -68,6 +68,7 @@
 //     say a sentence about it.
 
 import Image, { type StaticImageData } from "next/image";
+import Link from "next/link";
 
 // Every column width the grid can produce, so the browser picks from the
 // generated srcset instead of assuming 100vw. 401px is mimis' own measured
@@ -79,21 +80,28 @@ import Image, { type StaticImageData } from "next/image";
 // gutters, past which the container stops growing and the cell is fixed at
 // (1662 - 5*5) / 6.
 const SIZES =
-  "(min-width: 1758px) 273px, (min-width: 1200px) 17vw, (min-width: 810px) 33vw, 50vw";
+  "(min-width: 1200px) 340px, (min-width: 810px) 33vw, 50vw";
 
 export function ProductTile({
   name,
   image,
+  hoverImage,
   alt,
   price,
   variants,
+  href,
   eager = false,
   index = 0,
 }: {
   name: string;
   image: StaticImageData;
+  // Optional second frame, shown on hover. Packshot stays the default so
+  // touch and reduced-motion visitors still see the product, not the ad.
+  hoverImage?: StaticImageData;
   // Display strings, not money — see ProductGrid.tsx for why.
-  price: string;
+  // Optional until a price exists; omitting it drops the line rather than
+  // inventing a dollar amount the tile would then have to recant.
+  price?: string;
   // Sizes on the tees, flavours on the sandwich. One slot, because the
   // reference has one row there and the product decides what fills it.
   variants: string[];
@@ -111,9 +119,13 @@ export function ProductTile({
   // mechanism `.home-rise` already uses for the header's three zones — the
   // stagger is CSS's to own, the index is the component's.
   index?: number;
+  href?: string;
 }) {
-  return (
-    <figure className="vv-product m-0" style={{ ["--i" as string]: index }}>
+  const tile = (
+    <figure
+      className={`vv-product m-0${href ? "" : " vv-product-static"}`}
+      style={{ ["--i" as string]: index }}
+    >
       <div className="vv-product-frame relative aspect-[4/5] w-full">
         <Image
           src={image}
@@ -124,11 +136,22 @@ export function ProductTile({
           placeholder="blur"
           className="object-contain"
         />
+        {hoverImage ? (
+          <Image
+            src={hoverImage}
+            alt=""
+            fill
+            sizes={SIZES}
+            loading="lazy"
+            placeholder="blur"
+            className="vv-product-hover object-cover"
+          />
+        ) : null}
       </div>
 
       <figcaption className="vv-product-info">
         <span className="vv-product-name">{name}</span>
-        <span className="vv-product-price">{price}</span>
+        {price ? <span className="vv-product-price">{price}</span> : null}
         {/* The reference's hover row. It is a real list, not a decorative
             string: a <ul> so the count and the boundaries between items are
             announced, and NOT aria-hidden — sizes and flavours are product
@@ -137,13 +160,23 @@ export function ProductTile({
 
             Its height is reserved at rest (globals.css), so revealing it
             cannot push the rows below it down. */}
-        <ul className="vv-product-variants">
-          {variants.map((v) => (
-            <li key={v}>{v}</li>
-          ))}
-        </ul>
+        {variants.length > 0 ? (
+          <ul className="vv-product-variants">
+            {variants.map((v) => (
+              <li key={v}>{v}</li>
+            ))}
+          </ul>
+        ) : null}
       </figcaption>
     </figure>
+  );
+
+  if (!href) return tile;
+
+  return (
+    <Link href={href} className="vv-product-link">
+      {tile}
+    </Link>
   );
 }
 

@@ -28,7 +28,8 @@
                    #000, no underline
      right         a flex COLUMN, align-items: flex-end, justify: center,
                    gap 6px — brand name in 14/600 uppercase (plain text, not
-                   a link) over a legal link at 10/400/17 uppercase
+                   a link) over a legal line at 12/400/17 uppercase
+                   (theirs was 10px; 12 is the readable floor)
 
    The right zone being two stacked lines is what makes the row 40px tall
    and therefore the bar 80px. Everything else in the row is 20px.
@@ -58,101 +59,60 @@
 
 import Link from "next/link";
 import { InstagramLink } from "@/components/social/InstagramLink";
-import {
-  CONTACT_HREF,
-  NAV_DESTINATIONS_PARKED,
-  SECONDARY_PAGES_LIVE,
-} from "@/lib/site";
+import { destinationHref, liveInteriorNav } from "@/lib/site";
 
-/* Four links, their count and the header's set — a footer listing different
-   destinations than the nav is a second, quieter IA to keep in sync.
-
-   THE TEST IS THE SAME ONE NavItem MAKES, and it has to be or the two lists
-   drift (2026-08-19). The rule this file must never break is that it cannot
-   be what resurrects a link to a dark route — but a PARKED link's href is
-   `/`, never the route, so parking satisfies that rule as completely as
-   dropping the link does, and it keeps the footer showing what the header
-   shows. Dropped only when the pages are dark AND nothing is parking them,
-   which is the case where there is genuinely nowhere to send anyone.
-
-   Contact is not a route, so the list can never go empty either way. */
-const LINKS = [
-  ...(NAV_DESTINATIONS_PARKED || SECONDARY_PAGES_LIVE
-    ? [
-        { href: "/locations", label: "Locations" },
-        { href: "/products", label: "Products" },
-        { href: "/story", label: "Our Story" },
-      ]
-    : []),
-  { href: CONTACT_HREF, label: "Contact", external: true },
-];
+/* Same live routes as PaperNav. Contact is out of the chrome for now —
+   Instagram stays as the chip on the left, not as a duplicate text link. */
+const LINKS = liveInteriorNav();
 
 // Their 14/600/20 uppercase, in this site's Inter. `.nav-link` on top so the
 // footer's hover and press behaviour is the header's rather than a second set
 // of rules to keep in step.
 const FOOTER_LINK =
-  "nav-link inline-block text-[14px] font-semibold uppercase leading-5 text-black no-underline";
+  "nav-link inline-block text-[14px] font-semibold uppercase leading-5 tracking-[0.04em] text-black no-underline";
 
-// Their brand line: same size and weight as the links, but it is not one.
+// Their brand line: same size and weight as the links. Ours is a home link,
+// because the shop has a second route and the stamp is the way back.
 const FOOTER_BRAND =
-  "text-[14px] font-semibold uppercase leading-[17px] text-black";
+  "text-[14px] font-semibold uppercase leading-[17px] tracking-[0.04em] text-black";
 
-// Their legal slot: 10/400/17 uppercase.
+// Legal slot under the brand. 12px is the floor; theirs was 10.
 const FOOTER_LEGAL =
-  "text-[10px] font-normal uppercase leading-[17px] text-black";
+  "text-[12px] font-normal uppercase leading-[17px] tracking-[0.04em] text-black";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[var(--paper)] px-6">
-      {/* The rule sits on the CONTAINER, so it stops at the page gutter the
-          way theirs stops at their container edge — not full-bleed. */}
-      {/* `p-5` — 20px on all four sides, theirs exactly. The rule sits on
-          this container's top edge, so it stops at the page gutter the way
-          theirs stops at their container edge, and the row inside is inset
-          20px horizontally as well as vertically.
-
-          `.vv-footer-rule` rather than `border-t`: a real border adds a pixel
-          of layout height and made this bar 81px against their 80. See
-          globals.css. */}
-      <div className="vv-footer-rule mx-auto max-w-[1710px] p-5">
+    <footer className="w-full bg-[var(--paper)] px-6 pb-[env(safe-area-inset-bottom)]">
+      {/* The rule sits on the CONTAINER, so it stops at the page gutter —
+          24px in — not the raw viewport edge. Chrome is full-width; the
+          product is `--shop`. They are different layers. */}
+      <div className="vv-footer-rule w-full py-5">
         {/* Equal thirds at tablet+, matching their 450.7/450.7/450.7 — a
             grid, not space-between, so the zones stay equal no matter what
             the labels are. Stacked below that. */}
-        <div className="flex flex-col items-center gap-6 tablet:grid tablet:min-h-10 tablet:grid-cols-3 tablet:items-start tablet:gap-0">
-          <div className="flex justify-center tablet:justify-start">
+        <div className="flex min-h-10 items-center justify-between tablet:grid tablet:grid-cols-3 tablet:items-start tablet:gap-0">
+          <div className="flex justify-start">
             <InstagramLink />
           </div>
 
-          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <ul className="hidden items-center justify-center gap-x-6 tablet:flex">
             {LINKS.map((link) => (
               <li key={link.label}>
-                {link.external ? (
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={FOOTER_LINK}
-                  >
-                    {link.label}
-                  </a>
-                ) : (
-                  /* Parked with the header, not independently. A footer still
-                     routing to /products while the nav sent everything home
-                     would be the one place the parking leaked. */
-                  <Link
-                    href={NAV_DESTINATIONS_PARKED ? "/" : link.href}
-                    className={FOOTER_LINK}
-                  >
-                    {link.label}
-                  </Link>
-                )}
+                <Link
+                  href={destinationHref(link.href)}
+                  className={FOOTER_LINK}
+                >
+                  {link.label}
+                </Link>
               </li>
             ))}
           </ul>
 
-          <div className="flex flex-col items-center gap-1.5 tablet:items-end tablet:justify-center">
-            <span className={FOOTER_BRAND}>Casa Vavva</span>
-            <span className={FOOTER_LEGAL}>
+          <div className="flex flex-col items-end justify-center gap-1.5">
+            <Link href="/" className={`${FOOTER_BRAND} nav-link no-underline`}>
+              Casa Vavva
+            </Link>
+            <span className={FOOTER_LEGAL} suppressHydrationWarning>
               © {new Date().getFullYear()}
             </span>
           </div>
