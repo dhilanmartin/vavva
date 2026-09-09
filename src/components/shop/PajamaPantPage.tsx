@@ -6,7 +6,7 @@ import { ShopPdp } from "./ShopPdp";
 export function PajamaPantPage() {
   return (
     <ShopPdp
-      title="Pajama Pant"
+      title="Pajama"
       price="$85"
       lede="Pinstripe pajama pant. Light cotton, drawstring waist, cut to sleep in and leave the house in."
       features={[

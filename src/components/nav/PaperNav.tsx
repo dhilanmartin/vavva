@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ComingSoon } from "@/components/glitch/ComingSoon";
 import { destinationHref } from "@/lib/site";
 
 const LINK =
@@ -25,6 +26,10 @@ export function PaperNav() {
         <Link href={backHref} className={LINK}>
           {backLabel}
         </Link>
+        {/* 1:1 scale of the landing plate, static, 20px tall. */}
+        <span className="gw-nav-slot absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <ComingSoon size="bar" word="Coming Soon" />
+        </span>
         <Link
           href={destinationHref("/products")}
           aria-current={pathname.startsWith("/products") ? "page" : undefined}

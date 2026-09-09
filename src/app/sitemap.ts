@@ -25,7 +25,8 @@ const ROUTES = [
         "/products/leopard",
         "/products/sakura",
         "/products/midnight",
-        "/products/pajama-pant",
+        "/products/pajama",
+        "/products/blank-tee",
       ]
     : []),
   ...(SECONDARY_PAGES_LIVE ? ["/locations", "/story"] : []),

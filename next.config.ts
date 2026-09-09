@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    viewTransition: true,
+  },
   async redirects() {
     return [
         {
@@ -21,6 +24,11 @@ const nextConfig: NextConfig = {
         {
           source: "/products/sweet-dreams",
           destination: "/products/midnight",
+          permanent: false,
+        },
+        {
+          source: "/products/pajama-pant",
+          destination: "/products/pajama",
           permanent: false,
         },
     ];

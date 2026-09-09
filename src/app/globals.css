@@ -1829,10 +1829,99 @@ html.intro-js .scroll-reveal.reveal-stagger {
    opacity-only transition are for. Revealing it by adding a line would push
    every row below it down 24px on hover, which in a grid means the whole
    page moving because a pointer crossed a photograph. */
+/* APPLE ROUNDING, 2026-09-09, and it is a deliberate reversal of the
+   reference's "flat: no radius, no border, no shadow" (ProductGrid.tsx) —
+   not a drift back to the mimis card this grid already retired.
+
+   The reason is the phone, which is the grid's densest presentation: two
+   ~161px cells sitting 5px apart on the same near-white paper their own
+   #F2F2F2 field nearly matches. A corner separates them into two objects
+   for free, which is the job the 1px hairline used to do before it was
+   removed for costing a border.
+
+   `border-radius` alone draws a circular arc, which is not the shape Apple
+   draws — theirs is a superellipse, curvature continuous through the point
+   where the corner meets the edge. `corner-shape: squircle` is the native
+   version of that and it is Chromium-only today (Chrome/Edge 139+, no
+   Safari, no Firefox — caniuse mdn-css_properties_corner-shape_squircle).
+
+   So the two are set in layers rather than gated together: the radius is
+   unconditional, the shape is an enhancement on top. Safari draws a rounded
+   rectangle, Chromium draws the squircle, and neither reads as the broken
+   one. No polyfill — an SVG clip-path per cell is not worth a corner, and
+   the fallback is not a degradation, it is just the older shape.
+
+   The radius tracks the cell instead of sitting fixed, because a corner is
+   read as a proportion of what it turns: 14px against the phone's ~161px
+   cell is the same optical corner as 18px against the ~341px cell the
+   3-column grid produces at `--shop`. */
 .vv-product-frame {
   overflow: hidden;
   /* The tees' own shot background — see the note above. */
   background: #f2f2f2;
+  border-radius: 14px;
+  /* Press feedback lives on the frame, not on `.vv-product` — the stagger
+     already owns that element's transform (see .reveal-stagger below) and
+     two rules animating one property would fight over the same frames. */
+  transition: transform 120ms var(--ease-out);
+}
+
+@supports (corner-shape: squircle) {
+  .vv-product-frame {
+    corner-shape: squircle;
+  }
+}
+
+@media (min-width: 810px) {
+  .vv-product-frame {
+    border-radius: 18px;
+  }
+}
+
+/* THE CATALOGUE IS VEILED, 2026-09-09. D: "add a gaussian blur to each
+   product image, to signify coming soon (dont disable product page tho)."
+
+   The parenthetical is the whole design. The blur is a STATE OF THE
+   PHOTOGRAPH, not a state of the tile — the link still works, the tile still
+   presses, the keyboard still reaches it, and the product page behind it
+   shows the garment sharp. Nothing here is `pointer-events: none` and
+   nothing is aria-hidden; a visitor who wants to see the thing can still
+   get to it in one click. What the grid says is "not yet", not "not here".
+
+   IT IS ON THE <img>, NOT THE FRAME. The frame owns the #F2F2F2 field and
+   the squircled corner, and blurring it would soften the corner into the
+   paper — the one edge on this page that is supposed to be crisp. On the
+   image the blur feathers the packshot into the grey field instead, which
+   is the same thing a veil does.
+
+   The radius steps with the cell and so does this, for the same reason: a
+   blur is read as a proportion of what it obscures, and 5px against the
+   phone's ~161px cell is the optical equal of 8px against the ~341px cell
+   the 3-column grid produces at `--shop`. A single value would be a haze on
+   one and a smear on the other.
+
+   THE STRENGTH IS DELIBERATELY SHORT OF ILLEGIBLE. 12px was tried first and
+   it took the leopard, the blossom and the starfield to three coloured
+   blobs — at that point the grid is five rectangles and a price list, and a
+   veiled catalogue that shows nothing is just an empty page with extra
+   steps. The blur has to say "not yet" while still leaving the shape,
+   colour and print readable enough to want.
+
+   ONLY THE HOVER FRAME IS SCALED. It is the one `object-cover` image here,
+   so it fills the frame edge to edge and a blur samples transparency past
+   those edges — a pale vignette around all four sides. 1.06 pushes the
+   sampled edge outside the crop. The packshots are `object-contain` and are
+   deliberately left alone: ProductGrid.tsx's note is that the 4:5 frame
+   shows these garments WHOLE with no crop at all, and scaling them up to
+   tidy an edge that letterboxing already handles would spend that. */
+.vv-product-frame img {
+  filter: blur(5px);
+}
+
+@media (min-width: 810px) {
+  .vv-product-frame img {
+    filter: blur(8px);
+  }
 }
 
 .vv-product-info {
@@ -1849,6 +1938,21 @@ html.intro-js .scroll-reveal.reveal-stagger {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: #000;
+}
+
+/* THREE KINDS OF INFORMATION WERE PRINTED IN ONE STYLE. Name, price and the
+   variant row all resolved to 12px/500/uppercase/#000, so the cell had to be
+   read line by line instead of scanned — the name is what the thing IS, the
+   price and the sizes are facts about it, and nothing said so.
+
+   Separated by ink alone, deliberately: size, weight and tracking are the
+   reference's and changing any of them would move the cell's metrics. --mute
+   is rgba(0,0,0,0.55) — 4.55:1 on the paper, over the 4.5:1 floor (see the
+   token's own note at the top of this file), so the price is quieter than
+   the name without becoming fine print. */
+.vv-product-price,
+.vv-product-variants {
+  color: var(--mute);
 }
 
 /* Reserved, not collapsed. `height` rather than `min-height` so a long
@@ -1885,10 +1989,31 @@ html.intro-js .scroll-reveal.reveal-stagger {
   .vv-product:hover .vv-product-hover {
     opacity: 1;
   }
+
+  /* KEYBOARD PARITY. The rule above hides the variant row at rest and hands
+     it to `:hover`, which a keyboard cannot produce — so a sighted keyboard
+     visitor tabbed to a tile, got the focus ring, and the sizes stayed at
+     opacity 0. Screen readers were always fine: the <ul> is real and not
+     aria-hidden, so it was only the people who can see the cell who could
+     not see what was in it.
+
+     This used to be argued for by page copy — ProductTile.tsx says the
+     hover-only reveal is acceptable because the sentence above the grid
+     already carried it. That sentence ("A first look. Nothing is for sale
+     yet.") was deleted 2026-08-18, so the argument went with it.
+
+     :focus-visible, not :focus — a pointer press must not latch the row open
+     behind the pointer that is already revealing it. */
+  .vv-product-link:focus-visible .vv-product-variants,
+  .vv-product-link:focus-visible .vv-product-hover {
+    opacity: 1;
+  }
 }
 
 .vv-product-hover {
   opacity: 0;
+  /* Clears the blur's own vignette — see the note on `.vv-product-frame img`. */
+  transform: scale(1.06);
   transition: opacity 250ms cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
@@ -1897,6 +2022,17 @@ html.intro-js .scroll-reveal.reveal-stagger {
   .vv-product-hover {
     transition: none;
   }
+
+  /* Kill the press-scale itself, not just its transition — otherwise it is
+     the same jump, delivered instantly. Same treatment .nav-link,
+     .social-link and .gate-submit already carry. */
+  .vv-product-frame {
+    transition: none;
+  }
+
+  .vv-product-link:active .vv-product-frame {
+    transform: none;
+  }
 }
 
 .vv-product-link {
@@ -1904,6 +2040,31 @@ html.intro-js .scroll-reveal.reveal-stagger {
   color: inherit;
   text-decoration: none;
   cursor: pointer;
+  /* iOS otherwise paints a grey wash over the whole cell on tap — the
+     largest target on the site flashing the browser's default box is louder
+     than the press feedback below and arrives instead of it. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* PRESS FEEDBACK. This was the page's real gap: the tile is the primary
+   action here and the biggest target on the site, and it did nothing until
+   the route changed — tap, nothing, new page. Every other pressable thing
+   already answers on the press (.nav-link, .social-link, .gate-submit,
+   .gw-enter), so the catalogue was the one place the site went quiet.
+
+   0.98, NOT the 0.96 those four share, and the difference is measured rather
+   than preferred. A ratio is not a constant amount of movement: 0.96 on a
+   92px nav link pulls its edge in 1.8px, while the same ratio on the ~341px
+   desktop cell pulls it 6.8px — the identical number reads as a tap on one
+   and as the grid lurching on the other. 0.98 puts the cell's edge travel
+   back in the same range the small controls live in.
+
+   The frame moves and the caption does not, which is also the honest
+   description of what is being pressed: the photograph is the object, the
+   two lines under it are its label. `touch-action: manipulation` is already
+   global on <html>, so there is no 300ms tap delay in front of this. */
+.vv-product-link:active .vv-product-frame {
+  transform: scale(0.98);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1939,23 +2100,20 @@ html.intro-js .scroll-reveal.reveal-stagger {
    viewport — the house still owns the desk. The product is `--shop`: a
    sized object in the middle. 1710 used to be both, and the mask filled
    leftover paper. Stillz-shaped, not Stillz-copied: no centered logo,
-   thumbs stay with the photos, CTA stays black and column-width.
+   thumbs stay with the photos on desktop, CTA stays black and column-width.
 
    Gallery language is the catalogue's: #f2f2f2 frames, 5px gaps, no radius.
    Two photographs only — a six-thumb rail of invented crops would be a
    catalogue of pictures we do not have.
 
-   Thumbs stay beside the stage at every width. The 520px photo is a cap,
-   not a floor: below that the stage shrinks so the 72px rail still fits.
-   A 1fr photo column plus margin-inline: auto was centering a 520px stage
-   in leftover tablet paper and leaving the thumbs stranded on the leading
-   edge. The stack is one column `min(100%, 597px)` so gallery and buy share
-   a width; the photo track is `minmax(0, 520px)` so it shrinks on a phone
-   instead of overflowing.
+   On a phone the rail is chrome the other products do not have, so it
+   goes. The stage is the same 520px-capped square as a one-shot product;
+   tap cycles the photographs. Thumbs return at the two-column step,
+   beside the stage, where there is room for a selector.
 
-   Two columns when the pair actually fits (597 + 56 + 320), not at the
-   1200px type step. Stacked, the buy column is the gallery's width so the
-   CTA shares the photo's edges.
+   The stack is one column `min(100%, 520px)` so gallery and buy share a
+   width and the CTA shares the photo's edges. Two columns when the pair
+   actually fits, not at the 1200px type step.
 
    Buy column is the text stack from the headed render, set to the start
    edge, Inter, black on white. The black CTA is not a second accent:
@@ -1963,19 +2121,14 @@ html.intro-js .scroll-reveal.reveal-stagger {
    object. */
 .vv-pdp {
   display: grid;
-  grid-template-columns: min(100%, calc(72px + 5px + 520px));
+  grid-template-columns: min(100%, 520px);
   justify-content: start;
   gap: 40px;
   width: 100%;
 }
 
-.vv-pdp:not(:has(.vv-pdp-thumbs)) {
-  grid-template-columns: min(100%, 520px);
-}
-
 @media (min-width: 1024px) {
-  .vv-pdp,
-  .vv-pdp:not(:has(.vv-pdp-thumbs)) {
+  .vv-pdp {
     grid-template-columns: max-content 320px;
     justify-content: center;
     justify-items: stretch;
@@ -1986,30 +2139,69 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
 .vv-pdp-gallery {
   display: grid;
-  grid-template-columns: 72px minmax(0, 520px);
+  grid-template-columns: minmax(0, 520px);
   gap: 5px;
   align-items: start;
   width: 100%;
 }
 
-.vv-pdp-gallery:not(:has(.vv-pdp-thumbs)) {
-  grid-template-columns: minmax(0, 520px);
+.vv-pdp-thumbs {
+  display: none;
 }
 
-.vv-pdp-thumbs {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+@media (min-width: 1024px) {
+  .vv-pdp-gallery:has(.vv-pdp-thumbs) {
+    grid-template-columns: 72px minmax(0, 520px);
+  }
+
+  .vv-pdp-thumbs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
 }
 
 .vv-pdp-stage {
   position: relative;
+  display: block;
   aspect-ratio: 1;
   width: 100%;
   max-width: 520px;
   min-width: 0;
+  padding: 0;
+  border: 0;
   overflow: hidden;
   background: #f2f2f2;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.vv-pdp-stage {
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+button.vv-pdp-stage:focus-visible {
+  outline: 1px solid #000;
+  outline-offset: 2px;
+}
+
+.vv-pdp-shot {
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out);
+  pointer-events: none;
+}
+
+.vv-pdp-shot.is-cover {
+  object-fit: cover;
+}
+
+.vv-pdp-shot.is-active {
+  opacity: 1;
 }
 
 .vv-pdp-thumb {
@@ -2027,19 +2219,6 @@ html.intro-js .scroll-reveal.reveal-stagger {
 .vv-pdp-thumb.is-active {
   outline: 1px solid #000;
   outline-offset: 2px;
-}
-
-.vv-pdp-count {
-  position: absolute;
-  inset-inline-start: 12px;
-  inset-block-end: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-  color: #000;
 }
 
 .vv-pdp-buy {
@@ -2232,12 +2411,15 @@ html.intro-js .scroll-reveal.reveal-stagger {
   cursor: default;
 }
 
+.vv-pdp-cta-bar {
+  margin: 28px 0 0;
+}
+
 .vv-pdp-cta {
   display: grid;
   place-items: center;
   width: 100%;
   min-height: 48px;
-  margin: 28px 0 0;
   padding-block: 14px;
   padding-inline: 16px;
   border: 0;
@@ -2249,12 +2431,17 @@ html.intro-js .scroll-reveal.reveal-stagger {
 }
 
 @media (max-width: 1023.98px) {
-  .vv-pdp-cta {
+  /* Sticky lives on the bar, not the button. Safari warps a sticky
+     element that also carries transform (press-scale) and a painted
+     box-shadow, and env(safe-area-inset-bottom) on the button itself
+     made its height breathe as the iOS chrome moved. */
+  .vv-pdp-cta-bar {
     position: sticky;
     bottom: 0;
     z-index: 4;
-    padding-bottom: calc(14px + env(safe-area-inset-bottom));
-    box-shadow: 0 -16px 0 var(--paper);
+    margin-top: 16px;
+    padding-top: 12px;
+    background: var(--paper);
   }
 }
 
@@ -2312,9 +2499,14 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
 @media (prefers-reduced-motion: reduce) {
   .vv-pdp-cta,
+  .vv-pdp-shot,
   .vv-pdp-qty button,
   .vv-pdp-accordions summary span {
     transition: none;
+  }
+
+  .vv-pdp-cta:active {
+    transform: none;
   }
 }
 
@@ -2503,6 +2695,75 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
 
 .gw-enter:active {
   transform: scale(0.98);
+}
+
+/* The shop-nav plate is the landing sign, scaled. Same type, insets,
+   keyline, radius, shadow — scale only. Plate sizes are the measured badge
+   (grid strut + insets), not the theoretical 18+14+14: 52px mobile,
+   61px tablet. Static: no scramble, no hue drift.
+
+   32px, and it is pinned from both ends rather than picked. The floor is
+   the legend: scaling the plate to the nav's 20px line-height took the
+   24px legend to 7.9px, and text below ~12px stops being read and starts
+   being a texture — on a SIGN, whose whole subject is legibility, that is
+   the one thing it cannot be. 12px legend => 61 * (12/24) = 30.5px plate.
+   The ceiling is the bar: a centred object in a 64px nav that takes more
+   than half its height stops reading as an item in the row and starts
+   reading as the row. 30.5 and 32 leave one number, and it happens to be
+   the ordinary small-control height, 1.6x the 20px line box. */
+.gw-nav-slot {
+  --gw-plate: 52px;
+  --gw-target: 32px;
+  --gw-scale: calc(var(--gw-target) / var(--gw-plate));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--gw-target);
+  width: calc(170px * var(--gw-scale));
+}
+
+@media (min-width: 810px) {
+  .gw-nav-slot {
+    --gw-plate: 61px;
+    width: calc(224px * var(--gw-scale));
+  }
+}
+
+.gw-enter-bar {
+  cursor: default;
+  flex-shrink: 0;
+  transform: scale(var(--gw-scale));
+  transform-origin: center;
+}
+
+.gw-enter-bar:active {
+  transform: scale(var(--gw-scale));
+}
+
+.gw-enter-bar .gw-badge {
+  animation: none;
+}
+
+/* Shared-element morph: landing hero plate → shop-nav plate.
+   Next starts the view transition on the /products navigation; the name
+   pairs the two `.gw-enter` hosts. */
+.gw-enter {
+  view-transition-name: casa-sign;
+}
+
+::view-transition-group(casa-sign) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-rise);
+  z-index: 50;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
 
 @keyframes gwDrift {
@@ -2763,8 +3024,7 @@ html:has(.home-stage) footer {
    itself.
 
    The shop header is back (Home/Back + Products). D, 2026-09-09: keep the
-   announcement on the home page. The 2026-08-18 rule returns, on the shell
-   so the clip collapses with the bar. Interior routes keep their own chrome.
+   announcement on the home page. Interior routes keep their own chrome.
    `:has(.home-stage)` rather than a pathname branch, so the root layout
    stays a server component. */
 

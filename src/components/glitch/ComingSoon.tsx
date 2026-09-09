@@ -15,10 +15,11 @@
    thing malfunctioning rather than as an effect applied to a shape.
 
    It went green (guide), then yellow (warning), then red (regulatory) inside
-   one day, and settled on green. The legend is Coming Soon. The plate is a
-   link to /products — a guide sign that names a destination, which is the
-   class green already was. The scramble, magnet and material are
-   unchanged. globals.css has the contrast figures.
+   one day, and settled on green. As of 2026-09-09 the landing legend is
+   Casa Vavva. The plate is a link to /products — a guide sign that names a
+   house. Clicking it morphs the plate into the shop nav, where the legend
+   is Coming Soon, sized with Home and Products (view-transition-name:
+   casa-sign). The scramble, magnet and material are unchanged.
 
    THERE IS NO ARROW ANY MORE. It pointed down at the studio's one sentence,
    then up at it when D flipped the order, and then the sentence itself was
@@ -33,19 +34,31 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { ACTIVE, GlitchWord, IDLE } from "./engine";
 
-const WORD = "Coming Soon";
+const HERO_WORD = "Casa Vavva";
+const BAR_WORD = "Coming Soon";
 
 // 10 is plenty. The IDLE preset only ever animates its first 7 (sliceCount),
 // so the extra three exist for the hover preset without being rebuilt on the
 // transition.
 const LAYERS = 10;
 
-export function ComingSoon() {
-  const hostRef = useRef<HTMLAnchorElement>(null);
+export function ComingSoon({
+  size = "hero",
+  word,
+}: {
+  size?: "hero" | "bar";
+  word?: string;
+}) {
+  const hostRef = useRef<HTMLElement | null>(null);
+  const bar = size === "bar";
+  const legend = word ?? (bar ? BAR_WORD : HERO_WORD);
+  const bindHost = (node: HTMLElement | null) => {
+    hostRef.current = node;
+  };
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host) return;
+    if (!host || bar) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
@@ -55,7 +68,7 @@ export function ComingSoon() {
     );
     if (!base) return;
 
-    const engine = new GlitchWord(base, layers, WORD, reduced);
+    const engine = new GlitchWord(base, layers, legend, reduced);
 
     /* START OPTIMISTICALLY, PAUSE ON SIGNAL — `onScreen` begins TRUE.
 
@@ -265,7 +278,7 @@ export function ComingSoon() {
       if (magnet) magnet.style.willChange = "";
       engine.destroy();
     };
-  }, []);
+  }, [legend, bar]);
 
   // Every copy lands in the SAME grid cell, which is what keeps them
   // registered on each other at any size with no absolute positioning and
@@ -312,16 +325,7 @@ export function ComingSoon() {
   const PANEL =
     "gw-badge absolute -inset-x-[27px] -top-[14px] -bottom-[14px] rounded-[8px] tablet:-inset-x-9 tablet:-top-[17px] tablet:-bottom-[17px] tablet:rounded-[11px]";
 
-
-  return (
-    <Link
-      ref={hostRef}
-      href="/products"
-      // The scramble rewrites the visible glyphs, so the accessible name
-      // cannot come from the DOM text. The label is the word the sign says.
-      aria-label="Coming Soon"
-      className="gw-enter relative inline-flex select-none items-center justify-center px-3 py-2"
-    >
+  const face = (
       <span aria-hidden data-glitch-magnet className="relative inline-block">
         <span className="relative grid place-items-center">
           {/* THE ANCHOR. Inter is proportional, so every substituted letter is
@@ -330,7 +334,7 @@ export function ComingSoon() {
               tick and the sign visibly breathes. A monospace face would not
               need this. */}
           <span aria-hidden="true" className={`${CELL} ${TEXT} invisible`}>
-            {WORD}
+            {legend}
           </span>
 
           {/* The original. It carries the real text, so the scramble writes
@@ -344,7 +348,7 @@ export function ComingSoon() {
           <span data-glitch-base className={`${CELL} relative z-10`}>
             <span data-glitch-badge className={PANEL} />
             <span data-glitch-text className={`${TEXT} relative`}>
-              {WORD}
+              {legend}
             </span>
           </span>
 
@@ -356,7 +360,9 @@ export function ComingSoon() {
               The negative `animationDelay` puts every copy at a different
               point in the panel's hue drift, so a tear reveals a SEAM: the
               surface disagrees with itself. */}
-          {Array.from({ length: LAYERS }).map((_, i) => (
+          {bar
+            ? null
+            : Array.from({ length: LAYERS }).map((_, i) => (
             <span
               key={i}
               data-glitch-layer
@@ -369,12 +375,36 @@ export function ComingSoon() {
                 style={{ animationDelay: `${-(i * 2.4).toFixed(1)}s` }}
               />
               <span data-glitch-text className={`${TEXT} relative`}>
-                {WORD}
+                {legend}
               </span>
             </span>
           ))}
         </span>
       </span>
+  );
+
+  if (bar) {
+    return (
+      <span
+        ref={bindHost}
+        aria-label={legend}
+        className="gw-enter gw-enter-bar relative inline-flex select-none items-center justify-center px-3 py-2"
+      >
+        {face}
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      ref={bindHost}
+      href="/products"
+      // The scramble rewrites the visible glyphs, so the accessible name
+      // cannot come from the DOM text. The label is the word the sign says.
+      aria-label={legend}
+      className="gw-enter relative inline-flex select-none items-center justify-center px-3 py-2"
+    >
+      {face}
     </Link>
   );
 }

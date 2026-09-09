@@ -97,19 +97,20 @@ const PRODUCTS = [
     href: "/products/midnight",
   },
   {
+    name: "Pajama",
+    image: pajamaPant,
+    alt: "Blue and white pinstripe pajama pants.",
+    price: "$85",
+    variants: ["S", "M", "L", "XL"],
+    href: "/products/pajama",
+  },
+  {
     name: "Blank Tee, Black",
     image: teeBlankBlack,
     alt: "Black cotton tee with no print.",
     price: "$65",
     variants: ["S", "M", "L", "XL"],
-  },
-  {
-    name: "Pajama Pant",
-    image: pajamaPant,
-    alt: "Blue and white pinstripe pajama pants.",
-    price: "$85",
-    variants: ["S", "M", "L", "XL"],
-    href: "/products/pajama-pant",
+    href: "/products/blank-tee",
   },
 ];
 
@@ -160,14 +161,22 @@ const PRODUCTS = [
    index from the real tiles so the entrance cascades through both rows as
    one gesture rather than restarting halfway down the page.
 
-   The eager count follows the desktop row: 6 is the entire first row there,
-   and at two columns it is the first three rows. Both are above the fold on
-   the viewports they apply to, which is the only thing this number is for —
-   Next would otherwise wait on an IntersectionObserver for images already on
-   screen. With six products it happens to be the whole catalogue; leave it
-   at 6 rather than tracking the count, or a seventh product silently starts
-   eager-loading a below-fold image. */
-const EAGER_TILES = 5;
+   The eager count is THE WIDEST FIRST ROW, and nothing else. Its only job is
+   to stop Next waiting on an IntersectionObserver for images that are
+   already on screen; every tile past the first row is a below-fold image
+   being fetched for nobody.
+
+   The grid is 2 columns on the phone and 3 from tablet up, so the widest
+   first row is 3. It had drifted to 5 — the whole catalogue — against a
+   comment that described 6, a six-column desktop row and an eight-item
+   catalogue, none of which this grid has had since. At two columns that
+   meant a phone eager-loading rows two and three before it had painted row
+   one.
+
+   Track the column count, never the product count: the moment this is the
+   length of PRODUCTS it is not a first row any more, it is a preload of the
+   catalogue wearing a first row's name. */
+const EAGER_TILES = 3;
 
 export function ProductGrid() {
   // 2-col on the phone, 3-col from tablet up. Four columns is Balenciaga's

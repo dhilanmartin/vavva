@@ -1,86 +1,74 @@
-// Product tile. Fourth pass, 2026-08-14 — the first three are in git history
-// and summarised in DESIGN.md; the short version is internetlabs.co card ->
-// "too much of a flashcard" -> flat mimis.nyc grid card.
+// Product tile.
 //
-// This pass re-measured mimis.nyc/shop live rather than trusting the notes
-// the last pass left, and two of those notes turned out to be wrong:
+// THIS HEADER WAS REWRITTEN 2026-09-09 BECAUSE IT HAD STOPPED BEING TRUE. It
+// described the 2026-08-14 mimis.nyc pass — a 24px radius, a 1px inset
+// hairline, a "COMING SOON" hover chip, a <figure> that was deliberately not
+// a link, and a cell with "NO PRICE LINE" — and every one of those had been
+// removed or reversed by the Stussy rebuild four days later, without the
+// comment following. A reader trusting the top of this file was being handed
+// a different component than the one below it. The history is in git and in
+// ProductGrid.tsx; what follows is only what is here now.
 //
-//   radius  the last pass recorded "flat — no radius, no shadow." Their image
-//           wrapper (.framer-1x451sv) computes `border-radius: 24px` with
-//           `overflow: hidden`. It is rounded, and it always was; the flat
-//           reading came from an outer container that carries no radius of
-//           its own. 24px here, matching them exactly — which also happens to
-//           be `.vv-embed`'s mobile radius, though this deliberately does not
-//           reuse that class: .vv-embed carries a drop shadow and mimis'
-//           card has none.
-//   hover   the spec file says "no hover state, confirmed by direct hover
-//           test," and that part still holds — re-confirmed by a real pointer
-//           hover this session, not a synthetic event: their two stacked
-//           image layers are SSR responsive variants (one is display:none per
-//           breakpoint), not a hover swap. Vavva's hover exists for a reason
-//           their catalogue doesn't have — see "not for sale" below.
+// THE CELL, as built (measurements and their source live in ProductGrid.tsx,
+// the CSS in globals.css under `---- product tile`):
 //
-// What is reproduced 1:1 from them:
+//   photo       4:5, object-contain on a #F2F2F2 field, corners rounded —
+//               14px on the phone, 18px from tablet up, squircled where
+//               `corner-shape` exists. The field and the corner are both
+//               departures from the reference; both are argued in globals.css
+//   photo→text  10px
+//   name        12px / 1.4, weight 500, uppercase, left, black
+//   price       same metrics, --mute, directly under the name
+//   variants    same metrics, --mute, 10px below the price. Height reserved
+//               at rest so revealing it cannot reflow the grid
 //
-//   grid gap    20px           (ProductGrid.tsx)
-//   image→name  20px
-//   name        Inter 600 16px / 20px, uppercase, centred
-//   radius      24px, overflow hidden
+// LINK OR FIGURE, DECIDED BY `href`. A tile with a product page is wrapped in
+// a <Link>; one without renders as a bare <figure> and is not a tab stop,
+// because a dead <a> would announce as a link and show a target that goes
+// nowhere. That is the same rule Nav.tsx applies to inert labels.
 //
-// Three deliberate departures, each because Vavva's inventory is not theirs:
+//   EVERY PRODUCT HAS A PAGE as of 2026-09-09, so the branch is currently
+//   only exercised by ComingSoonTile below. It had drifted: Blank Tee, Black
+//   printed $65 with no `href` while the four cells around it opened, which
+//   made one tile in five look exactly like a link, behave like an image and
+//   signal neither to touch or to the keyboard. That was closed by building
+//   the page (BlankTeePage.tsx), not by styling the difference.
 //
-//   SQUARE, not their 4:3. Measured, not preferred: every tee source is
-//   480x600 with the garment inked from y=125 to y=476. Covered into a 4:3
-//   box the crop lands at y=120..480 — the shoulders and hem come within 5px
-//   of the frame edge. Covered into a square the crop is y=60..540, which
-//   leaves ~64px of air top and bottom and ~42px at the sides. Their photos
-//   are full-bleed lifestyle shots that fill any frame you give them; these
-//   are packshots whose subject brings its own margins, and the frame has to
-//   respect the subject's proportions rather than the reference's.
+//   IF A PRODUCT EVER LANDS HERE WITHOUT A PAGE AGAIN, that is the decision
+//   to revisit — an unlinked tile is indistinguishable from a linked one at
+//   rest, since the only tell is `cursor: default`. Give it a page or leave
+//   it out of PRODUCTS; do not invent a third state in this component.
 //
-//   HAIRLINE, 1px rgba(0,0,0,0.10) inset. Its reason has changed once
-//   already: it arrived because the tees were shot on pure #FFFFFF against
-//   a #FFFFFF paper and floated with no tile around them, and D re-exported
-//   all seven on #F2F2F2 the same day, which solved that. It stays for a
-//   different reason — the catalogue's backgrounds are not uniform (the
-//   PB&J is on #FBFBFB, the tees on #F2F2F2), and the rule is what makes
-//   all eight read as the same kind of object anyway. See globals.css.
-//
-//   NO PRICE LINE. Their card is image → name → price. Nothing here is for
-//   sale, no tee has a price yet, and every tile repeating the same
-//   "COMING SOON" in the price slot is noise, not information. Availability
-//   is stated once, in page copy, and answered per-tile on hover.
-//
-// NOT FOR SALE, and how that is expressed (D, 2026-08-14: "nothing should be
-// available for purchase yet. maybe a hover state showing that"):
-//
-//   - The tile is a <figure>, not a link. There is no product page to link
-//     to, and a dead <a> would announce as a link, take a tab stop and show a
-//     target in the status bar. Same reasoning NavItem already applies to the
-//     inert nav labels — see Nav.tsx.
-//   - Hover (pointer devices only) fades a "COMING SOON" chip up from the
-//     bottom of the image and deepens the hairline. The chip is aria-hidden:
-//     it is a pointer-only restatement of copy the page already carries in
-//     text above the grid, so assistive tech and touch users lose nothing.
-//     That page line is what makes a hover-only affordance acceptable here.
-//   - The chip sits at the bottom edge rather than washing the whole image,
-//     because a scrim over a white-on-white packshot erases the product to
-//     say a sentence about it.
+// THE VARIANT ROW is a real <ul>, not a decorative string, and it is not
+// aria-hidden: sizes and flavours are product information, and hiding them
+// would leave a screen reader with a price and no idea what it buys. On
+// pointer devices it is revealed by hover or by :focus-visible; on touch,
+// where neither exists, it is simply always visible.
 
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 
-// Every column width the grid can produce, so the browser picks from the
-// generated srcset instead of assuming 100vw. 401px is mimis' own measured
-// column at this site's 1710px cap (1662px of content, 4 columns, 3x20px
-// gaps); between 1200 and 1758 the grid is still 4 columns but fluid, hence
-// the 25vw step. The sources are 480px wide, so Next caps there regardless —
-// this exists to stop a phone downloading the widest candidate.
-// 2 columns, then 3 at tablet, then 6 at desktop. 1758px is 1710 + two 24px
-// gutters, past which the container stops growing and the cell is fixed at
-// (1662 - 5*5) / 6.
-const SIZES =
-  "(min-width: 1200px) 340px, (min-width: 810px) 33vw, 50vw";
+// Every column width the grid can actually produce, so the browser picks
+// from the generated srcset instead of assuming 100vw.
+//
+// Re-derived 2026-09-09; the previous string and its comment described a
+// 1710px container, 4 columns and 6-at-desktop, none of which this grid has.
+// The container is `--shop` (1080px) with 24px of padding inside it, so
+// content tops out at 1032px, and the grid is 2 columns below 810px and 3
+// from there up — it never reaches 4.
+//
+//   vw < 810     2 cols, (vw - 48 - 5) / 2      ~= 50vw
+//   810..1079    3 cols, (vw - 48 - 10) / 3     ~= 33vw
+//   vw >= 1080   container capped, (1032 - 10) / 3 = 341px, fixed
+//
+// The breakpoint for the fixed value is 1080 (where `--shop` caps), not the
+// 1200 `desktop:` line it used to carry — between those two the old string
+// asked for up to 396px for a 341px cell.
+//
+// Largely academic in practice: the sources are 480px wide, so Next caps the
+// candidate list there and most of these land on the same file. It exists so
+// a phone does not reach for the widest candidate on principle.
+const SIZES = "(min-width: 1080px) 341px, (min-width: 810px) 33vw, 50vw";
 
 export function ProductTile({
   name,

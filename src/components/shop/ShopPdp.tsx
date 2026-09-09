@@ -33,13 +33,31 @@ export function ShopPdp({
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const current = gallery[active] ?? gallery[0];
   const many = gallery.length > 1;
 
   const add = () => {
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1800);
   };
+
+  const cycle = () => {
+    if (!many) return;
+    setActive((i) => (i + 1) % gallery.length);
+  };
+
+  const shots = gallery.map((img, i) => (
+    <Image
+      key={img.alt}
+      src={img.src}
+      alt={i === active ? img.alt : ""}
+      fill
+      sizes="(min-width: 1024px) 520px, calc(100vw - 3rem)"
+      placeholder="blur"
+      className={`vv-pdp-shot${img.fit === "cover" ? " is-cover" : ""}${
+        i === active ? " is-active" : ""
+      }`}
+    />
+  ));
 
   return (
     <div className="vv-pdp home-rise" style={{ ["--i" as string]: 3 }}>
@@ -51,7 +69,7 @@ export function ShopPdp({
                 key={img.alt}
                 type="button"
                 aria-pressed={i === active}
-                aria-label={`View image ${i + 1} of ${gallery.length}`}
+                aria-label={`View ${img.alt}`}
                 className={`vv-pdp-thumb${i === active ? " is-active" : ""}`}
                 onClick={() => setActive(i)}
               >
@@ -68,21 +86,18 @@ export function ShopPdp({
           </div>
         ) : null}
 
-        <div className="vv-pdp-stage">
-          <Image
-            src={current.src}
-            alt={current.alt}
-            fill
-            sizes="(min-width: 1024px) 520px, calc(100vw - 6.5rem)"
-            placeholder="blur"
-            className={current.fit === "cover" ? "object-cover" : "object-contain"}
-          />
-          {many ? (
-            <span className="vv-pdp-count">
-              {active + 1} / {gallery.length}
-            </span>
-          ) : null}
-        </div>
+        {many ? (
+          <button
+            type="button"
+            className="vv-pdp-stage"
+            onClick={cycle}
+            aria-label={`View next photograph of ${title}`}
+          >
+            {shots}
+          </button>
+        ) : (
+          <div className="vv-pdp-stage">{shots}</div>
+        )}
       </div>
 
       <div className="vv-pdp-buy">
@@ -136,14 +151,16 @@ export function ShopPdp({
           </div>
         </div>
 
-        <button
-          type="button"
-          className="vv-pdp-cta"
-          onClick={add}
-          aria-live="polite"
-        >
-          {added ? "Added" : `Add to cart — ${price}`}
-        </button>
+        <div className="vv-pdp-cta-bar">
+          <button
+            type="button"
+            className="vv-pdp-cta"
+            onClick={add}
+            aria-live="polite"
+          >
+            {added ? "Added" : `Add to cart — ${price}`}
+          </button>
+        </div>
         <p className="vv-pdp-ship">
           Please allow 1–2 weeks for items to ship.
         </p>
