@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ComingSoon } from "@/components/glitch/ComingSoon";
 import { destinationHref } from "@/lib/site";
 
 const LINK =
@@ -26,10 +25,17 @@ export function PaperNav() {
         <Link href={backHref} className={LINK}>
           {backLabel}
         </Link>
-        {/* 1:1 scale of the landing plate, static, 20px tall. */}
-        <span className="gw-nav-slot absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <ComingSoon size="bar" word="Coming Soon" />
-        </span>
+        {/* THE PLATE IS NOT IN HERE ANY MORE, 2026-09-09, and it is worth
+            saying why rather than leaving a gap where it stood. It was a
+            scaled copy of the landing sign, centred between these two links,
+            and it announced "Coming Soon" over a catalogue that by then also
+            blurred every photograph and disabled every Add to cart. Three
+            statements of one fact, and the nav's was the weakest of them:
+            chrome that repeats what the page already says is decoration.
+
+            The message now lives in the one place a visitor actually reaches
+            for it — the CTA on the product page (ShopPdp.tsx). This row is
+            navigation again, which is all a nav owes anyone. */}
         <Link
           href={destinationHref("/products")}
           aria-current={pathname.startsWith("/products") ? "page" : undefined}

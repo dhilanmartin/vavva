@@ -17,9 +17,20 @@
    It went green (guide), then yellow (warning), then red (regulatory) inside
    one day, and settled on green. As of 2026-09-09 the landing legend is
    Casa Vavva. The plate is a link to /products — a guide sign that names a
-   house. Clicking it morphs the plate into the shop nav, where the legend
-   is Coming Soon, sized with Home and Products (view-transition-name:
-   casa-sign). The scramble, magnet and material are unchanged.
+   house.
+
+   IT BRIEFLY HAD A SECOND HOME and does not any more. A `size="bar"` variant
+   put a 32px scaled copy of this plate in the shop nav, reading Coming Soon,
+   with a view-transition morph (`casa-sign`) pairing the two. It came out the
+   same day: the shop said "not yet" three times over — in the nav, in a blur
+   on every photograph, and on the CTA — and the nav's copy was the one that
+   said it furthest from where anyone would ask. The variant is deleted rather
+   than left behind a prop nobody passes; the morph, the `casa-sign` name and
+   the `experimental.viewTransition` flag went with it. Git has the geometry
+   if a second instance is ever wanted again.
+
+   So there is ONE of these, on the landing, and the scramble, magnet and
+   material are unchanged.
 
    THERE IS NO ARROW ANY MORE. It pointed down at the studio's one sentence,
    then up at it when D flipped the order, and then the sentence itself was
@@ -35,30 +46,22 @@ import { useEffect, useRef } from "react";
 import { ACTIVE, GlitchWord, IDLE } from "./engine";
 
 const HERO_WORD = "Casa Vavva";
-const BAR_WORD = "Coming Soon";
 
 // 10 is plenty. The IDLE preset only ever animates its first 7 (sliceCount),
 // so the extra three exist for the hover preset without being rebuilt on the
 // transition.
 const LAYERS = 10;
 
-export function ComingSoon({
-  size = "hero",
-  word,
-}: {
-  size?: "hero" | "bar";
-  word?: string;
-}) {
+export function ComingSoon() {
   const hostRef = useRef<HTMLElement | null>(null);
-  const bar = size === "bar";
-  const legend = word ?? (bar ? BAR_WORD : HERO_WORD);
+  const legend = HERO_WORD;
   const bindHost = (node: HTMLElement | null) => {
     hostRef.current = node;
   };
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host || bar) return;
+    if (!host) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
@@ -278,7 +281,7 @@ export function ComingSoon({
       if (magnet) magnet.style.willChange = "";
       engine.destroy();
     };
-  }, [legend, bar]);
+  }, [legend]);
 
   // Every copy lands in the SAME grid cell, which is what keeps them
   // registered on each other at any size with no absolute positioning and
@@ -360,9 +363,7 @@ export function ComingSoon({
               The negative `animationDelay` puts every copy at a different
               point in the panel's hue drift, so a tear reveals a SEAM: the
               surface disagrees with itself. */}
-          {bar
-            ? null
-            : Array.from({ length: LAYERS }).map((_, i) => (
+          {Array.from({ length: LAYERS }).map((_, i) => (
             <span
               key={i}
               data-glitch-layer
@@ -382,18 +383,6 @@ export function ComingSoon({
         </span>
       </span>
   );
-
-  if (bar) {
-    return (
-      <span
-        ref={bindHost}
-        aria-label={legend}
-        className="gw-enter gw-enter-bar relative inline-flex select-none items-center justify-center px-3 py-2"
-      >
-        {face}
-      </span>
-    );
-  }
 
   return (
     <Link

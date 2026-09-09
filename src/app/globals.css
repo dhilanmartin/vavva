@@ -1878,51 +1878,17 @@ html.intro-js .scroll-reveal.reveal-stagger {
   }
 }
 
-/* THE CATALOGUE IS VEILED, 2026-09-09. D: "add a gaussian blur to each
-   product image, to signify coming soon (dont disable product page tho)."
+/* THE PHOTOGRAPHS WERE BRIEFLY BLURRED, 2026-09-09, and are sharp again the
+   same day. 5px on the phone and 8px from tablet up, on the <img> so the
+   squircled corner stayed crisp, stepped with the cell the way the radius
+   above is — the geometry was right and it is in git.
 
-   The parenthetical is the whole design. The blur is a STATE OF THE
-   PHOTOGRAPH, not a state of the tile — the link still works, the tile still
-   presses, the keyboard still reaches it, and the product page behind it
-   shows the garment sharp. Nothing here is `pointer-events: none` and
-   nothing is aria-hidden; a visitor who wants to see the thing can still
-   get to it in one click. What the grid says is "not yet", not "not here".
-
-   IT IS ON THE <img>, NOT THE FRAME. The frame owns the #F2F2F2 field and
-   the squircled corner, and blurring it would soften the corner into the
-   paper — the one edge on this page that is supposed to be crisp. On the
-   image the blur feathers the packshot into the grey field instead, which
-   is the same thing a veil does.
-
-   The radius steps with the cell and so does this, for the same reason: a
-   blur is read as a proportion of what it obscures, and 5px against the
-   phone's ~161px cell is the optical equal of 8px against the ~341px cell
-   the 3-column grid produces at `--shop`. A single value would be a haze on
-   one and a smear on the other.
-
-   THE STRENGTH IS DELIBERATELY SHORT OF ILLEGIBLE. 12px was tried first and
-   it took the leopard, the blossom and the starfield to three coloured
-   blobs — at that point the grid is five rectangles and a price list, and a
-   veiled catalogue that shows nothing is just an empty page with extra
-   steps. The blur has to say "not yet" while still leaving the shape,
-   colour and print readable enough to want.
-
-   ONLY THE HOVER FRAME IS SCALED. It is the one `object-cover` image here,
-   so it fills the frame edge to edge and a blur samples transparency past
-   those edges — a pale vignette around all four sides. 1.06 pushes the
-   sampled edge outside the crop. The packshots are `object-contain` and are
-   deliberately left alone: ProductGrid.tsx's note is that the 4:5 frame
-   shows these garments WHOLE with no crop at all, and scaling them up to
-   tidy an edge that letterboxing already handles would spend that. */
-.vv-product-frame img {
-  filter: blur(5px);
-}
-
-@media (min-width: 810px) {
-  .vv-product-frame img {
-    filter: blur(8px);
-  }
-}
+   IT WAS THE MESSAGE THAT WAS WRONG, not the value. A blurred catalogue
+   spends the photographs, which are the only thing on this page anyone came
+   for, to deliver a fact — "not for sale yet" — that a disabled CTA states
+   plainly at the moment it actually matters. Obscuring five products to
+   avoid saying one sentence is a bad trade. The sentence is on the button
+   now (ShopPdp.tsx); the garments are visible. */
 
 .vv-product-info {
   margin-top: 10px;
@@ -2012,8 +1978,6 @@ html.intro-js .scroll-reveal.reveal-stagger {
 
 .vv-product-hover {
   opacity: 0;
-  /* Clears the blur's own vignette — see the note on `.vv-product-frame img`. */
-  transform: scale(1.06);
   transition: opacity 250ms cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
@@ -2449,6 +2413,38 @@ button.vv-pdp-stage:focus-visible {
   transform: scale(0.96);
 }
 
+/* A DEAD CONTROL HAS TO LOOK DEAD. The button is `disabled` until commerce
+   exists (ShopPdp.tsx), and a full-black 48px bar that does not answer a
+   press is the single most misleading object on the page — the site's only
+   primary action, indistinguishable from a working one.
+
+   So it gives up the two things that made it read as pressable, the black
+   fill and the press-scale, and keeps its size and position: this is still
+   where the buy button is, it is just not one yet. The 1px keyline holds the
+   shape so the CTA bar does not collapse into whitespace.
+
+   The keyline is rgba(0,0,0,0.14) and NOT the `1px solid #000` the size
+   chips and the quantity stepper carry, which is the whole difference being
+   drawn: those are live outline controls, and matching them would make this
+   look like a third one. It sits between their black and the 0.08 hairlines
+   elsewhere in the sheet.
+
+   --mute on the paper, which AUDIT.md already measures at 4.55:1 — above
+   4.5:1, so the label stays legible rather than leaning on the browser's
+   default disabled washout. Disabled controls are exempt from the contrast
+   minimum; this one meets it anyway, because it is the sentence that
+   explains the whole shop. */
+.vv-pdp-cta:disabled {
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: transparent;
+  color: var(--mute);
+  cursor: default;
+}
+
+.vv-pdp-cta:disabled:active {
+  transform: none;
+}
+
 .vv-pdp-ship {
   margin: 12px 0 0;
   font-size: 12px;
@@ -2697,74 +2693,15 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   transform: scale(0.98);
 }
 
-/* The shop-nav plate is the landing sign, scaled. Same type, insets,
-   keyline, radius, shadow — scale only. Plate sizes are the measured badge
-   (grid strut + insets), not the theoretical 18+14+14: 52px mobile,
-   61px tablet. Static: no scramble, no hue drift.
-
-   32px, and it is pinned from both ends rather than picked. The floor is
-   the legend: scaling the plate to the nav's 20px line-height took the
-   24px legend to 7.9px, and text below ~12px stops being read and starts
-   being a texture — on a SIGN, whose whole subject is legibility, that is
-   the one thing it cannot be. 12px legend => 61 * (12/24) = 30.5px plate.
-   The ceiling is the bar: a centred object in a 64px nav that takes more
-   than half its height stops reading as an item in the row and starts
-   reading as the row. 30.5 and 32 leave one number, and it happens to be
-   the ordinary small-control height, 1.6x the 20px line box. */
-.gw-nav-slot {
-  --gw-plate: 52px;
-  --gw-target: 32px;
-  --gw-scale: calc(var(--gw-target) / var(--gw-plate));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--gw-target);
-  width: calc(170px * var(--gw-scale));
-}
-
-@media (min-width: 810px) {
-  .gw-nav-slot {
-    --gw-plate: 61px;
-    width: calc(224px * var(--gw-scale));
-  }
-}
-
-.gw-enter-bar {
-  cursor: default;
-  flex-shrink: 0;
-  transform: scale(var(--gw-scale));
-  transform-origin: center;
-}
-
-.gw-enter-bar:active {
-  transform: scale(var(--gw-scale));
-}
-
-.gw-enter-bar .gw-badge {
-  animation: none;
-}
-
-/* Shared-element morph: landing hero plate → shop-nav plate.
-   Next starts the view transition on the /products navigation; the name
-   pairs the two `.gw-enter` hosts. */
-.gw-enter {
-  view-transition-name: casa-sign;
-}
-
-::view-transition-group(casa-sign) {
-  animation-duration: 420ms;
-  animation-timing-function: var(--ease-rise);
-  z-index: 50;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(*),
-  ::view-transition-new(*),
-  ::view-transition-group(*) {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
-  }
-}
+/* THE SHOP-NAV COPY OF THIS PLATE IS GONE, 2026-09-09, and with it
+   `.gw-nav-slot`, `.gw-enter-bar`, the `casa-sign` view-transition pairing
+   and the `experimental.viewTransition` flag in next.config.ts. It existed
+   for one afternoon: a 32px scaled render of the sign, centred in the shop
+   nav, morphing in from the landing. It came out because the shop had by
+   then grown three ways of saying the same thing, and chrome that repeats
+   the page is decoration. ComingSoon.tsx carries the full argument; git
+   carries the geometry, which was sound and is worth re-reading rather than
+   re-deriving if a second instance is ever wanted. */
 
 @keyframes gwDrift {
   0%,

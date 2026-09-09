@@ -31,14 +31,8 @@ export function ShopPdp({
   const [active, setActive] = useState(0);
   const [size, setSize] = useState(sizes?.[0] ?? "");
   const [qty, setQty] = useState(1);
-  const [added, setAdded] = useState(false);
 
   const many = gallery.length > 1;
-
-  const add = () => {
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1800);
-  };
 
   const cycle = () => {
     if (!many) return;
@@ -151,14 +145,25 @@ export function ShopPdp({
           </div>
         </div>
 
+        {/* THE CTA IS THE ONLY PLACE THE SHOP SAYS "NOT YET", 2026-09-09.
+
+            It used to add to a cart that does not exist — `setAdded(true)`,
+            the label flipped to "Added" for 1800ms, and nothing anywhere
+            recorded a thing. That is worse than no button: it tells a
+            visitor the purchase worked.
+
+            `disabled` and the label states why, in place of the price. The
+            price is already two lines up in `.vv-pdp-price`, so repeating it
+            on a button nobody can press only makes the dead control louder.
+
+            This replaced two louder signals on the same day — a Coming Soon
+            plate in the shop nav and a gaussian blur over every photograph
+            in the grid. Both said this, further from where it is asked, and
+            the blur charged the whole catalogue for it. One sentence, at the
+            one moment a visitor reaches to buy. */}
         <div className="vv-pdp-cta-bar">
-          <button
-            type="button"
-            className="vv-pdp-cta"
-            onClick={add}
-            aria-live="polite"
-          >
-            {added ? "Added" : `Add to cart — ${price}`}
+          <button type="button" className="vv-pdp-cta" disabled>
+            Coming soon
           </button>
         </div>
         <p className="vv-pdp-ship">
