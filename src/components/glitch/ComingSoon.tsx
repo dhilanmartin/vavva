@@ -19,22 +19,14 @@
    Casa Vavva. The plate is a link to /products — a guide sign that names a
    house.
 
-   IT HAS A SECOND HOME, and the story of why is the reason `size="bar"` says
-   what it says. A 32px scaled render of this plate sits at the centre of the
-   shop nav (PaperNav.tsx). It first read COMING SOON, and it came out within
-   the day: the shop was then saying "not yet" three times over — in the nav,
-   in a blur across every photograph, and on the CTA — and the nav's copy said
-   it furthest from where anyone would ask. It came back the same evening
-   reading VAVVA, which is the fix rather than a reversal. As an announcement
-   it was the weakest of three. As a WORDMARK it is the only one: the house's
-   name, held in the centre of its own chrome, saying nothing about stock.
-
-   So the two instances are one object in two registers — the landing's is a
-   sign you press, the nav's is a maker's mark you do not. The bar is static
-   (no engine, no clones, no hue drift) and is not a link. Everything else —
-   type, insets, keyline, radius, shadow — is shared, and it is scaled rather
-   than restyled so the geometry stays literally 1:1. Change the plate and
-   both change.
+   IT HAD A SECOND HOME, more than once, and does not any more. A `size="bar"`
+   variant put scaled copies of this plate in the shop — first as Coming Soon
+   between the nav links, then as a Vavva wordmark, then alone as the whole
+   header. Each came out: chrome that repeats the page, or a mark fighting a
+   Products heading for the same band. The variant, the morph and the
+   `experimental.viewTransition` flag are gone with them. Git has the
+   geometry. So there is ONE of these, on the landing, and the scramble,
+   magnet and material are unchanged.
 
    THERE IS NO ARROW ANY MORE. It pointed down at the studio's one sentence,
    then up at it when D flipped the order, and then the sentence itself was
@@ -56,25 +48,16 @@ const HERO_WORD = "Casa Vavva";
 // transition.
 const LAYERS = 10;
 
-export function ComingSoon({
-  size = "hero",
-  word,
-}: {
-  size?: "hero" | "bar";
-  word?: string;
-}) {
+export function ComingSoon() {
   const hostRef = useRef<HTMLElement | null>(null);
-  const bar = size === "bar";
-  const legend = word ?? HERO_WORD;
+  const legend = HERO_WORD;
   const bindHost = (node: HTMLElement | null) => {
     hostRef.current = node;
   };
 
   useEffect(() => {
     const host = hostRef.current;
-    // The nav plate is a still of this sign, not a second copy of it running.
-    // Chrome that twitches is chrome you look at instead of through.
-    if (!host || bar) return;
+    if (!host) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
@@ -294,7 +277,7 @@ export function ComingSoon({
       if (magnet) magnet.style.willChange = "";
       engine.destroy();
     };
-  }, [legend, bar]);
+  }, [legend]);
 
   // Every copy lands in the SAME grid cell, which is what keeps them
   // registered on each other at any size with no absolute positioning and
@@ -375,14 +358,8 @@ export function ComingSoon({
 
               The negative `animationDelay` puts every copy at a different
               point in the panel's hue drift, so a tear reveals a SEAM: the
-              surface disagrees with itself.
-
-              THE BAR RENDERS NONE OF THEM. Its engine never starts, so ten
-              invisible copies of the plate would be ten spans of dead DOM in
-              the chrome of every interior route. */}
-          {bar
-            ? null
-            : Array.from({ length: LAYERS }).map((_, i) => (
+              surface disagrees with itself. */}
+          {Array.from({ length: LAYERS }).map((_, i) => (
             <span
               key={i}
               data-glitch-layer
@@ -402,21 +379,6 @@ export function ComingSoon({
         </span>
       </span>
   );
-
-  /* The nav plate is a SPAN, not a link. On /products it would point at the
-     page it is already sitting on, and on a PDP it would duplicate the
-     Products link two inches to its right. A wordmark is not a destination. */
-  if (bar) {
-    return (
-      <span
-        ref={bindHost}
-        aria-hidden="true"
-        className="gw-enter gw-enter-bar relative inline-flex select-none items-center justify-center px-3 py-2"
-      >
-        {face}
-      </span>
-    );
-  }
 
   return (
     <Link

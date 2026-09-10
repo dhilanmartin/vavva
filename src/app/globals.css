@@ -300,8 +300,8 @@ html.intro-go .home-rise {
 }
 
 /* Orphan control on paragraphs. `pretty` keeps the last line from collapsing
-   to a stub. `balance` belongs on short headings (`.vv-pdp-title`), not on
-   body copy — it evened out whole blocks. */
+   to a stub. `balance` belongs on short headings (`.vv-shop-title`,
+   `.vv-pdp-title`), not on body copy — it evened out whole blocks. */
 p {
   text-wrap: pretty;
 }
@@ -2047,11 +2047,20 @@ html.intro-js .scroll-reveal.reveal-stagger {
   margin-inline: auto;
 }
 
-/* `.vv-shop-title` is gone with the visible "Products" heading, 2026-09-09 —
-   the catalogue's masthead is the sign now (`.gw-mark-slot` below, argued in
-   products/page.tsx) and the h1 it styled is `sr-only`. The rule was left
-   behind for one commit styling nothing; if a shop heading ever comes back it
-   should be written against whatever it then has to sit with. */
+/* The catalogue's page title. Serif, centred, 32px — the house's interior
+   heading size. Restored 2026-09-09 after a pass that hid it behind the
+   street-sign masthead; the sign is landing-only again, so this heading is
+   what names the page. */
+.vv-shop-title {
+  font-family: var(--font-serif);
+  font-weight: 520;
+  font-size: 32px;
+  line-height: 36px;
+  letter-spacing: -0.022em;
+  color: #000;
+  text-align: center;
+  text-wrap: balance;
+}
 
 /* ---- product page (Silk Mask, 2026-09-08) --------------------------------
 
@@ -2688,97 +2697,18 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   transform: scale(0.98);
 }
 
-/* ---- the shop-nav plate (PaperNav.tsx) -----------------------------------
+/* THE SHOP COPY OF THIS PLATE IS GONE AGAIN, 2026-09-09. It came back as a
+   nav chip, a page masthead, then a stillz-style solo header — and each time
+   it competed with the Products heading or repeated what the page already
+   said. Landing only. Git has the geometry. */
 
-   The landing sign at 32px, and the only thing this block does is SCALE it.
-   Type, insets, keyline, radius and shadow all come from `.gw-badge` and
-   ComingSoon's own TEXT/PANEL classes, untouched, so the nav plate is
-   literally the same object seen from further away.
-
-   THAT IS THE WHOLE LESSON OF THE FIRST ATTEMPT, which set an 8px legend,
-   3px insets and a 1px keyline as three independent decisions. Every one of
-   them was a defensible number and the result was not a smaller sign, it was
-   a different sign wearing the same green — highway signs are read as a set
-   of ratios, and retuning any of them individually breaks all of them. If
-   this needs to change size again, change `--gw-target` and nothing else.
-
-   32px IS PINNED FROM BOTH ENDS rather than picked. The floor is the legend:
-   scaling to the nav's 20px line-height took the 24px legend to 7.9px, and
-   text under ~12px stops being read and becomes a texture — on a sign, whose
-   entire subject is legibility, that is the one thing it cannot be. A 12px
-   legend forces 61 * (12/24) = 30.5px. The ceiling is the bar: a centred
-   object taking more than half a 64px nav stops reading as an item in the
-   row and starts reading as the row, which caps it at 32. Those leave one
-   number, and it is also the ordinary small-control height and 1.6x the
-   20px line box.
-
-   `--gw-plate` IS THE MEASURED BADGE, not the arithmetic one. 18 + 14 + 14
-   predicts 46px on mobile and the box is 52px, because the negative insets
-   size from a text CELL whose height is the font's line box rather than its
-   em. Measure it after any type change; do not re-derive it.
-
-   NEITHER SLOT HOLDS A WIDTH. The first version set an explicit width per
-   breakpoint, computed from the string "Coming Soon" — so the legend could
-   not be reworded without re-measuring the nav, and it was reworded to
-   "Vavva" the same day. Scaling about the centre leaves the centre where it
-   was, so both slots simply centre the host box and let the plate overflow
-   it symmetrically, which is correct at any legend length.
-
-   TWO SIZES, ONE MECHANISM. `--gw-target` is the only thing that differs:
-   52px in the catalogue's own band, where its heading used to be, and 32px
-   in the nav row everywhere else. The mark recedes into chrome as you go
-   further into the shop. Everything else — the plate, the scale arithmetic,
-   the static-ness — is shared, so there is still exactly one sign in this
-   codebase and it is still never restyled, only resized. */
-.gw-nav-slot,
-.gw-mark-slot {
-  --gw-plate: 52px;
-  --gw-scale: calc(var(--gw-target) / var(--gw-plate));
-}
-
-@media (min-width: 810px) {
-  .gw-nav-slot,
-  .gw-mark-slot {
-    --gw-plate: 61px;
-  }
-}
-
-.gw-nav-slot {
-  --gw-target: 32px;
-  width: max-content;
-  /* Centres the HOST box on the nav's midpoint; the plate is centred on the
-     host, so the plate lands on the midpoint too. Out of flow, so its width
-     never pushes the links either side. */
-  transform: translate(-50%, -50%);
-}
-
-/* The catalogue's masthead. In flow, so it reserves the 52px it occupies —
-   the scaled plate overflows this box by a few pixels top and bottom, which
-   is harmless in a band with margins on both sides and is the price of not
-   hard-coding the plate's own dimensions here. */
-.gw-mark-slot {
-  --gw-target: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--gw-target);
-}
-
-.gw-enter-bar {
-  cursor: default;
-  transform: scale(var(--gw-scale));
-  transform-origin: center;
-}
-
-/* The two things the landing plate does that a wordmark must not: answer a
-   press it cannot service, and drift its hue in the corner of the eye on
-   every page of the shop. */
-.gw-enter-bar:active {
-  transform: scale(var(--gw-scale));
-}
-
-.gw-enter-bar .gw-badge {
-  animation: none;
+/* The header rule, same weight as `.vv-footer-rule`. D asked for a line under
+   the shop nav once the street sign left — without it the Home/Products row
+   floated on open paper and the footer was the only edge the page had. Full
+   bleed, not guttered: the footer rule is inset on a padded container; this
+   one closes the chrome band itself. */
+.vv-paper-nav {
+  box-shadow: inset 0 -1px 0 0 #000;
 }
 
 @keyframes gwDrift {
