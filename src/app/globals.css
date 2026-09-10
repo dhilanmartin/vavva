@@ -573,11 +573,10 @@ p {
     color: var(--red);
   }
 
-  /* Nav link states. Rest black / none, hover Vavva red + underline
-     (type and rule). Named at both ends so a current-page underline
-     (Products, always on in PaperNav) turns red under the pointer and
-     returns to ink via currentColor when it leaves — not a stale hover
-     colour. --red is the brush/favicon accent, #b32622. */
+  /* Nav link states. Rest black / no underline. Hover Vavva red + underline.
+     Current page is no longer forced-underlined (D, 2026-09-10) — the mark
+     in the middle carries the page, and a permanent underline on Products
+     fought the hover. --red is the brush/favicon accent, #b32622. */
   .nav-link:hover {
     color: var(--red);
     text-decoration-line: underline;
@@ -2059,8 +2058,20 @@ html.intro-js .scroll-reveal.reveal-stagger {
   padding-top: 16px;
 }
 
-/* `.vv-shop-title` kept for any interior page that still wants a visible
-   heading; the catalogue no longer mounts it. */
+/* The catalogue's title mark, in the header (PaperNav). Same 32px serif that
+   used to sit under the rule as a page h1 — now the house name, Vavva. */
+.vv-shop-mark {
+  font-family: var(--font-serif);
+  font-weight: 520;
+  font-size: 32px;
+  line-height: 36px;
+  letter-spacing: -0.022em;
+  color: #000;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Kept for any interior page that still wants a body heading. */
 .vv-shop-title {
   font-family: var(--font-serif);
   font-weight: 520;
@@ -2908,10 +2919,10 @@ html:has(.home-stage) footer {
   width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   /* End padding clears the 36px dismiss + 12px inset + 24px between
-     targets. Start stays 24. Symmetric 48px still let "Follow Us" sit
-     9px from the X on a 375px bar. */
+     targets. Start clears the Shop link the same way (24px inset + ~48px
+     label + gap) so the centred news cannot run under it on a phone. */
   padding-block: 12px;
-  padding-inline-start: 24px;
+  padding-inline-start: 88px;
   padding-inline-end: 72px;
   background-color: #fff;
   color: #000;
@@ -3159,6 +3170,79 @@ html.intro-go .vv-announce {
   max-width: 1200px;
   margin: 0 auto;
   font-weight: 500;
+}
+
+/* Shop, top left of the home bar — same face as PaperNav's side links so
+   the word is one language across the site. Absolute like the dismiss, so
+   the news line stays centred on the full bar. End padding already clears
+   the X; start padding now clears this. */
+.vv-announce-shop {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 24px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: translateY(-50%);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vv-announce-shop::after {
+  content: "";
+  position: absolute;
+  inset: -4px -8px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vv-announce-shop:hover {
+    color: var(--red);
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+  }
+}
+
+.vv-announce-shop:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-announce-shop:active {
+    transform: translateY(-50%);
+  }
+}
+
+/* After dismiss: news and X are gone, Shop stays. Same 43px row so the
+   artwork does not jump; start padding relaxes because there is nothing
+   centred to clear. */
+.vv-announce--nav-only {
+  padding-inline: 24px;
+  text-align: start;
+}
+
+.vv-announce--nav-only .vv-announce-shop {
+  position: static;
+  transform: none;
+}
+
+.vv-announce--nav-only .vv-announce-shop:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vv-announce--nav-only .vv-announce-shop:active {
+    transform: none;
+  }
 }
 
 .vv-announce-link {

@@ -13,8 +13,10 @@ export function PaperNav() {
   if (pathname === "/") return null;
 
   const onProduct = pathname.startsWith("/products/");
+  const onShop = pathname.startsWith("/products");
   const backHref = onProduct ? "/products" : "/";
   const backLabel = onProduct ? "Back" : "Home";
+  const shopHref = destinationHref("/products");
 
   return (
     <header className="vv-paper-nav relative z-20 bg-[var(--paper)]">
@@ -25,10 +27,19 @@ export function PaperNav() {
         <Link href={backHref} className={LINK}>
           {backLabel}
         </Link>
+        {/* House name in the middle — Balenciaga puts the brand here.
+            Absolute so Home/Back vs Products of unequal width cannot pull
+            it off centre. */}
+        <span
+          aria-hidden="true"
+          className="vv-shop-mark absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        >
+          Vavva
+        </span>
         <Link
-          href={destinationHref("/products")}
-          aria-current={pathname.startsWith("/products") ? "page" : undefined}
-          className={`${LINK} underline`}
+          href={shopHref}
+          aria-current={onShop ? "page" : undefined}
+          className={LINK}
         >
           Products
         </Link>
