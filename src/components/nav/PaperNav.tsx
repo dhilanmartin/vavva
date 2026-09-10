@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ComingSoon } from "@/components/glitch/ComingSoon";
 import { destinationHref } from "@/lib/site";
 
 const LINK =
@@ -25,17 +26,25 @@ export function PaperNav() {
         <Link href={backHref} className={LINK}>
           {backLabel}
         </Link>
-        {/* THE PLATE IS NOT IN HERE ANY MORE, 2026-09-09, and it is worth
-            saying why rather than leaving a gap where it stood. It was a
-            scaled copy of the landing sign, centred between these two links,
-            and it announced "Coming Soon" over a catalogue that by then also
-            blurred every photograph and disabled every Add to cart. Three
-            statements of one fact, and the nav's was the weakest of them:
-            chrome that repeats what the page already says is decoration.
+        {/* THE HOUSE'S MARK, centred between the two links — a 32px scaled
+            render of the landing plate (ComingSoon.tsx), static and not a
+            link.
 
-            The message now lives in the one place a visitor actually reaches
-            for it — the CTA on the product page (ShopPdp.tsx). This row is
-            navigation again, which is all a nav owes anyone. */}
+            IT SAYS VAVVA, and that word is the entire difference between this
+            and the version that was removed hours earlier. That one read
+            COMING SOON over a catalogue that also blurred every photograph
+            and disabled every Add to cart: chrome repeating what the page
+            already said twice. A wordmark repeats nothing. It is the one
+            thing a header is actually for, and it is the reason this row can
+            centre something at all — Home and Products are wayfinding, and
+            what belongs between them is whose shop this is.
+
+            It is absolutely positioned so it centres on the NAV, not on the
+            gap between two links of unequal width (Back is 45px, Products is
+            82px — flex would sit it 18px right of centre). */}
+        <span className="gw-nav-slot absolute left-1/2 top-1/2">
+          <ComingSoon size="bar" word="Vavva" />
+        </span>
         <Link
           href={destinationHref("/products")}
           aria-current={pathname.startsWith("/products") ? "page" : undefined}

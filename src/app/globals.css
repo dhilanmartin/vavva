@@ -2693,15 +2693,73 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
   transform: scale(0.98);
 }
 
-/* THE SHOP-NAV COPY OF THIS PLATE IS GONE, 2026-09-09, and with it
-   `.gw-nav-slot`, `.gw-enter-bar`, the `casa-sign` view-transition pairing
-   and the `experimental.viewTransition` flag in next.config.ts. It existed
-   for one afternoon: a 32px scaled render of the sign, centred in the shop
-   nav, morphing in from the landing. It came out because the shop had by
-   then grown three ways of saying the same thing, and chrome that repeats
-   the page is decoration. ComingSoon.tsx carries the full argument; git
-   carries the geometry, which was sound and is worth re-reading rather than
-   re-deriving if a second instance is ever wanted. */
+/* ---- the shop-nav plate (PaperNav.tsx) -----------------------------------
+
+   The landing sign at 32px, and the only thing this block does is SCALE it.
+   Type, insets, keyline, radius and shadow all come from `.gw-badge` and
+   ComingSoon's own TEXT/PANEL classes, untouched, so the nav plate is
+   literally the same object seen from further away.
+
+   THAT IS THE WHOLE LESSON OF THE FIRST ATTEMPT, which set an 8px legend,
+   3px insets and a 1px keyline as three independent decisions. Every one of
+   them was a defensible number and the result was not a smaller sign, it was
+   a different sign wearing the same green — highway signs are read as a set
+   of ratios, and retuning any of them individually breaks all of them. If
+   this needs to change size again, change `--gw-target` and nothing else.
+
+   32px IS PINNED FROM BOTH ENDS rather than picked. The floor is the legend:
+   scaling to the nav's 20px line-height took the 24px legend to 7.9px, and
+   text under ~12px stops being read and becomes a texture — on a sign, whose
+   entire subject is legibility, that is the one thing it cannot be. A 12px
+   legend forces 61 * (12/24) = 30.5px. The ceiling is the bar: a centred
+   object taking more than half a 64px nav stops reading as an item in the
+   row and starts reading as the row, which caps it at 32. Those leave one
+   number, and it is also the ordinary small-control height and 1.6x the
+   20px line box.
+
+   `--gw-plate` IS THE MEASURED BADGE, not the arithmetic one. 18 + 14 + 14
+   predicts 46px on mobile and the box is 52px, because the negative insets
+   size from a text CELL whose height is the font's line box rather than its
+   em. Measure it after any type change; do not re-derive it.
+
+   THE SLOT SCALES ITSELF AND HOLDS NO WIDTH. The first version set an
+   explicit width per breakpoint, computed from the string "Coming Soon" —
+   which meant the legend could not be reworded without re-measuring the
+   nav, and it was reworded to "Vavva" the same day. Since the slot is out of
+   flow its width never pushes the links either side, and scaling about the
+   centre leaves the centre where it was, so sizing to content is both
+   simpler and correct at any legend length. */
+.gw-nav-slot {
+  --gw-plate: 52px;
+  --gw-target: 32px;
+  --gw-scale: calc(var(--gw-target) / var(--gw-plate));
+  width: max-content;
+  /* Centring and scale in ONE transform. Tailwind's `-translate-x-1/2`
+     utilities would occupy this property and the scale would silently
+     replace them. */
+  transform: translate(-50%, -50%) scale(var(--gw-scale));
+}
+
+@media (min-width: 810px) {
+  .gw-nav-slot {
+    --gw-plate: 61px;
+  }
+}
+
+.gw-enter-bar {
+  cursor: default;
+}
+
+/* The two things the landing plate does that a wordmark must not: answer a
+   press it cannot service, and drift its hue in the corner of the eye on
+   every page of the shop. */
+.gw-enter-bar:active {
+  transform: none;
+}
+
+.gw-enter-bar .gw-badge {
+  animation: none;
+}
 
 @keyframes gwDrift {
   0%,
