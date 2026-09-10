@@ -176,14 +176,14 @@ const PRODUCTS = [
    Track the column count, never the product count: the moment this is the
    length of PRODUCTS it is not a first row any more, it is a preload of the
    catalogue wearing a first row's name. */
-const EAGER_TILES = 3;
+const EAGER_TILES = 4;
 
 export function ProductGrid() {
-  // 2-col on the phone, 3-col from tablet up. Four columns is Balenciaga's
-  // move and it wants a denser catalogue. Drop the 560 cap so desktop uses
-  // `--shop`.
+  // 2 / 3 / 4. Four at desktop is the Balenciaga collection crop D asked
+  // for 2026-09-10 — denser, edge-aligned under the header rule. Five SKUs
+  // leave a short last row; that is a catalogue of five, not a bug.
   return (
-    <div className="grid grid-cols-2 gap-x-[5px] gap-y-10 tablet:grid-cols-3 desktop:gap-y-[30px]">
+    <div className="grid grid-cols-2 gap-x-[5px] gap-y-10 tablet:grid-cols-3 desktop:grid-cols-4 desktop:gap-y-[30px]">
       {PRODUCTS.map((product, i) => (
         <ProductTile
           key={product.name}

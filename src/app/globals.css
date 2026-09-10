@@ -2047,10 +2047,20 @@ html.intro-js .scroll-reveal.reveal-stagger {
   margin-inline: auto;
 }
 
-/* The catalogue's page title. Serif, centred, 32px — the house's interior
-   heading size. Restored 2026-09-09 after a pass that hid it behind the
-   street-sign masthead; the sign is landing-only again, so this heading is
-   what names the page. */
+/* Catalogue crop, Balenciaga-shaped 2026-09-10. The listing is not a
+   titled article — it is photographs under a rule. `.vv-shop` (1080) stays
+   for the PDP; the grid runs to the same 24px gutter the header already
+   uses so the first row's outer edges line up with Home / Products. */
+.vv-shop-bleed {
+  width: 100%;
+  margin-inline: auto;
+  /* 16px under the header rule — the reference's measured breath between
+     the bottom hairline and the top of the first image row. */
+  padding-top: 16px;
+}
+
+/* `.vv-shop-title` kept for any interior page that still wants a visible
+   heading; the catalogue no longer mounts it. */
 .vv-shop-title {
   font-family: var(--font-serif);
   font-weight: 520;

@@ -51,24 +51,16 @@ import Link from "next/link";
 // Every column width the grid can actually produce, so the browser picks
 // from the generated srcset instead of assuming 100vw.
 //
-// Re-derived 2026-09-09; the previous string and its comment described a
-// 1710px container, 4 columns and 6-at-desktop, none of which this grid has.
-// The container is `--shop` (1080px) with 24px of padding inside it, so
-// content tops out at 1032px, and the grid is 2 columns below 810px and 3
-// from there up — it never reaches 4.
+// Re-derived 2026-09-10 for the Balenciaga crop: bleed grid (24px gutter,
+// no `--shop` cap), 2 / 3 / 4 columns.
 //
-//   vw < 810     2 cols, (vw - 48 - 5) / 2      ~= 50vw
-//   810..1079    3 cols, (vw - 48 - 10) / 3     ~= 33vw
-//   vw >= 1080   container capped, (1032 - 10) / 3 = 341px, fixed
+//   vw < 810      2 cols, (vw - 48 - 5) / 2       ~= 50vw
+//   810..1199     3 cols, (vw - 48 - 10) / 3      ~= 33vw
+//   vw >= 1200    4 cols, (vw - 48 - 15) / 4      ~= 25vw
 //
-// The breakpoint for the fixed value is 1080 (where `--shop` caps), not the
-// 1200 `desktop:` line it used to carry — between those two the old string
-// asked for up to 396px for a 341px cell.
-//
-// Largely academic in practice: the sources are 480px wide, so Next caps the
-// candidate list there and most of these land on the same file. It exists so
-// a phone does not reach for the widest candidate on principle.
-const SIZES = "(min-width: 1080px) 341px, (min-width: 810px) 33vw, 50vw";
+// Sources are 480px wide, so Next caps the candidate list there. This exists
+// so a phone does not reach for the widest file on principle.
+const SIZES = "(min-width: 1200px) 25vw, (min-width: 810px) 33vw, 50vw";
 
 export function ProductTile({
   name,
