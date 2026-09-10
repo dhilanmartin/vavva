@@ -300,8 +300,8 @@ html.intro-go .home-rise {
 }
 
 /* Orphan control on paragraphs. `pretty` keeps the last line from collapsing
-   to a stub. `balance` belongs on short headings (`.vv-shop-title`,
-   `.vv-pdp-title`), not on body copy — it evened out whole blocks. */
+   to a stub. `balance` belongs on short headings (`.vv-pdp-title`), not on
+   body copy — it evened out whole blocks. */
 p {
   text-wrap: pretty;
 }
@@ -2047,16 +2047,11 @@ html.intro-js .scroll-reveal.reveal-stagger {
   margin-inline: auto;
 }
 
-.vv-shop-title {
-  font-family: var(--font-serif);
-  font-weight: 520;
-  font-size: 32px;
-  line-height: 36px;
-  letter-spacing: -0.022em;
-  color: #000;
-  text-align: center;
-  text-wrap: balance;
-}
+/* `.vv-shop-title` is gone with the visible "Products" heading, 2026-09-09 —
+   the catalogue's masthead is the sign now (`.gw-mark-slot` below, argued in
+   products/page.tsx) and the h1 it styled is `sr-only`. The rule was left
+   behind for one commit styling nothing; if a shop heading ever comes back it
+   should be written against whatever it then has to sit with. */
 
 /* ---- product page (Silk Mask, 2026-09-08) --------------------------------
 
@@ -2722,39 +2717,64 @@ html.intro-js .reveal-stagger.is-visible .vv-product {
    size from a text CELL whose height is the font's line box rather than its
    em. Measure it after any type change; do not re-derive it.
 
-   THE SLOT SCALES ITSELF AND HOLDS NO WIDTH. The first version set an
-   explicit width per breakpoint, computed from the string "Coming Soon" —
-   which meant the legend could not be reworded without re-measuring the
-   nav, and it was reworded to "Vavva" the same day. Since the slot is out of
-   flow its width never pushes the links either side, and scaling about the
-   centre leaves the centre where it was, so sizing to content is both
-   simpler and correct at any legend length. */
-.gw-nav-slot {
+   NEITHER SLOT HOLDS A WIDTH. The first version set an explicit width per
+   breakpoint, computed from the string "Coming Soon" — so the legend could
+   not be reworded without re-measuring the nav, and it was reworded to
+   "Vavva" the same day. Scaling about the centre leaves the centre where it
+   was, so both slots simply centre the host box and let the plate overflow
+   it symmetrically, which is correct at any legend length.
+
+   TWO SIZES, ONE MECHANISM. `--gw-target` is the only thing that differs:
+   52px in the catalogue's own band, where its heading used to be, and 32px
+   in the nav row everywhere else. The mark recedes into chrome as you go
+   further into the shop. Everything else — the plate, the scale arithmetic,
+   the static-ness — is shared, so there is still exactly one sign in this
+   codebase and it is still never restyled, only resized. */
+.gw-nav-slot,
+.gw-mark-slot {
   --gw-plate: 52px;
-  --gw-target: 32px;
   --gw-scale: calc(var(--gw-target) / var(--gw-plate));
-  width: max-content;
-  /* Centring and scale in ONE transform. Tailwind's `-translate-x-1/2`
-     utilities would occupy this property and the scale would silently
-     replace them. */
-  transform: translate(-50%, -50%) scale(var(--gw-scale));
 }
 
 @media (min-width: 810px) {
-  .gw-nav-slot {
+  .gw-nav-slot,
+  .gw-mark-slot {
     --gw-plate: 61px;
   }
 }
 
+.gw-nav-slot {
+  --gw-target: 32px;
+  width: max-content;
+  /* Centres the HOST box on the nav's midpoint; the plate is centred on the
+     host, so the plate lands on the midpoint too. Out of flow, so its width
+     never pushes the links either side. */
+  transform: translate(-50%, -50%);
+}
+
+/* The catalogue's masthead. In flow, so it reserves the 52px it occupies —
+   the scaled plate overflows this box by a few pixels top and bottom, which
+   is harmless in a band with margins on both sides and is the price of not
+   hard-coding the plate's own dimensions here. */
+.gw-mark-slot {
+  --gw-target: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--gw-target);
+}
+
 .gw-enter-bar {
   cursor: default;
+  transform: scale(var(--gw-scale));
+  transform-origin: center;
 }
 
 /* The two things the landing plate does that a wordmark must not: answer a
    press it cannot service, and drift its hue in the corner of the eye on
    every page of the shop. */
 .gw-enter-bar:active {
-  transform: none;
+  transform: scale(var(--gw-scale));
 }
 
 .gw-enter-bar .gw-badge {

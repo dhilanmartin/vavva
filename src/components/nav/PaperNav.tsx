@@ -17,6 +17,12 @@ export function PaperNav() {
   const backHref = onProduct ? "/products" : "/";
   const backLabel = onProduct ? "Back" : "Home";
 
+  /* The catalogue stands the mark up at 52px in its own band, where its
+     heading used to be (products/page.tsx), so a second copy in this row
+     would be the same object twice on one screen. Every other interior route
+     keeps it here, small, as chrome. */
+  const markInPage = pathname === "/products";
+
   return (
     <header className="vv-paper-nav relative z-20 bg-[var(--paper)]">
       <nav
@@ -42,9 +48,11 @@ export function PaperNav() {
             It is absolutely positioned so it centres on the NAV, not on the
             gap between two links of unequal width (Back is 45px, Products is
             82px — flex would sit it 18px right of centre). */}
-        <span className="gw-nav-slot absolute left-1/2 top-1/2">
-          <ComingSoon size="bar" word="Vavva" />
-        </span>
+        {markInPage ? null : (
+          <span className="gw-nav-slot absolute left-1/2 top-1/2">
+            <ComingSoon size="bar" word="Vavva" />
+          </span>
+        )}
         <Link
           href={destinationHref("/products")}
           aria-current={pathname.startsWith("/products") ? "page" : undefined}

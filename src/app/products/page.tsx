@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ComingSoon } from "@/components/glitch/ComingSoon";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ScrollReveal } from "@/components/reveal/ScrollReveal";
 import { isRouteLive } from "@/lib/site";
@@ -83,10 +84,41 @@ export default function ProductsPage() {
             Contact) rather than restarting, which is the same thing the
             landing's one paragraph does at index 3. The page reads as one
             cascade from the top of the window down, not as two competing
-            ones. */}
-        <h1 className="vv-shop-title home-rise" style={{ ["--i" as string]: 3 }}>
-          Products
-        </h1>
+            ones.
+
+            WHAT RISES IS NOW THE PLATE, not the word. See below. */}
+
+        {/* THE HEADING IS THE SIGN, 2026-09-09. D: "it still looks full / too
+            minimal at the same time... removing the Products text... the
+            vavva logo should be a little bigger / more pronounced."
+
+            Both halves of that are one problem. The top of this page carried
+            TWO centred objects forty pixels apart — a 32px Vavva plate in the
+            nav row and a 32px serif "Products" under it — competing for the
+            same job, which is what read as full. And the page said "Products"
+            three times above the fold (nav link, this heading, footer link)
+            and "Vavva" twice, so once the repetition is discounted there is
+            almost no page left, which is what read as minimal. One object,
+            said once, fixes both.
+
+            The plate wins that contest and the word loses it, because the
+            word is the one the nav already said. PaperNav.tsx drops its
+            inline copy on THIS ROUTE ONLY and the plate stands up to 52px
+            here; on a product page it stays 32px in the nav row, so the mark
+            recedes into chrome as you go further in.
+
+            THE <h1> IS STILL HERE, `sr-only`. It is the document's heading
+            and its search result, and neither of those is served by a green
+            rectangle — the plate is `aria-hidden` (ComingSoon.tsx), so with
+            the heading gone outright this page would have had no h1 at all.
+            Same arrangement as the landing (page.tsx:114). */}
+        <h1 className="sr-only">Products</h1>
+        <div
+          className="gw-mark-slot home-rise"
+          style={{ ["--i" as string]: 3 }}
+        >
+          <ComingSoon size="bar" word="Vavva" />
+        </div>
         {/* `reveal-stagger` moves the entrance off this wrapper and onto the
             tiles, 50ms apart — see globals.css. The wrapper still owns the
             observer and the intro-js gate.
